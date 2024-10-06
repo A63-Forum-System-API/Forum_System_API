@@ -233,3 +233,6 @@ fabric.properties
 
 # Ignore .vscode folder
 .vscode/
+
+# Ignore the .sql schema
+forum_system_structure.sql
