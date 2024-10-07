@@ -236,3 +236,6 @@ fabric.properties
 
 # Ignore the .sql schema
 forum_system_structure.sql
+
+# Ignore db credentials
+db_credentials.py
