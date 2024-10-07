@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing_extensions import Optional
 
 
-class Topic(BaseModel):
+class Reply(BaseModel):
     id: Optional[int]
     content: str
     is_best_reply: bool = False
