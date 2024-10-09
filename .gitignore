@@ -235,7 +235,7 @@ fabric.properties
 .vscode/
 
 # Ignore the .sql schema
-forum_system_structure.sql
+forum_system_schema.sql.sql
 
 # Ignore db credentials
 db_credentials.py
