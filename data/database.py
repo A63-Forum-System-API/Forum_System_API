@@ -2,8 +2,8 @@ import os
 from mariadb import connect
 from mariadb.connections import Connection
 
-# from dotenv import load_dotenv
-# load_dotenv() if there is a problem
+from dotenv import load_dotenv
+load_dotenv() #if there is a problem
 
 
 def _get_connection() -> Connection:
@@ -11,7 +11,7 @@ def _get_connection() -> Connection:
         user=os.getenv('DB_USER'),
         password=os.getenv('DB_PASSWORD'),
         host=os.getenv('DB_HOST'),
-        port=os.getenv('DB_PORT'),
+        port=int(os.getenv('DB_PORT')),
         database=os.getenv('DB_NAME')
     )
 
