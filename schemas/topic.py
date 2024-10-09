@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing_extensions import Optional
+from typing import Optional
 
 
 class Topic(BaseModel):
