@@ -5,27 +5,28 @@ from services import category_service, topic_service
 
 topics_router = APIRouter(prefix='/topics')
 
-#
-# @topics_router.get('/')
-# def get_all_topics(
-#     sort: str | None = None,
-#     search: str | None = None,
-#     category_id: int | None = None,
-#     author_id: int | None = None,
-#     status: int | None = None
-# ):
-#
-#     # sorting by created_at
-#     # filter by category_id, author_id, is_locked
-#     # search by name
-#
-#     topics = topic_service.get_all_topics(sort, search, category_id, author_id, status)
-#
-#     if sort and (sort == 'asc' or sort == 'desc'):
-#         return topic_service.sort_topics(topics, reverse=sort == 'desc')
-#     else:
-#         return topics
 
+@topics_router.get('/')
+def get_all_topics(
+    sort: str | None = None,
+    search: str | None = None,
+    category_id: int | None = None,
+    author_id: int | None = None,
+    is_locked: str | None = None,
+    limit: int = 10,
+    offset: int = 0,
+):
+
+    # sorting by created_at
+    # filter by category_id, author_id, is_locked
+    # search by name
+
+    topics = topic_service.get_all_topics(search, category_id, author_id, is_locked, limit, offset)
+
+    if sort and (sort == 'asc' or sort == 'desc'):
+        return sorted(topics, key=lambda t: t.created_at, reverse=sort == 'desc')
+    else:
+        return topics
 
 # @topics_router.get('/{id}')
 # def get_topic_by_id(id: int):
