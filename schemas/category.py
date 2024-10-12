@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-from schemas.topic import Topic
+from schemas.topic import TopicsView
 from typing import Optional
 
 
@@ -28,7 +28,7 @@ class Category(BaseModel):
 
 class SingleCategory(BaseModel):
     category: Category
-    topics: list[Topic]
+    topics: list[TopicsView]
 
 
 class ViewAllCategories(BaseModel):

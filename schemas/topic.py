@@ -16,25 +16,23 @@ class TopicBase(BaseModel):
 
 class TopicsView(TopicBase):
     created_at: datetime
-    replies_count: int
     author_id: int
 
     class Config:
         fields = {'id': 0, 'title': 1, 'is_locked': 2, 'created_at': 3,
-                  'category_id': 4, 'author_id': 5, 'replies_count': 6}
+                  'category_id': 4, 'author_id': 5}
 
 class TopicView(TopicBase):
     content: str
     created_at: datetime
     best_reply_id: Optional[int]
-    replies_count: int
     all_replies: list[Reply]
     author_id: int
 
     class Config:
         fields = {'id': 0, 'title': 1, 'content': 2, 'is_locked': 3,
                   'created_at': 4, 'category_id': 5, 'author_id': 6,
-                  'best_reply_id': 7, 'replies_count': 8, 'all_replies': 9}
+                  'best_reply_id': 7, 'all_replies': 8}
 
 
 class TopicCreate(TopicBase):
