@@ -1,5 +1,6 @@
 from data.database import insert_query, read_query
-from schemas.topic import TopicCreate, TopicsView
+from schemas.reply import Reply
+from schemas.topic import TopicCreate, TopicsView, TopicView
 
 
 def get_all_topics(search: str, category_id: int,
@@ -34,6 +35,44 @@ def get_all_topics(search: str, category_id: int,
             category_id=category_id,
             author_id=author_id,
         ) for id, title, is_locked, created_at, category_id, author_id in topics]
+
+
+def get_by_id(topic_id: int):
+    query = """SELECT id, title, content, is_locked, 
+                created_at, category_id, author_id, best_reply_id 
+                FROM topics WHERE id = ?"""
+
+    topic = read_query(query, (topic_id,))
+    replies = get_all_replies(topic_id)
+
+    return (TopicView(
+        id=id,
+        title=title,
+        content=content,
+        is_locked=is_locked,
+        created_at=created_at,
+        category_id=category_id,
+        author_id=author_id,
+        best_reply_id=best_reply_id,
+        all_replies=replies
+    ) for id, title, content, is_locked, created_at, category_id,
+        author_id, best_reply_id  in topic) if topic else None
+
+
+def get_all_replies(topic_id: int):
+    query = """SELECT id, content, created_at, topic_id, author_id FROM replies WHERE topic_id = ?"""
+
+    replies = read_query(query, (topic_id,))
+
+    return [Reply(
+        id=id,
+        content=content,
+        created_at=created_at,
+        topic_id=topic_id,
+        author_id=author_id
+    ) for id, content, created_at, topic_id, author_id in replies]
+
+
 
 
 def create(topic: TopicCreate):

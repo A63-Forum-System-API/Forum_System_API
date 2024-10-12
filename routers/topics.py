@@ -17,10 +17,6 @@ def get_all_topics(
     offset: int = 0,
 ):
 
-    # sorting by created_at
-    # filter by category_id, author_id, is_locked
-    # search by name
-
     topics = topic_service.get_all_topics(search, category_id, author_id, is_locked, limit, offset)
 
     if sort and (sort == 'asc' or sort == 'desc'):
@@ -28,14 +24,14 @@ def get_all_topics(
     else:
         return topics
 
-# @topics_router.get('/{id}')
-# def get_topic_by_id(id: int):
-#     topic = topic_service.get_by_id(id)
-#
-#     if topic is None:
-#         return Response(content=f"No topic with ID {id} found", status_code=404)
-#     else:
-#         return topic
+@topics_router.get('/{id}')
+def get_topic_by_id(id: int):
+    topic = topic_service.get_by_id(id)
+
+    if topic is None:
+        return Response(content=f"No topic with ID {id} found", status_code=404)
+    else:
+        return topic
 
 
 @topics_router.post('/', status_code=201)
