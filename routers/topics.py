@@ -39,7 +39,13 @@ topics_router = APIRouter(prefix='/topics')
 
 @topics_router.post('/', status_code=201)
 def create_topic(topic: TopicCreate):
+    if topic.is_locked not in ['locked', 'not locked']:
+        return Response(
+            content="Parameter is_locked must be either 'locked' or 'not_locked'",
+            status_code=400)
+
     return topic_service.create(topic)
+
 #
 # @topics_router.put('/{id}')
 # def lock_topic(id: int):
