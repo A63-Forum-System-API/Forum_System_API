@@ -30,7 +30,7 @@ def get_all_topics(search: str, category_id: int,
         TopicsView(
             id=id,
             title=title,
-            is_locked=is_locked,
+            is_locked='locked' if is_locked else 'not locked',
             created_at=created_at,
             category_id=category_id,
             author_id=author_id,
@@ -38,41 +38,48 @@ def get_all_topics(search: str, category_id: int,
 
 
 def get_by_id(topic_id: int):
-    query = """SELECT id, title, content, is_locked, 
-                created_at, category_id, author_id, best_reply_id 
-                FROM topics WHERE id = ?"""
+    query = """SELECT t.*, r.*
+                FROM topics t
+                LEFT JOIN replies r ON t.id = r.topic_id
+                WHERE t.id = ?"""
 
-    topic = read_query(query, (topic_id,))
-    replies = get_all_replies(topic_id)
+    data = read_query(query, (topic_id,))
 
-    return (TopicView(
-        id=id,
-        title=title,
-        content=content,
-        is_locked=is_locked,
-        created_at=created_at,
-        category_id=category_id,
-        author_id=author_id,
-        best_reply_id=best_reply_id,
-        all_replies=replies
-    ) for id, title, content, is_locked, created_at, category_id,
-        author_id, best_reply_id  in topic) if topic else None
+    topic = parse_topic_data(data[0])
+    replies = parse_replies_data(data)
 
+    if not topic:
+        return None
 
-def get_all_replies(topic_id: int):
-    query = """SELECT id, content, created_at, topic_id, author_id FROM replies WHERE topic_id = ?"""
+    return TopicView(**topic, all_replies=replies)
 
-    replies = read_query(query, (topic_id,))
+def parse_topic_data(data):
+    id, title, content, is_locked, created_at, category_id, author_id, best_reply_id = data[:8]
+    return {
+        'id': id,
+        'title': title,
+        'content': content,
+        'is_locked': 'locked' if is_locked else 'not locked',
+        'created_at': created_at,
+        'category_id': category_id,
+        'author_id': author_id,
+        'best_reply_id': best_reply_id,
+    }
 
-    return [Reply(
+def parse_replies_data(data):
+    replies = []
+    for row in data:
+        if row[8]:
+            id, content, topic_id, created_at, author_id = row[8:13]
+            reply = Reply(
         id=id,
         content=content,
         created_at=created_at,
         topic_id=topic_id,
-        author_id=author_id
-    ) for id, content, created_at, topic_id, author_id in replies]
+        author_id=author_id)
+            replies.append(reply)
 
-
+    return replies
 
 
 def create(topic: TopicCreate):
