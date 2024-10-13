@@ -1,27 +1,35 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
+from schemas.reply import Reply
 
-class Topic(BaseModel):
-    id: Optional[int]
+
+class TopicBase(BaseModel):
+    id: Optional[int] = None
     title: str
-    content: str
-    is_locked: bool = False
-    created_at: datetime = datetime.now()
+    is_locked: bool | str
     category_id: int
+
+
+class TopicsView(TopicBase):
+    created_at: datetime
+    author_id: int
+
+
+class TopicView(TopicBase):
+    content: str
+    created_at: datetime
     author_id: int
     best_reply_id: Optional[int]
+    all_replies: list[Reply]
 
-    @classmethod
-    def from_query_result(cls, id, content,
-                          is_locked, created_at, category_id,
-                          author_id, best_reply_id):
-        return cls(id=id,
-                   content=content,
-                   is_locked=is_locked,
-                   created_at=created_at,
-                   category_id=category_id,
-                   author_id=author_id,
-                   best_reply_id=best_reply_id)
+
+class TopicCreate(TopicBase):
+    content: str
+    is_locked: str = "not locked"
+
+
+class TopicUpdate(BaseModel):
+    is_locked: bool
 

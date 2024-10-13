@@ -1,6 +1,6 @@
 from data.database import insert_query, read_query
 from schemas.category import Category, ViewAllCategories
-from schemas.topic import Topic
+from schemas.topic import TopicsView
 
 
 
@@ -52,7 +52,7 @@ def get_by_id(id: int):
     return category
 
 
-def get_category_topics(id: int) -> list[Topic]:
+def get_category_topics(id: int) -> list[TopicsView]:
     data = read_query(
         """SELECT t.id, t.title, t.content, t.is_locked, t.created_at, t.author_id, br.reply_id
             FROM topics t
