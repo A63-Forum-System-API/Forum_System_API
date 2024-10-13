@@ -15,12 +15,30 @@ def get_all_categories(
     limit: int = 10,
     offset: int = 0
 ):
-    categories = category_service.get_categories(search, limit, offset)
+    # validation
+    if not sort in (None, "asc", "desc"):
+        return Response(
+            content=f"Invalid value for sort: {sort}. Valid values are: asc, desc", 
+            status_code=400,
+            )
+    if sort and sort_by not in ("title", "created_at"):
+        return Response(
+            content=f"Invalid value for sort_by: {sort_by}. Valid values are: title, created_at", 
+            status_code=400,
+            )
+    if limit < 1 or limit > 100: # fastapi checks if limit is int
+        return Response(
+            content=f"Invalid value for limit: {limit}. Valid values are: int [1-100]", 
+            status_code=400,
+            )
+    if offset < 0:
+        return Response(
+            content=f"Invalid value for offset: {offset}. Valid values are: int >= 0", 
+            status_code=400,
+            )
 
-    if sort and (sort == 'asc' or sort == 'desc'):
-        return category_service.sort_categories(categories, reverse=sort == 'desc', attribute=sort_by)
-    else:
-        return categories
+    return category_service.get_categories(search, sort, sort_by, limit, offset)
+
 
 
 @categories_router.get('/{id}')
