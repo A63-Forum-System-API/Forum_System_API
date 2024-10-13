@@ -1,7 +1,6 @@
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional
-
 from schemas.reply import Reply
 
 
@@ -28,8 +27,3 @@ class TopicView(TopicBase):
 class TopicCreate(TopicBase):
     content: str
     is_locked: str = "not locked"
-
-
-class TopicUpdate(BaseModel):
-    is_locked: bool
-

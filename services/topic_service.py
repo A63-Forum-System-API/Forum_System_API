@@ -1,4 +1,4 @@
-from data.database import insert_query, read_query
+from data.database import insert_query, read_query, update_query
 from schemas.reply import Reply
 from schemas.topic import TopicCreate, TopicsView, TopicView
 
@@ -96,3 +96,17 @@ def create(topic: TopicCreate):
     topic.id = generated_id
 
     return topic
+
+
+def id_exists(topic_id: int):
+    query = """SELECT 1 FROM topics WHERE id = ?"""
+    result = read_query(query, (topic_id,))
+
+    return len(result) > 0
+
+
+def lock_topic(topic_id: int):
+    query = """UPDATE topics SET is_locked = True WHERE id = ?"""
+    update_query(query, (topic_id,))
+
+    return True

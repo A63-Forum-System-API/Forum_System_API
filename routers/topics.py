@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Response, Body
-from starlette import status
-from schemas.topic import TopicCreate, TopicUpdate
-from services import category_service, topic_service
+from fastapi import APIRouter, Response
+from schemas.topic import TopicCreate
+from services import topic_service
 
 topics_router = APIRouter(prefix='/topics')
 
@@ -43,12 +42,13 @@ def create_topic(topic: TopicCreate):
 
     return topic_service.create(topic)
 
-#
-# @topics_router.put('/{id}')
-# def lock_topic(id: int):
-#     if not topic_service.id_exists(id):
-#         return Response(status_code=404)
-#
-#     topic_service.lock_topic(id)
-#
-#     return {'message': f'Topic locked successfully.'}
+
+@topics_router.put('/{id}')
+def lock_topic(id: int):
+    if not topic_service.id_exists(id):
+        return Response(content=f"No topic with ID {id} found", status_code=404)
+
+    if topic_service.lock_topic(id):
+        return {'message': f'Topic is successfully locked.'}
+    else:
+        return Response(status_code=400)
