@@ -39,8 +39,8 @@ def create(user: UserCreate):
             VALUES(?, ?, ?, ?, ?, ?, ?)
             """
     generated_id = insert_query(query, (user.username, user.first_name,
-                                      user.last_name, user.email, hash_password,
-                                      user.is_admin, user.picture))
+                                        user.last_name, user.email, hash_password,
+                                        user.is_admin, user.picture))
 
     return User(id=generated_id,
                 username=user.username,
@@ -49,4 +49,4 @@ def create(user: UserCreate):
                 email=user.email,
                 is_admin=user.is_admin,
                 picture=user.picture
-    )
+                )
