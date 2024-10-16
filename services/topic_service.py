@@ -82,15 +82,12 @@ def parse_replies_data(data):
     return replies
 
 
-def create(topic: TopicCreate):
+def create(topic: TopicCreate, user_id: int):
     is_locked_bool = True if topic.is_locked == 'locked' else False
-
-    # # TODO take id of user who is logged in
-    author_id = 1
 
     query = """INSERT INTO topics(title, content, is_locked, category_id, author_id)
                 VALUES(?, ?, ?, ?, ?)"""
-    params = [topic.title, topic.content, is_locked_bool, topic.category_id, author_id]
+    params = [topic.title, topic.content, is_locked_bool, topic.category_id, user_id]
 
     generated_id = insert_query(query, params)
     topic.id = generated_id
@@ -106,6 +103,7 @@ def id_exists(topic_id: int):
 
 
 def lock_topic(topic_id: int):
+
     query = """UPDATE topics SET is_locked = True WHERE id = ?"""
     update_query(query, (topic_id,))
 

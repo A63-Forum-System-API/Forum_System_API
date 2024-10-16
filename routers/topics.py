@@ -34,21 +34,22 @@ def get_topic_by_id(id: int):
 
 
 @topics_router.post('/', status_code=201)
-def create_topic(topic: TopicCreate):
+def create_topic(topic: TopicCreate, current_user: UserFromToken = Depends(get_current_user)):
     if topic.is_locked not in ['locked', 'not locked']:
         return Response(
             content="Parameter is_locked must be either 'locked' or 'not_locked'",
             status_code=400)
 
-    return topic_service.create(topic)
+    return topic_service.create(topic, current_user.id)
 
 
 @topics_router.put('/{id}')
-def lock_topic(id: int):
+def lock_topic(id: int, current_user: UserFromToken = Depends(get_current_user)):
     if not topic_service.id_exists(id):
         return Response(content=f"No topic with ID {id} found", status_code=404)
 
+    if not user_service.is_admin(current_user.id):
+        return Response(content="Only admins can lock topics", status_code=403)
+
     if topic_service.lock_topic(id):
         return {'message': f'Topic is successfully locked.'}
-    else:
-        return Response(status_code=400)
