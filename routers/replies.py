@@ -1,10 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.openapi.models import Response
 
+from common.auth import get_current_user
 from schemas.reply import ReplyBase
+from schemas.user import UserFromToken
 from services import topic_service, reply_service
 
 replies_router = APIRouter(prefix='/replies')
+
 
 @replies_router.post('/', status_code=201)
 def create_reply(reply: ReplyBase,

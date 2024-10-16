@@ -1,5 +1,5 @@
 from data.database import insert_query, read_query, update_query
-from schemas.reply import Reply, ReplyBase, ReplyDetailed
+from schemas.reply import ReplyBase, ReplyDetailed
 from schemas.topic import TopicCreate, TopicsView, TopicView
 from services import reply_service
 

@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, Depends
+
+from common.auth import get_current_user
 from schemas.topic import TopicCreate
-from services import topic_service, reply_service
+from schemas.user import UserFromToken
+from services import topic_service, reply_service, user_service
 
 topics_router = APIRouter(prefix='/topics')
 
