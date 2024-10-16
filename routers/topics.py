@@ -25,6 +25,7 @@ def get_all_topics(
     else:
         return topics
 
+
 @topics_router.get('/{topic_id}')
 def get_topic_by_id(topic_id: int):
     topic = topic_service.get_by_id(topic_id)
@@ -60,6 +61,7 @@ def lock_topic(topic_id: int,
     topic_service.lock_topic(topic_id)
     return {'message': f'Topic is successfully locked.'}
 
+
 @topics_router.put('/{topic_id}/replies/{reply_id}')
 def chose_topic_best_reply(topic_id: int,
                            reply_id: int,
@@ -78,6 +80,3 @@ def chose_topic_best_reply(topic_id: int,
 
     return {'message': f'Best reply for topic with ID {topic_id} is now reply with ID {reply_id}.'}
 
-
-
-#

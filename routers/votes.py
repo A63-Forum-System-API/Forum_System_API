@@ -10,7 +10,7 @@ votes_router = APIRouter(prefix='/votes')
 def vote(reply_id: int,
          vote_type: str,
          current_user_id: int = Depends(get_current_user)):
-    vote_int = 1 if vote_type =='upvote' else 0
+    vote_int = 1 if vote_type == 'upvote' else 0
 
     if not reply_service.id_exists(reply_id):
         return Response(content=f"No reply with ID {reply_id} found", status_code=404)
