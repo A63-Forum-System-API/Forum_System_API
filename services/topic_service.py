@@ -1,6 +1,7 @@
 from data.database import insert_query, read_query, update_query
-from schemas.reply import Reply
+from schemas.reply import Reply, ReplyBase, ReplyDetailed
 from schemas.topic import TopicCreate, TopicsView, TopicView
+from services import reply_service
 
 
 def get_all_topics(search: str, category_id: int,
@@ -37,50 +38,53 @@ def get_all_topics(search: str, category_id: int,
         ) for id, title, is_locked, created_at, category_id, author_id in topics]
 
 
-def get_by_id(topic_id: int):
-    query = """SELECT t.*, r.*
-                FROM topics t
-                LEFT JOIN replies r ON t.id = r.topic_id
-                WHERE t.id = ?"""
+def get_topic_with_replies(topic_id: int):
+    query = """
+    SELECT 
+        t.id, t.title, t.content, t.is_locked, t.created_at, t.category_id, t.author_id, t.best_reply_id,
+        r.id as reply_id, r.content as reply_content, r.created_at as reply_created_at, r.author_id as reply_author_id,
+        SUM(CASE 
+                WHEN v.vote_type = True THEN 1 
+                WHEN v.vote_type = False THEN -1 
+                ELSE 0 
+            END) as total_votes
+    FROM topics t
+    LEFT JOIN replies r ON t.id = r.topic_id
+    LEFT JOIN votes v ON r.id = v.reply_id
+    WHERE t.id = ?
+    GROUP BY t.id, r.id
+    """
 
     data = read_query(query, (topic_id,))
 
-    topic = parse_topic_data(data[0])
-    replies = parse_replies_data(data)
-
-    if not topic:
+    if not data:
         return None
 
-    return TopicView(**topic, all_replies=replies)
-
-def parse_topic_data(data):
-    id, title, content, is_locked, created_at, category_id, author_id, best_reply_id = data[:8]
-    return {
-        'id': id,
-        'title': title,
-        'content': content,
-        'is_locked': 'locked' if is_locked else 'not locked',
-        'created_at': created_at,
-        'category_id': category_id,
-        'author_id': author_id,
-        'best_reply_id': best_reply_id,
+    topic_data = data[0]
+    topic = {
+        'id': topic_data[0],
+        'title': topic_data[1],
+        'content': topic_data[2],
+        'is_locked': 'locked' if topic_data[3] else 'not locked',
+        'created_at': topic_data[4],
+        'category_id': topic_data[5],
+        'author_id': topic_data[6],
+        'best_reply_id': topic_data[7],
     }
 
-def parse_replies_data(data):
     replies = []
     for row in data:
         if row[8]:
-            id, content, topic_id, created_at, author_id = row[8:13]
-            reply = Reply(
-        id=id,
-        content=content,
-        created_at=created_at,
-        topic_id=topic_id,
-        author_id=author_id)
-            replies.append(reply)
+            replies.append(ReplyDetailed(
+                id=row[8],
+                content=row[9],
+                created_at=row[10],
+                topic_id=topic_id,
+                author_id=row[11],
+                total_votes=row[12]
+            ))
 
-    return replies
-
+    return TopicView(**topic, all_replies=replies)
 
 def create(topic: TopicCreate, user_id: int):
     is_locked_bool = True if topic.is_locked == 'locked' else False
@@ -89,7 +93,7 @@ def create(topic: TopicCreate, user_id: int):
                 VALUES(?, ?, ?, ?, ?)"""
     params = [topic.title, topic.content, is_locked_bool, topic.category_id, user_id]
 
-    generated_id = insert_query(query, params)
+    generated_id = insert_query(query, (*params,))
     topic.id = generated_id
 
     return topic
