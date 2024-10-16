@@ -43,12 +43,12 @@ def parse_replies_data(data):
             total_votes = votes_data[0][0]
 
             reply = ReplyDetailed(
-        id=id,
-        content=content,
-        created_at=created_at,
-        topic_id=topic_id,
-        author_id=author_id,
-        total_votes=total_votes)
+                    id=id,
+                    content=content,
+                    created_at=created_at,
+                    topic_id=topic_id,
+                    author_id=author_id,
+                    total_votes=total_votes)
             replies.append(reply)
 
     return replies
