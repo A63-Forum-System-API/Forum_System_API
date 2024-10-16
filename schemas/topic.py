@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
-from schemas.reply import Reply
+from schemas.reply import ReplyDetailed
 
 
 class TopicBase(BaseModel):
@@ -21,9 +21,12 @@ class TopicView(TopicBase):
     created_at: datetime
     author_id: int
     best_reply_id: Optional[int]
-    all_replies: list[Reply]
+    all_replies: list[ReplyDetailed]
 
 
-class TopicCreate(TopicBase):
+class TopicCreate(BaseModel):
+    id: Optional[int] = None
+    title: str
     content: str
-    is_locked: str = "not locked"
+    is_locked: bool | str = 'not locked'
+    category_id: int

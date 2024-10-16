@@ -1,5 +1,5 @@
 from data.database import insert_query, read_query, update_query
-from schemas.reply import Reply, ReplyBase, ReplyDetailed
+from schemas.reply import ReplyBase, ReplyDetailed
 from schemas.topic import TopicCreate, TopicsView, TopicView
 from services import reply_service
 
@@ -81,8 +81,7 @@ def get_by_id(topic_id: int):
                 created_at=row[10],
                 topic_id=topic_id,
                 author_id=row[11],
-                total_votes=row[12]
-            ))
+                total_votes=int(row[12])))
 
     return TopicView(**topic, all_replies=replies)
 
@@ -129,3 +128,9 @@ def update_best_reply(topic_id: int, reply_id: int):
                 SET best_reply_id = ? 
                 WHERE id = ?"""
     update_query(query, (reply_id, topic_id))
+
+    query = """UPDATE replies 
+                SET is_best_reply = True 
+                WHERE id = ?"""
+
+    update_query(query, (reply_id,))

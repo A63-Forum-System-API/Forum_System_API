@@ -1,8 +1,8 @@
 import os
 from mariadb import connect
 from mariadb.connections import Connection
-
 from dotenv import load_dotenv
+
 load_dotenv() #if there is a problem
 
 
