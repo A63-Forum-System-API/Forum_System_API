@@ -40,3 +40,11 @@ def update_query(sql, sql_params=()):
         conn.commit()
 
         return True
+
+
+def query_count(sql: str, sql_params=()) -> int:
+    with _get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(sql, sql_params)
+
+        return cursor.fetchone()[0]

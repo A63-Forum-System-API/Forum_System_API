@@ -49,3 +49,12 @@ def get_category_by_id(id: int):
         return Response(content=f"No category with ID {id} found", status_code=404)
     else:
         return category
+    
+
+
+@categories_router.post('/', status_code=201)
+def create_category(category: Category):
+    try:
+        return category_service.create(category)
+    except Exception as e:
+        return Response(content=str(e), status_code=409)
