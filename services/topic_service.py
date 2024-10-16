@@ -96,15 +96,32 @@ def create(topic: TopicCreate, user_id: int):
 
 
 def id_exists(topic_id: int):
-    query = """SELECT 1 FROM topics WHERE id = ?"""
+    query = """SELECT 1 
+                FROM topics 
+                WHERE id = ?"""
     result = read_query(query, (topic_id,))
 
     return len(result) > 0
 
 
 def lock_topic(topic_id: int):
-
-    query = """UPDATE topics SET is_locked = True WHERE id = ?"""
+    query = """UPDATE topics 
+                SET is_locked = True 
+                WHERE id = ?"""
     update_query(query, (topic_id,))
 
-    return True
+
+def validate_topic_author(topic_id: int, user_id: int):
+    query = """SELECT 1 
+                FROM topics 
+                WHERE id = ? AND author_id = ?"""
+    result = read_query(query, (topic_id, user_id))
+
+    return len(result) > 0
+
+
+def update_best_reply(topic_id: int, reply_id: int):
+    query = """UPDATE topics 
+                SET best_reply_id = ? 
+                WHERE id = ?"""
+    update_query(query, (reply_id, topic_id))
