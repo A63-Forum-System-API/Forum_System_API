@@ -2,7 +2,6 @@ from fastapi import APIRouter, Response, Depends
 
 from common.auth import get_current_user
 from schemas.topic import TopicCreate
-from schemas.user import UserFromToken
 from services import topic_service, reply_service, user_service
 
 topics_router = APIRouter(prefix='/topics')
@@ -38,24 +37,24 @@ def get_topic_by_id(topic_id: int):
 
 @topics_router.post('/', status_code=201)
 def create_topic(topic: TopicCreate,
-                 current_user: UserFromToken = Depends(get_current_user)):
+                 current_user_id: int = Depends(get_current_user)):
 
     if topic.is_locked not in ['locked', 'not locked']:
         return Response(
             content="Parameter is_locked must be either 'locked' or 'not_locked'",
             status_code=400)
 
-    return topic_service.create(topic, current_user.id)
+    return topic_service.create(topic, current_user_id)
 
 
 @topics_router.put('/{topic_id}')
 def lock_topic(topic_id: int,
-               current_user: UserFromToken = Depends(get_current_user)):
+               current_user_id: int = Depends(get_current_user)):
 
     if not topic_service.id_exists(topic_id):
         return Response(content=f"No topic with ID {topic_id} found", status_code=404)
 
-    if not user_service.is_admin(current_user.id):
+    if not user_service.is_admin(current_user_id):
         return Response(content="Only admins can lock topics", status_code=403)
 
     topic_service.lock_topic(topic_id)
@@ -64,12 +63,12 @@ def lock_topic(topic_id: int,
 @topics_router.put('/{topic_id}/replies/{reply_id}')
 def chose_topic_best_reply(topic_id: int,
                            reply_id: int,
-                           current_user: UserFromToken = Depends(get_current_user)):
+                           current_user_id: int = Depends(get_current_user)):
 
     if not topic_service.id_exists(topic_id):
         return Response(content=f"No topic with ID {topic_id} found", status_code=404)
 
-    if not topic_service.validate_topic_author(topic_id, current_user.id):
+    if not topic_service.validate_topic_author(topic_id, current_user_id):
         return Response(content=f"Current user is not the author of this topic")
 
     if not reply_service.id_exists(reply_id):

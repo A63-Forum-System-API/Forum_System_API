@@ -14,10 +14,6 @@ class User(BaseModel):
     picture: Optional[str] = None
 
 
-class UserFromToken(BaseModel):
-    id: int
-
-
 class UserCreate(BaseModel):
     username: str
     first_name: str

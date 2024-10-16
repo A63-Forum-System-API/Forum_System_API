@@ -24,6 +24,9 @@ class TopicView(TopicBase):
     all_replies: list[ReplyDetailed]
 
 
-class TopicCreate(TopicBase):
+class TopicCreate(BaseModel):
+    id: Optional[int] = None
+    title: str
     content: str
-    is_locked: str = "not locked"
+    is_locked: bool | str = 'not locked'
+    category_id: int

@@ -10,7 +10,6 @@ class ReplyBase(BaseModel):
 
 
 class ReplyDetailed(ReplyBase):
-    is_best_reply: bool
     created_at: datetime
     author_id: int
     total_votes: int

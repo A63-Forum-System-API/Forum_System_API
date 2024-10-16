@@ -11,7 +11,7 @@ from schemas.token import TokenData
 
 load_dotenv()
 
-_SECRET_KEY = os.getenv('SECRETKEY')
+_SECRET_KEY = os.getenv('SECRET_KEY')
 _ALGORITHM = os.getenv('ALGORITHM')
 _ACCESS_TOKEN_EXPIRE = int(os.getenv('ACCESS_TOKEN_EXPIRE'))
 
@@ -46,19 +46,14 @@ def authenticate_user(
     if not verify_password(password, hash_password):
         return None
 
-    return {'sub': user[0]}
+    return {'user_id': user[0]}
 
 
-def create_access_token(
-        data: dict,
-        expires_delta: timedelta | None = None):
+def create_access_token(data: dict):
 
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=_ACCESS_TOKEN_EXPIRE)
 
+    expire = datetime.now(timezone.utc) + timedelta(minutes=_ACCESS_TOKEN_EXPIRE)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, _SECRET_KEY, algorithm=_ALGORITHM)
 
@@ -73,7 +68,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 
     try:
         payload = jwt.decode(token, _SECRET_KEY, algorithms=[_ALGORITHM])
-        user_identifier: str = payload.get("sub")
+        user_identifier: str = payload.get("user_id")
         if user_identifier is None:
             raise credential_exception
 
