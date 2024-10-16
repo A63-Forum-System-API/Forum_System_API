@@ -20,3 +20,4 @@ def create_reply(reply: ReplyBase,
             status_code=400)
 
     return reply_service.create(reply, current_user.id)
+

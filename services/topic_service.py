@@ -38,7 +38,7 @@ def get_all_topics(search: str, category_id: int,
         ) for id, title, is_locked, created_at, category_id, author_id in topics]
 
 
-def get_topic_with_replies(topic_id: int):
+def get_by_id(topic_id: int):
     query = """
     SELECT 
         t.id, t.title, t.content, t.is_locked, t.created_at, t.category_id, t.author_id, t.best_reply_id,
