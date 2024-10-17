@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response, Depends
 
 from common.auth import get_current_user
 from schemas.topic import TopicCreate
-from services import topic_service, reply_service, user_service
+from services import topic_service, reply_service, user_service, category_service
 
 topics_router = APIRouter(prefix='/topics')
 
@@ -13,37 +13,47 @@ def get_all_topics(
     search: str | None = None,
     category_id: int | None = None,
     author_id: int | None = None,
-    is_locked: str | None = None,
+    is_locked: bool | None = None,
     limit: int = 10,
     offset: int = 0,
+    current_user_id: int = Depends(get_current_user)
 ):
+
+    if category_id and not category_service.validate_user_access(current_user_id, category_id):
+        return Response(content="User does not have access to this category", status_code=403)
 
     topics = topic_service.get_all_topics(search, category_id, author_id, is_locked, limit, offset)
 
+    accessible_topics = topic_service.accessible_topics(topics, current_user_id)
+
     if sort and (sort == 'asc' or sort == 'desc'):
-        return sorted(topics, key=lambda t: t.created_at, reverse=sort == 'desc')
+        return sorted(accessible_topics, key=lambda t: t.created_at, reverse=sort == 'desc')
     else:
-        return topics
+        return accessible_topics
 
 
 @topics_router.get('/{topic_id}')
-def get_topic_by_id(topic_id: int):
+def get_topic_by_id(topic_id: int,
+                    current_user_id: int = Depends(get_current_user)):
+
     topic = topic_service.get_by_id(topic_id)
 
     if topic is None:
         return Response(content=f"No topic with ID {topic_id} found", status_code=404)
-    else:
-        return topic
+
+    if not category_service.validate_user_access(current_user_id, topic.category_id):
+        return Response(content="User does not have access to this category", status_code=403)
+
+    return topic
 
 
 @topics_router.post('/', status_code=201)
 def create_topic(topic: TopicCreate,
                  current_user_id: int = Depends(get_current_user)):
 
-    if topic.is_locked not in ['locked', 'not locked']:
-        return Response(
-            content="Parameter is_locked must be either 'locked' or 'not_locked'",
-            status_code=400)
+    access = category_service.validate_user_access(current_user_id, topic.category_id)
+    if access.write_access:
+        return Response(content="User does not have access to write a topic in this category", status_code=403)
 
     return topic_service.create(topic, current_user_id)
 

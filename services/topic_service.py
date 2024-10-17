@@ -1,14 +1,12 @@
 from data.database import insert_query, read_query, update_query
 from schemas.reply import ReplyBase, ReplyDetailed
 from schemas.topic import TopicCreate, TopicsView, TopicView
-from services import reply_service
+from services import reply_service, category_service
 
 
 def get_all_topics(search: str, category_id: int,
-                   author_id: int, is_locked: str,
+                   author_id: int, is_locked: bool,
                    limit: int, offset: int):
-
-    is_locked_bool = True if is_locked == 'locked' else False
 
     query = """SELECT id, title, is_locked, created_at, category_id, author_id FROM topics"""
 
@@ -20,7 +18,7 @@ def get_all_topics(search: str, category_id: int,
     if author_id is not None:
         params.append(f"author_id = {author_id}")
     if is_locked is not None:
-        params.append(f"is_locked = {is_locked_bool}")
+        params.append(f"is_locked = {is_locked}")
 
     if params:
         query += " WHERE " + " AND ".join(params) + " LIMIT " + str(limit) + " OFFSET " + str(offset)
@@ -31,7 +29,7 @@ def get_all_topics(search: str, category_id: int,
         TopicsView(
             id=id,
             title=title,
-            is_locked='locked' if is_locked else 'not locked',
+            is_locked=is_locked,
             created_at=created_at,
             category_id=category_id,
             author_id=author_id,
@@ -65,7 +63,7 @@ def get_by_id(topic_id: int):
         'id': topic_data[0],
         'title': topic_data[1],
         'content': topic_data[2],
-        'is_locked': 'locked' if topic_data[3] else 'not locked',
+        'is_locked': topic_data[3],
         'created_at': topic_data[4],
         'category_id': topic_data[5],
         'author_id': topic_data[6],
@@ -86,11 +84,9 @@ def get_by_id(topic_id: int):
     return TopicView(**topic, all_replies=replies)
 
 def create(topic: TopicCreate, user_id: int):
-    is_locked_bool = True if topic.is_locked == 'locked' else False
-
     query = """INSERT INTO topics(title, content, is_locked, category_id, author_id)
                 VALUES(?, ?, ?, ?, ?)"""
-    params = [topic.title, topic.content, is_locked_bool, topic.category_id, user_id]
+    params = [topic.title, topic.content, topic.is_locked, topic.category_id, user_id]
 
     generated_id = insert_query(query, (*params,))
     topic.id = generated_id
@@ -132,5 +128,16 @@ def update_best_reply(topic_id: int, reply_id: int):
     query = """UPDATE replies 
                 SET is_best_reply = True 
                 WHERE id = ?"""
-
     update_query(query, (reply_id,))
+
+def accessible_topics(topics: list[TopicsView], user_id: int):
+    accessible_topics = []
+
+    for topic in topics:
+        access = category_service.validate_user_access(user_id, topic.category_id)
+        if not access:
+            continue
+
+        accessible_topics.append(topic)
+
+    return accessible_topics
