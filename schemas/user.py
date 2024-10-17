@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi import HTTPException
-from pydantic import BaseModel, Field, field_validator, ValidationError
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from pydantic import EmailStr
 import re
@@ -9,21 +9,24 @@ from starlette import status
 
 
 class User(BaseModel):
-    id: Optional[int]
+    # id: Optional[int]
     username: str = Field(
         min_length=5,
         max_length=15,
-        pattern="^[a-zA-Z0-9_-]+$"
+        pattern="^[a-zA-Z0-9_-]+$",
+        example="example_user"
     )
     first_name: str = Field(
         min_length=2,
         max_length=25,
-        pattern="^[a-zA-Z]+$"
+        pattern="^[a-zA-Z]+$",
+        example="Example"
     )
     last_name: str = Field(
         min_length=2,
         max_length=25,
-        pattern="^[a-zA-Z]+$"
+        pattern="^[a-zA-Z]+$",
+        example="Example"
     )
     email: EmailStr
     is_admin: bool = False
@@ -36,20 +39,22 @@ class User(BaseModel):
 
 
 class UserCreate(User):
-    username: str
-    first_name: str
-    last_name: str
-    email: EmailStr
     password: str = Field(
         min_length=4,
         max_length=36,
+        example="Example123@"
     )
-    is_admin: bool = False
-    picture: Optional[str] = None
 
     @field_validator('password')
     def validate_password(cls, value):
-        if not re.search(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$", value):
+        validate = lambda pwd: (
+                any(c.isupper() for c in pwd) and
+                any(c.islower() for c in pwd) and
+                any(c.isdigit() for c in pwd) and
+                any(c in '@$!%*?&' for c in pwd)
+        )
+
+        if not validate(value):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Password must contain at least one uppercase letter, one lowercase letter, "
