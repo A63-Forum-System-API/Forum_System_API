@@ -1,6 +1,6 @@
 from common.auth import get_password_hash
 from data.database import insert_query, read_query
-from schemas.user import UserCreate, User
+from schemas.user import UserCreate, User, UserUpdate
 
 
 def is_admin(user_id: int):
@@ -10,43 +10,72 @@ def is_admin(user_id: int):
     return True if result[0][0] else False
 
 
-def get_by_username(username: str):
+def id_exists(user_id: int):
+    query = """SELECT id FROM users WHERE id = ?"""
+    result = read_query(query, (user_id,))
+
+    return True if result else False
+
+
+# def get_by_username(username: str):
+#     query = """
+#             SELECT id, username, first_name, last_name, email, is_admin, picture
+#             FROM users WHERE username = ?
+#             """
+#     result = read_query(query, (username,))
+#
+#     if not result:
+#         return None
+#     result = result[0]
+#
+#     return User(
+#         username=result[1],
+#         first_name=result[2],
+#         last_name=result[3],
+#         email=result[4],
+#         picture=result[5]
+#     )
+
+
+def check_if_email_exist(email: str):
     query = """
             SELECT id, username, first_name, last_name, email, is_admin, picture 
-            FROM users WHERE username = ?
+            FROM users WHERE email = ?
             """
-    result = read_query(query, (username,))
+    result = read_query(query, (email,))
 
     if not result:
-        return None
-    result = result[0]
-
-    return User(
-        id=result[0],
-        username=result[1],
-        first_name=result[2],
-        last_name=result[3],
-        email=result[4],
-        is_admin=bool(result[5]),
-        picture=result[6]
-    )
+        return False
+    return True
 
 
 def create(user: UserCreate):
     hash_password = get_password_hash(user.password)
     query = """
-            INSERT INTO users(username, first_name, last_name, email, hash_password, is_admin, picture)
-            VALUES(?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO users(username, first_name, last_name, email, hash_password, picture)
+            VALUES(?, ?, ?, ?, ?, ?)
             """
-    generated_id = insert_query(query, (user.username, user.first_name,
-                                      user.last_name, user.email, hash_password,
-                                      user.is_admin, user.picture))
+    insert_query(query, (user.username, user.first_name,
+                         user.last_name, user.email, hash_password,
+                         user.picture))
 
-    return User(id=generated_id,
-                username=user.username,
+    return User(username=user.username,
                 first_name=user.first_name,
                 last_name=user.last_name,
                 email=user.email,
-                is_admin=user.is_admin,
                 picture=user.picture
-    )
+                )
+
+
+def update(user_id: int, user: UserUpdate):
+    query = """
+            UPDATE users
+            SET is_admin = ?
+            WHERE id = ?
+            """
+    insert_query(query, (user.is_admin, user_id))
+
+    return {"msg": f"User with #ID {user_id} successfully updated to {'admin' if user.is_admin else 'basic bitch!'}"}
+
+
+# TODO !!! Responds with a list of all users for a specific Private Category along with their Access Level
