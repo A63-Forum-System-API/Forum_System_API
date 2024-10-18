@@ -52,3 +52,14 @@ def parse_replies_data(data):
             replies.append(reply)
 
     return replies
+
+
+def get_category_id(reply_id: int):
+    query = """SELECT c.id
+                FROM categories c
+                JOIN topics t ON c.id = t.category_id
+                JOIN replies r ON t.id = r.topic_id
+                WHERE r.id = ?"""
+    cat_id_data = read_query(query, (reply_id,))
+
+    return cat_id_data[0][0]
