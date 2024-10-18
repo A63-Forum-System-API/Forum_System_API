@@ -1,17 +1,20 @@
 from fastapi import APIRouter, Depends
 from fastapi.openapi.models import Response
+from pydantic.v1.typing import LITERAL_TYPES
+
 from common.auth import get_current_user
 from services import reply_service, vote_service, category_service
 
 votes_router = APIRouter(prefix='/votes')
 
 
-@votes_router.put('/{reply_id}')
+@votes_router.put('/{reply_id}/votes_type/{vote_type}')
 def vote(reply_id: int,
-         vote_type: str,
+         vote_type: int,
          current_user_id: int = Depends(get_current_user)):
-    vote_int = 1 if vote_type == 'upvote' else 0
 
+    if vote_type > 1:
+        return Response(content="Vote type must be 0 for downvote or 1 for upvote", status_code=400)
 
     category_id = reply_service.get_category_id(reply_id)
     access = category_service.validate_user_access(current_user_id, category_id)
