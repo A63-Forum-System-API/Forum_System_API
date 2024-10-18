@@ -13,6 +13,7 @@ def vote(reply_id: int,
          vote_type: int,
          current_user_id: int = Depends(get_current_user)):
 
+
     if vote_type > 1:
         return Response(content="Vote type must be 0 for downvote or 1 for upvote", status_code=400)
 
@@ -29,7 +30,7 @@ def vote(reply_id: int,
         vote_service.create_vote(reply_id, vote_type, current_user_id)
         return Response(content=f"User voted for reply with ID {reply_id} successfully", status_code=201)
 
-    if vote == vote_int:
+    if vote == vote_type:
         return Response(content=f"Current user has already voted for this reply with '{vote_type}'", status_code=400)
 
     vote_service.update_vote(reply_id, vote_type, current_user_id)

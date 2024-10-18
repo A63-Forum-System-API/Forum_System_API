@@ -10,8 +10,8 @@ def exists(reply_id: int, user_id: int):
     return result[0][0] if result else None
 
 
-def create_vote(reply_id: int, vote_type: str, user_id: int):
-    vote_type = True if vote_type == 'upvote' else False
+def create_vote(reply_id: int, vote_type: int, user_id: int):
+    vote_type = True if vote_type == 1 else False
 
     query = """INSERT INTO votes(reply_id, vote_type, user_id)
                 VALUES(?, ?, ?)"""
@@ -20,8 +20,8 @@ def create_vote(reply_id: int, vote_type: str, user_id: int):
     insert_query(query, (*params,))
 
 
-def update_vote(reply_id: int, vote_type: str, user_id: int):
-    vote_type = True if vote_type == 'upvote' else False
+def update_vote(reply_id: int, vote_type: int, user_id: int):
+    vote_type = True if vote_type == 1 else False
 
     query = """UPDATE votes 
                 SET vote_type = ? 
