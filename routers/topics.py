@@ -19,8 +19,9 @@ def get_all_topics(
     current_user_id: int = Depends(get_current_user)
 ):
 
-    if category_id and not category_service.validate_user_access(current_user_id, category_id):
-        return Response(content="User does not have access to this category", status_code=403)
+    if not user_service.is_admin(current_user_id):
+        if category_id and not category_service.validate_user_access(current_user_id, category_id):
+            return Response(content="User does not have access to this category", status_code=403)
 
     topics = topic_service.get_all_topics(search, category_id, author_id, is_locked, limit, offset)
 
@@ -41,8 +42,9 @@ def get_topic_by_id(topic_id: int,
     if topic is None:
         return Response(content=f"No topic with ID {topic_id} found", status_code=404)
 
-    if not category_service.validate_user_access(current_user_id, topic.category_id):
-        return Response(content="User does not have access to this category", status_code=403)
+    if not user_service.is_admin(current_user_id):
+        if not category_service.validate_user_access(current_user_id, topic.category_id):
+            return Response(content="User does not have access to this category", status_code=403)
 
     return topic
 
@@ -50,6 +52,7 @@ def get_topic_by_id(topic_id: int,
 @topics_router.post('/', status_code=201)
 def create_topic(topic: TopicCreate,
                  current_user_id: int = Depends(get_current_user)):
+
 
     access = category_service.validate_user_access(current_user_id, topic.category_id)
     if access.write_access:
