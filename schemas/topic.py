@@ -11,13 +11,14 @@ class TopicBase(BaseModel):
         max_length=45,
         examples=["Title of topic"]
     )
-    is_locked: bool
     category_id: int
+    is_locked: bool = False
 
 
 class TopicsView(TopicBase):
     created_at: datetime
     author_id: int
+
 
 
 class TopicView(TopicBase):
@@ -32,12 +33,8 @@ class TopicView(TopicBase):
     all_replies: list[ReplyDetailed]
 
 
-class TopicCreate(BaseModel):
-    id: Optional[int] = None
-    title: str
+class TopicCreate(TopicBase):
     content: str = Field(
         min_length=5,
         examples=["This is the content of the topic."]
     )
-    is_locked: bool = False
-    category_id: int

@@ -18,7 +18,6 @@ def create(reply: ReplyBase, user_id: int):
     params = [reply.content, reply.topic_id, user_id]
 
     generated_id = insert_query(query, (*params,))
-    reply.id = generated_id
 
     return reply
 
@@ -54,12 +53,12 @@ def parse_replies_data(data):
     return replies
 
 
-def get_category_id(reply_id: int):
-    query = """SELECT c.id
-                FROM categories c
-                JOIN topics t ON c.id = t.category_id
-                JOIN replies r ON t.id = r.topic_id
-                WHERE r.id = ?"""
-    cat_id_data = read_query(query, (reply_id,))
+def get_reply_by_id(reply_id: int):
+    query = """SELECT content, topic_id
+                FROM replies
+                WHERE id = ?"""
 
-    return cat_id_data[0][0]
+    reply_data = read_query(query, (reply_id,))
+
+    reply = reply_data[0]
+    return ReplyBase(content=reply[0], topic_id=reply[1])

@@ -4,7 +4,6 @@ from typing import Optional
 
 
 class ReplyBase(BaseModel):
-    id: Optional[int] = None
     content: str = Field(
         min_length=5,
         examples=["This is the content of the reply."]

@@ -8,7 +8,8 @@ def get_all_topics(search: str, category_id: int,
                    author_id: int, is_locked: bool,
                    limit: int, offset: int):
 
-    query = """SELECT id, title, is_locked, created_at, category_id, author_id FROM topics"""
+    query = """SELECT id, title, is_locked, created_at, category_id, author_id 
+    FROM topics"""
 
     params = []
     if search is not None:
@@ -89,7 +90,6 @@ def create(topic: TopicCreate, user_id: int):
     params = [topic.title, topic.content, topic.is_locked, topic.category_id, user_id]
 
     generated_id = insert_query(query, (*params,))
-    topic.id = generated_id
 
     return topic
 
@@ -129,15 +129,3 @@ def update_best_reply(topic_id: int, reply_id: int):
                 SET is_best_reply = True 
                 WHERE id = ?"""
     update_query(query, (reply_id,))
-
-def accessible_topics(topics: list[TopicsView], user_id: int):
-    accessible_topics = []
-
-    for topic in topics:
-        access = category_service.validate_user_access(user_id, topic.category_id)
-        if not access:
-            continue
-
-        accessible_topics.append(topic)
-
-    return accessible_topics
