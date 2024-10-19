@@ -73,9 +73,7 @@ def create_category(
         return Response(content=str(e), status_code=409)
 
 
-@categories_router.put(
-    "/{id}/private/{private_status_code}", status_code=204
-) 
+@categories_router.put("/{id}/private/{private_status_code}", status_code=204)
 def change_category_private_status(
     id: int, private_status_code: int, current_user_id: int = Depends(get_current_user)
 ):
@@ -85,20 +83,13 @@ def change_category_private_status(
             detail="You are not allowed to update categories!",
         )
     if private_status_code not in (0, 1):
-        return Response(
-            content="Private status code must be 0 or 1", status_code=400
-        )
-    
+        return Response(content="Private status code must be 0 or 1", status_code=400)
+
     try:
-        category_service.change_category_private_status(
-            id, private_status_code
-        )
+        category_service.change_category_private_status(id, private_status_code)
         return Response(status_code=204)
     except Exception as e:
-        return Response(
-            content=str(e), status_code=404
-        )
-
+        return Response(content=str(e), status_code=404)
 
 
 @categories_router.put("/{id}/lock/{locked_status_code}", status_code=204)
@@ -111,23 +102,17 @@ def change_category_lock_status(
             detail="You are not allowed to update categories!",
         )
     if locked_status_code not in (0, 1):
-        return Response(
-            content="Locked status code must be 0 or 1", status_code=400
-        )
-      
+        return Response(content="Locked status code must be 0 or 1", status_code=400)
+
     try:
-        category_service.change_category_lock_status(
-            id, locked_status_code
-        )
+        category_service.change_category_lock_status(id, locked_status_code)
         return Response(status_code=204)
     except Exception as e:
         return Response(content=str(e), status_code=404)
 
 
-
-
 @categories_router.put("/{category_id}/users/{user_id}/", status_code=204)
-def add_user_to_private_category(
+def manage_user_access_to_private_category(
     category_id: int,
     user_id: int,
     code_read_access: int,
@@ -144,10 +129,25 @@ def add_user_to_private_category(
             content="Write and read access code must be 0 or 1", status_code=400
         )
     try:
-        category_service.add_user_to_private_category(
+        category_service.manage_user_access_to_private_category(
             category_id, user_id, code_read_access, code_write_access
         )
         return Response(status_code=204)
-    
+
     except Exception as e:
-        return Response(content=str(e), status_code=409)
+        return Response(content=str(e), status_code=404)
+
+
+@categories_router.get("/{category_id}/private/users")
+def get_privileged_users_by_category(
+    category_id: int, current_user_id: int = Depends(get_current_user)
+):
+    if not user_service.is_admin(current_user_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not allowed to view privileged users!",
+        )
+    try:
+        return category_service.get_privileged_users_by_category(category_id)
+    except Exception as e:
+        return Response(content=str(e), status_code=404)

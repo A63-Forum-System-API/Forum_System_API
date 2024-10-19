@@ -1,4 +1,10 @@
-from data.database import insert_query, read_query, query_count, update_query, delete_query
+from data.database import (
+    insert_query,
+    read_query,
+    query_count,
+    update_query,
+    delete_query,
+)
 from schemas.category import Category, ViewAllCategories
 from schemas.category_accesses import Accesses
 from schemas.topic import TopicView
@@ -21,7 +27,7 @@ def get_categories(
     query = """SELECT id, title, description, is_private, is_locked, created_at, admin_id 
                FROM categories
                """
-    params = []     
+    params = []
 
     if is_admin(current_user_id):
         query += " WHERE is_private in (0, 1)"
@@ -89,7 +95,6 @@ def _get_by_id(id: int) -> Category:
     return Category.from_query_result(*data[0])
 
 
-
 def get_category_topics(id: int) -> list[TopicView]:
     data = read_query(
         """SELECT id, title, content, is_locked, created_at, author_id, best_reply_id
@@ -141,15 +146,15 @@ def title_exists(title: str) -> bool:
 
 def is_private(id: int) -> bool:
     result = read_query(
-            """SELECT is_private FROM categories 
-                WHERE id = ?""",
-            (id,),
-        )
+        """SELECT is_private FROM categories 
+           WHERE id = ?""",
+        (id,),
+    )
     if not result:
         raise Exception(f"Category with ID: {id} not found")
-    
+
     return result[0][0] == 1
-   
+
 
 def create(category: Category, current_user_id: int):
     if title_exists(category.title):
@@ -187,13 +192,11 @@ def create(category: Category, current_user_id: int):
     return category
 
 
-def change_category_private_status(
-    category_id: int, private_status_code: int
-):
+def change_category_private_status(category_id: int, private_status_code: int):
     category = _get_by_id(category_id)
     if not category:
         raise Exception(f"Category ID {category_id} not found")
-    
+
     if category.is_private == private_status_code:
         # Category with provided id and private status already has the given status. No change needed.
         return
@@ -202,13 +205,14 @@ def change_category_private_status(
             SET is_private = ? 
             WHERE id = ?"""
     update_query(query, (private_status_code, category_id))
-    if private_status_code == 0: 
+    if private_status_code == 0:
         # The category was initialy private and now it is changed to public.
         # Remove all user access to this category from category_accesses.
         # Public categories are accessible to anyone.
         # In case the category is changed back to private, no previous user access will exist.
         _remove_access_from_category(category_id)
-
+  
+  
 
 def _remove_access_from_category(category_id: int):
     query = """DELETE FROM category_accesses 
@@ -217,11 +221,19 @@ def _remove_access_from_category(category_id: int):
     logger.info(f"{deleted_rows} row(s) were deleted from category_accesses")
 
 
+def _remove_access_from_category_for_user(category_id: int, user_id: int):
+    query = """DELETE FROM category_accesses 
+            WHERE category_id = ?
+            AND user_id = ?"""
+    deleted_rows = delete_query(query, (category_id, user_id))
+    logger.info(f"{deleted_rows} row were deleted from category_accesses")
+
+
 def change_category_lock_status(category_id: int, locked_status_code: int):
     category = _get_by_id(category_id)
     if not category:
         raise Exception(f"Category ID {category_id} not found")
-    
+
     if category.is_locked == locked_status_code:
         # Category with provided id and lock status already has the given status. No change needed.
         return
@@ -275,84 +287,135 @@ def validate_user_access(user_id: int, category_id: int, access_type: str = "rea
 
 
 # Service for category access
-def change_user_write_access_for_category(
-    category_id: int, user_id: int, write_access_code: int
-):
-    if validate_user_access(user_id, category_id):
-        if write_access_code not in (0, 1):
-            raise Exception(f"Write access code must be 0 or 1")
+# def change_user_write_access_for_category(
+#     category_id: int, user_id: int, write_access_code: int
+# ):
+#     if validate_user_access(user_id, category_id):
+#         if write_access_code not in (0, 1):
+#             raise Exception(f"Write access code must be 0 or 1")
 
-        data = read_query(
-            """SELECT user_id, category_id, write_access, read_access
-                                            FROM category_accesses
-                                            WHERE category_id = ?
-                                            AND user_id = ?""",
-            (category_id, user_id),
-        )
-        access_model_for_user = Accesses.from_query_result(*data[0])
+#         data = read_query(
+#             """SELECT user_id, category_id, write_access, read_access
+#                                             FROM category_accesses
+#                                             WHERE category_id = ?
+#                                             AND user_id = ?""",
+#             (category_id, user_id),
+#         )
+#         access_model_for_user = Accesses.from_query_result(*data[0])
 
-        if access_model_for_user.write_access == write_access_code:
-            raise Exception(
-                f"User with ID {user_id} already has write access={write_access_code}"
-            )
+#         if access_model_for_user.write_access == write_access_code:
+#             raise Exception(
+#                 f"User with ID {user_id} already has write access={write_access_code}"
+#             )
 
-        query = """UPDATE category_accesses 
-                SET write_access = ? 
-                WHERE category_id = ?
-                AND user_id = ?"""
-        update_query(query, (write_access_code, category_id, user_id))
+#         query = """UPDATE category_accesses
+#                 SET write_access = ?
+#                 WHERE category_id = ?
+#                 AND user_id = ?"""
+#         update_query(query, (write_access_code, category_id, user_id))
 
 
 # Service for category access
-def change_user_read_access_for_category(
-    category_id: int, user_id: int, read_access_code: int
-):
-    if validate_user_access(user_id, category_id):
-        if read_access_code not in (0, 1):
-            raise Exception(f"Read access code must be 0 or 1")
+# def change_user_read_access_for_category(
+#     category_id: int, user_id: int, read_access_code: int
+# ):
+#     if validate_user_access(user_id, category_id):
+#         if read_access_code not in (0, 1):
+#             raise Exception(f"Read access code must be 0 or 1")
 
-        data = read_query(
-            """SELECT user_id, category_id, write_access, read_access
-                FROM category_accesses
-                WHERE category_id = ?
-                AND user_id = ?""",
-            (category_id, user_id),
-        )
-        access_model_for_user = Accesses.from_query_result(*data[0])
+#         data = read_query(
+#             """SELECT user_id, category_id, write_access, read_access
+#                 FROM category_accesses
+#                 WHERE category_id = ?
+#                 AND user_id = ?""",
+#             (category_id, user_id),
+#         )
+#         access_model_for_user = Accesses.from_query_result(*data[0])
 
-        if access_model_for_user.read_access == read_access_code:
-            raise Exception(
-                f"User with ID {user_id} already has read access={read_access_code}"
-            )
+#         if access_model_for_user.read_access == read_access_code:
+#             raise Exception(
+#                 f"User with ID {user_id} already has read access={read_access_code}"
+#             )
 
-        query = """UPDATE category_accesses 
-                SET read_access = ? 
-                WHERE category_id = ?
-                AND user_id = ?"""
-        update_query(query, (read_access_code, category_id, user_id))
+#         query = """UPDATE category_accesses
+#                 SET read_access = ?
+#                 WHERE category_id = ?
+#                 AND user_id = ?"""
+#         update_query(query, (read_access_code, category_id, user_id))
 
 
-
-def add_user_to_private_category(
+# Service for category access
+def manage_user_access_to_private_category(
     category_id: int, user_id: int, code_read_access: int, code_write_access: int
 ):
     if not is_private(category_id):
         raise Exception(f"Category ID {category_id} is public")
-        
+
     if not user_exists(user_id):
         raise Exception(f"User ID {user_id} not found")
-    
-    if query_count(
-            """SELECT COUNT(*)
+
+    data = read_query(
+        """SELECT user_id, category_id, write_access, read_access
                 FROM category_accesses
                 WHERE category_id = ?
                 AND user_id = ?""",
-            (category_id, user_id),
-        ) == 1:
-        raise Exception(f"User ID {user_id} already private member")
+        (category_id, user_id),
+    )
+    if data:
+        access_model_for_user = Accesses.from_query_result(*data[0])
+        if not code_read_access and not code_write_access:
+            _remove_access_from_category_for_user(category_id, user_id)
+            logger.info(
+                f"Access for user ID {user_id} removed for category ID {category_id}"
+            )
+            return
 
-    query = """INSERT INTO category_accesses 
-                (user_id, category_id, code_read_access, code_write_access)
+        if (
+            access_model_for_user.read_access == code_read_access
+            and access_model_for_user.write_access == code_write_access
+        ):
+            logger.info(
+                f"No access change for user ID {user_id} and category ID {category_id}"
+            )
+            return
+
+        query = """UPDATE category_accesses 
+                SET read_access = ?, write_access = ? 
+                WHERE category_id = ?
+                AND user_id = ?"""
+        update_query(query, (code_read_access, code_write_access, category_id, user_id))
+        logger.info(
+            f"Access for user ID {user_id} and category ID {category_id} updated"
+        )
+
+        return
+    else:
+        if not code_read_access and not code_write_access:
+            logger.info(
+                f"User ID {user_id} already doesn't have access to category ID {category_id}"
+            )
+            return
+
+        query = """INSERT INTO category_accesses 
+                (user_id, category_id, read_access, write_access)
                 VALUES (?, ?, ?, ?)"""
 
-    insert_query(query, (user_id, category_id, code_read_access, code_write_access))
+        insert_query(query, (user_id, category_id, code_read_access, code_write_access))
+        logger.info(f"Access for user ID {user_id} and category ID {category_id} added")
+
+        return
+
+
+
+def get_privileged_users_by_category(category_id):
+    if not is_private(category_id):
+        raise Exception(f"Category ID {category_id} is public")
+
+    data = read_query(
+        """SELECT user_id, category_id, write_access, read_access
+            FROM category_accesses
+            WHERE category_id = ?""",
+            (category_id,),
+    )
+
+    return [Accesses.from_query_result(*row) for row in data]
