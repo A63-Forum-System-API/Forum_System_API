@@ -6,6 +6,9 @@ from routers.tokens import token_router
 from routers.topics import topics_router
 from routers.users import users_router
 from routers.votes import votes_router
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 app = FastAPI()
 app.include_router(categories_router)
