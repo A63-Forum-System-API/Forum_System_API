@@ -89,7 +89,6 @@ def update(user_id: int, user: UserUpdate):
             """
     insert_query(query, (user.is_admin, user_id))
 
-    return {"msg": f"User with #ID {user_id} successfully updated to {'admin' if user.is_admin else 'basic bitch!'}"}
+    return {"msg": f"User with #ID {user_id} successfully updated to {'admin' if user.is_admin else 'regular user!'}"}
 
 
-# TODO !!! Responds with a list of all users for a specific Private Category along with their Access Level
