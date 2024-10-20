@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, Query
 from starlette.responses import Response
 
 from common.auth import get_current_user
-from schemas.conversation import Conversation
 from services import message_service, user_service, conversation_service
 
 conversations_router = APIRouter(prefix='/conversations')
@@ -24,3 +23,14 @@ def view_conversation(receiver_id: int,
                         status_code=404)
 
     return conversation_service.get_conversation(conversation_id, order)
+
+
+@conversations_router.get('/')
+def view_conversations(current_user_id: int = Depends(get_current_user),
+                       order: Optional[str] = Query("asc", pattern="^(asc|desc)$")):
+
+    conversations = conversation_service.get_conversations(current_user_id, order)
+
+    if not conversations:
+        return Response(content="No conversations found!", status_code=404)
+    return conversations
