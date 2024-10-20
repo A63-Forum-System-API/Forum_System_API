@@ -48,7 +48,7 @@ def get_all_categories(
 @categories_router.get("/{id}")
 def get_category_by_id(id: int, current_user_id: int = Depends(get_current_user)):
     try:
-        category = category_service.get_by_id(id, current_user_id)
+        category = category_service.get_by_id_with_topics(id, current_user_id)
     except Exception as e:
         return Response(content=str(e), status_code=403)
 

@@ -18,11 +18,11 @@ def vote(reply_id: int,
     if reply is None:
         return NotFound('Reply')
 
-    topic = topic_service.get_by_id(reply.topic_id)
+    topic = topic_service.get_by_id_with_replies(reply.topic_id)
     if topic.is_locked:
         return Locked('topic')
 
-    category = category_service.get_by_id(topic.category_id)
+    category = category_service.get_by_id_with_topics(topic.category_id)
     if not user_service.is_admin(current_user_id) and category.is_private:
         access = category_service.validate_user_access(current_user_id, topic.category_id)
         if access is None:

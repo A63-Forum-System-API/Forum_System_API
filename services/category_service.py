@@ -7,7 +7,7 @@ from data.database import (
 )
 from schemas.category import Category, ViewAllCategories
 from schemas.category_accesses import Accesses
-from schemas.topic import TopicView
+from schemas.topic import ViewAllTopics
 from services.user_service import is_admin, id_exists as user_exists
 import logging
 
@@ -54,10 +54,10 @@ def get_categories(
 
     data = read_query(query, params)
 
-    return [Category.from_query_result(*row) for row in data]
+    return [Category.from_query_result(*row) for row in data] # TODO ViewAllCategories
 
 
-def get_by_id(id: int, current_user_id: int):
+def get_by_id_with_topics(id: int, current_user_id: int):
     data = read_query(
         """SELECT id, title, description, is_private, is_locked, created_at, admin_id
             FROM categories
@@ -71,6 +71,7 @@ def get_by_id(id: int, current_user_id: int):
     category = Category.from_query_result(*data[0])
     if category.is_private:
         # Check if the user has access
+        # TODO think if we should validate this in router
         if not validate_user_access(current_user_id, category.id):
             raise Exception(
                 f"User ID {current_user_id} is not authorized to access category ID {category.id}"
@@ -81,7 +82,7 @@ def get_by_id(id: int, current_user_id: int):
     return category
 
 
-def _get_by_id(id: int) -> Category:
+def get_by_id(id: int) -> Category:
     """Get category id for internal use."""
     data = read_query(
         """SELECT id, title, description, is_private, is_locked, created_at, admin_id
@@ -95,25 +96,22 @@ def _get_by_id(id: int) -> Category:
     return Category.from_query_result(*data[0])
 
 
-def get_category_topics(id: int) -> list[TopicView]:
+def get_category_topics(id: int) -> list[ViewAllTopics]: # TODO id -> category_id
     data = read_query(
-        """SELECT id, title, content, is_locked, created_at, author_id, best_reply_id
+        """SELECT id, title, is_locked, created_at, author_id
             FROM topics
             WHERE category_id = ?""",
         (id,),
     )
     topics = []
     for row in data:
-        topic = TopicView(
+        topic = ViewAllTopics(
             id=row[0],
             title=row[1],
-            content=row[2],
-            is_locked=row[3],
-            created_at=row[4],
-            author_id=row[5],
-            best_reply_id=row[6],
-            category_id=id,
-            all_replies=[],
+            is_locked=row[2],
+            created_at=row[3],
+            author_id=row[4],
+            category_id=id, # TODO category_id
         )
         topics.append(topic)
 
@@ -174,7 +172,7 @@ def create(category: Category, current_user_id: int):
         ),
     )
 
-    category = _get_by_id(generated_id)
+    category = get_by_id_with_topics(generated_id)
     if category.is_private:
         query = """INSERT INTO category_accesses 
                 (user_id, category_id, write_access, read_access)
@@ -193,7 +191,7 @@ def create(category: Category, current_user_id: int):
 
 
 def change_category_private_status(category_id: int, private_status_code: int):
-    category = _get_by_id(category_id)
+    category = get_by_id_with_topics(category_id)
     if not category:
         raise Exception(f"Category ID {category_id} not found")
 
@@ -230,7 +228,7 @@ def _remove_access_from_category_for_user(category_id: int, user_id: int):
 
 
 def change_category_lock_status(category_id: int, locked_status_code: int):
-    category = _get_by_id(category_id)
+    category = get_by_id_with_topics(category_id)
     if not category:
         raise Exception(f"Category ID {category_id} not found")
 

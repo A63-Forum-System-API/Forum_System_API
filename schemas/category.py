@@ -1,12 +1,12 @@
 from datetime import datetime
 from pydantic import BaseModel
-from schemas.topic import TopicsView
+from schemas.topic import ViewAllTopics
 from typing import Optional
 
 
 class Category(BaseModel):
-    id: int
-    title: str
+    id: int # TODO optional int
+    title: str # TODO Field validation
     description: str
     is_private: bool = False
     is_locked: bool = False
@@ -28,11 +28,11 @@ class Category(BaseModel):
 
 class SingleCategory(BaseModel):
     category: Category
-    topics: list[TopicsView]
+    topics: list[ViewAllTopics]
 
 
 class ViewAllCategories(BaseModel):
     id: int
     title: str
     description: str
-    created_at: datetime = datetime.now()
+    created_at: datetime = datetime.now() # TODO remove default value

@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends
 from common.auth import get_current_user
 from common.custom_responses import ForbiddenAccess, NotFound, Locked
-from schemas.reply import ReplyBase
+from schemas.reply import Reply
 from services import topic_service, reply_service, category_service, user_service
 
 replies_router = APIRouter(prefix='/replies')
 
 
 @replies_router.post('/', status_code=201)
-def create_reply(reply: ReplyBase,
+def create_reply(reply: Reply,
                  current_user_id: int = Depends(get_current_user)):
 
     topic = topic_service.get_by_id(reply.topic_id)
@@ -21,8 +21,8 @@ def create_reply(reply: ReplyBase,
         return Locked('topic')
 
     if not user_service.is_admin(current_user_id) and category.is_private:
-        access = category_service.validate_user_access(current_user_id, topic.category_id)
-        if access is None or not access.write_access:
+        access = category_service.validate_user_access(current_user_id, topic.category_id, access_type='write')
+        if not access:
             return ForbiddenAccess()
 
     return reply_service.create(reply, current_user_id)

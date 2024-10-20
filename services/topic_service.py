@@ -1,43 +1,52 @@
 from data.database import insert_query, read_query, update_query
-from schemas.reply import ReplyBase, ReplyDetailed
-from schemas.topic import TopicCreate, TopicsView, TopicView
-from services import reply_service, category_service
+from schemas.reply import Reply
+from schemas.topic import ViewAllTopics, Topic, SingleTopic
+from services import reply_service, user_service
 
 
 def get_all_topics(search: str, category_id: int,
                    author_id: int, is_locked: bool,
-                   limit: int, offset: int):
+                   limit: int, offset: int, user_id: int):
 
-    query = """SELECT id, title, is_locked, created_at, category_id, author_id 
-    FROM topics"""
+    user_is_admin = user_service.is_admin(user_id)
 
+    query = """SELECT t.id, t.title, t.is_locked, t.created_at, t.author_id , t.category_id, COALESCE(COUNT(r.id), 0) as replies_count
+                FROM topics t
+                JOIN categories c ON t.category_id = c.id
+                LEFT JOIN replies r ON t.id = r.topic_id"""
+
+    where_conditions = []
     params = []
-    if search is not None:
-        params.append(f"title like '%{search}%'")
-    if category_id is not None:
-        params.append(f"category_id = {category_id}")
-    if author_id is not None:
-        params.append(f"author_id = {author_id}")
-    if is_locked is not None:
-        params.append(f"is_locked = {is_locked}")
 
-    if params:
-        query += " WHERE " + " AND ".join(params) + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+    if not user_is_admin:
+        where_conditions.append("""(c.is_private = 0 OR (c.is_private = 1 AND EXISTS (
+                                SELECT 1 FROM category_accesses ca 
+                                WHERE ca.category_id = t.category_id AND ca.user_id = ?)))""")
+        params.append(user_id)
+    if search is not None:
+        where_conditions.append("t.title like ?")
+        params.append(f'%{search}%')
+    if category_id is not None:
+        where_conditions.append("t.category_id = ?")
+        params.append(category_id)
+    if author_id is not None:
+        where_conditions.append("t.author_id = ?")
+        params.append(author_id)
+    if is_locked is not None:
+        where_conditions.append("t.is_locked = ?")
+        params.append(is_locked)
+
+    where_clause = " WHERE " + " AND ".join(where_conditions) if where_conditions else ""
+    query = f"{query}{where_clause} GROUP BY t.id LIMIT ? OFFSET ?"
+    params.append(limit)
+    params.append(offset)
 
     topics = read_query(query, params)
 
-    return [
-        TopicsView(
-            id=id,
-            title=title,
-            is_locked=is_locked,
-            created_at=created_at,
-            category_id=category_id,
-            author_id=author_id,
-        ) for id, title, is_locked, created_at, category_id, author_id in topics]
+    return [ViewAllTopics.from_query_result(*topic) for topic in topics]
 
 
-def get_by_id(topic_id: int):
+def get_by_id_with_replies(topic_id: int):
     query = """
     SELECT 
         t.id, t.title, t.content, t.is_locked, t.created_at, t.category_id, t.author_id, t.best_reply_id,
@@ -74,7 +83,7 @@ def get_by_id(topic_id: int):
     replies = []
     for row in data:
         if row[8]:
-            replies.append(ReplyDetailed(
+            replies.append(Reply(
                 id=row[8],
                 content=row[9],
                 created_at=row[10],
@@ -82,17 +91,28 @@ def get_by_id(topic_id: int):
                 author_id=row[11],
                 total_votes=int(row[12])))
 
-    return TopicView(**topic, all_replies=replies)
+    return SingleTopic(**topic, all_replies=replies)
 
-def create(topic: TopicCreate, user_id: int):
+def get_by_id(topic_id: int):
+    query = """SELECT id, title, content, is_locked, category_id, created_at, best_reply_id, author_id
+                FROM topics
+                WHERE id = ?"""
+
+    topic_data = read_query(query, (topic_id,))
+
+    if not topic_data:
+        return None
+
+    return Topic.from_query_result(*topic_data[0])
+
+def create(topic: Topic, user_id: int):
     query = """INSERT INTO topics(title, content, is_locked, category_id, author_id)
                 VALUES(?, ?, ?, ?, ?)"""
     params = [topic.title, topic.content, topic.is_locked, topic.category_id, user_id]
 
     generated_id = insert_query(query, (*params,))
 
-    return topic
-
+    return get_by_id(generated_id)
 
 def id_exists(topic_id: int):
     query = """SELECT 1 

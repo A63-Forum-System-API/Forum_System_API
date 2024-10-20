@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 from starlette.responses import JSONResponse
 from common.auth import authenticate_user, create_access_token
-from schemas.reply import ReplyBase
+from schemas.reply import Reply
 from schemas.token import Token
 from schemas.user import UserCreate, UserLogIn, UserUpdate, UserUpdate
 from services import topic_service, reply_service, user_service
