@@ -6,6 +6,7 @@ from routers.tokens import token_router
 from routers.topics import topics_router
 from routers.users import users_router
 from routers.votes import votes_router
+from routers.messages import messages_router
 
 app = FastAPI()
 app.include_router(categories_router)
@@ -14,6 +15,7 @@ app.include_router(replies_router)
 app.include_router(users_router)
 app.include_router(votes_router)
 app.include_router(token_router)
+app.include_router(messages_router)
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='localhost', port=8000)

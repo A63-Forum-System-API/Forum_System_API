@@ -34,7 +34,7 @@ class User(BaseModel):
 
     @field_validator('first_name', 'last_name', mode='before')
     def capitalize_names(cls, value):
-        return value.capitalize()
+        return '-'.join(part.capitalize() for part in value.split('-'))
 
 
 class UserCreate(User):

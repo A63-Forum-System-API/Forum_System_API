@@ -36,6 +36,20 @@ def id_exists(user_id: int):
 #         picture=result[5]
 #     )
 
+def get_user_by_id(user_id: int):
+    query = """
+            SELECT username, first_name, last_name, email, picture
+            FROM users WHERE id = ?
+            """
+    result = read_query(query, (user_id,))
+
+    return User(username=result[0][0],
+                first_name=result[0][1],
+                last_name=result[0][2],
+                email=result[0][3],
+                picture=result[0][4]
+                )
+
 
 def check_if_email_exist(email: str):
     query = """
