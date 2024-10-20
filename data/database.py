@@ -48,3 +48,12 @@ def query_count(sql: str, sql_params=()) -> int:
         cursor.execute(sql, sql_params)
 
         return cursor.fetchone()[0]
+    
+
+def delete_query(sql, sql_params=()):
+    with _get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(sql, sql_params)
+        conn.commit()
+
+        return cursor.rowcount
