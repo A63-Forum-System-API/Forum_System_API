@@ -7,7 +7,7 @@ from data.database import (
 )
 from schemas.category import Category, ViewAllCategories, SingleCategory
 from schemas.category_accesses import Accesses
-from schemas.topic import ViewAllTopics
+from schemas.topic import ViewAllTopics, ListOfTopics
 from services import topic_service
 from services.user_service import is_admin, id_exists as user_exists
 import logging
@@ -97,7 +97,7 @@ def get_by_id(id: int) -> Category:
     return Category.from_query_result(*data[0])
 
 
-def get_category_topics(id: int) -> list[ViewAllTopics]: # TODO id -> category_id
+def get_category_topics(id: int) -> list[ListOfTopics]:
     data = read_query(
         """SELECT id, title, is_locked, created_at, author_id
             FROM topics
@@ -106,13 +106,13 @@ def get_category_topics(id: int) -> list[ViewAllTopics]: # TODO id -> category_i
     )
     topics = []
     for row in data:
-        topic = ViewAllTopics(
+        topic = ListOfTopics(
             id=row[0],
             title=row[1],
             is_locked=row[2],
             created_at=row[3],
             author_id=row[4],
-            category_id=id # TODO category_id
+            category_id=id
         )
         topics.append(topic)
 
