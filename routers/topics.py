@@ -59,7 +59,7 @@ def create_topic(topic: Topic,
     user_is_admin = user_service.is_admin(current_user_id)
 
     if not user_is_admin and topic.is_locked == True:
-        return BadRequest('Only admins can lock topics')
+        return BadRequest('Only admins can create locked topics')
 
     if not user_is_admin and category.is_private:
         access = category_service.validate_user_access(current_user_id, topic.category_id, access_type='write')
