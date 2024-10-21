@@ -2,7 +2,7 @@ from data.database import read_query, insert_query, update_query
 
 
 def exists(reply_id: int, user_id: int):
-    query = """SELECT 1 
+    query = """SELECT vote_type 
                 FROM votes 
                 WHERE reply_id = ? AND user_id = ?"""
     result = read_query(query, (reply_id, user_id))
