@@ -5,9 +5,10 @@ from data.database import (
     update_query,
     delete_query,
 )
-from schemas.category import Category, ViewAllCategories
+from schemas.category import Category, ViewAllCategories, SingleCategory
 from schemas.category_accesses import Accesses
 from schemas.topic import ViewAllTopics
+from services import topic_service
 from services.user_service import is_admin, id_exists as user_exists
 import logging
 
@@ -24,7 +25,7 @@ def get_categories(
     current_user_id: int = None,
 ):
 
-    query = """SELECT id, title, description, is_private, is_locked, created_at, admin_id 
+    query = """SELECT id, title, description, created_at 
                FROM categories
                """
     params = []
@@ -54,7 +55,7 @@ def get_categories(
 
     data = read_query(query, params)
 
-    return [Category.from_query_result(*row) for row in data] # TODO ViewAllCategories
+    return [ViewAllCategories.from_query_result(*row) for row in data]
 
 
 def get_by_id_with_topics(id: int, current_user_id: int):
@@ -76,10 +77,10 @@ def get_by_id_with_topics(id: int, current_user_id: int):
             raise Exception(
                 f"User ID {current_user_id} is not authorized to access category ID {category.id}"
             )
-    category = category.model_dump()
-    category["topics"] = get_category_topics(id)
 
-    return category
+    topics = get_category_topics(id)
+
+    return SingleCategory(category=category, topics=topics)
 
 
 def get_by_id(id: int) -> Category:
@@ -111,7 +112,7 @@ def get_category_topics(id: int) -> list[ViewAllTopics]: # TODO id -> category_i
             is_locked=row[2],
             created_at=row[3],
             author_id=row[4],
-            category_id=id, # TODO category_id
+            category_id=id # TODO category_id
         )
         topics.append(topic)
 
@@ -172,7 +173,7 @@ def create(category: Category, current_user_id: int):
         ),
     )
 
-    category = get_by_id_with_topics(generated_id)
+    category = get_by_id(generated_id)
     if category.is_private:
         query = """INSERT INTO category_accesses 
                 (user_id, category_id, write_access, read_access)
@@ -191,7 +192,7 @@ def create(category: Category, current_user_id: int):
 
 
 def change_category_private_status(category_id: int, private_status_code: int):
-    category = get_by_id_with_topics(category_id)
+    category = get_by_id(category_id)
     if not category:
         raise Exception(f"Category ID {category_id} not found")
 
@@ -228,7 +229,7 @@ def _remove_access_from_category_for_user(category_id: int, user_id: int):
 
 
 def change_category_lock_status(category_id: int, locked_status_code: int):
-    category = get_by_id_with_topics(category_id)
+    category = get_by_id(category_id)
     if not category:
         raise Exception(f"Category ID {category_id} not found")
 

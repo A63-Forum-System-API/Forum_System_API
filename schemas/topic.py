@@ -45,10 +45,20 @@ class ViewAllTopics(BaseModel):
     created_at: datetime
     author_id: int
     category_id: int
-    replies_count: Optional[int]
+    replies_count: Optional[int] # TODO figure out this
 
     @classmethod
-    def from_query_result(cls, id, title, is_locked, created_at, author_id, category_id, replies_count):
+    def from_query_result(cls, id, title, is_locked, created_at, author_id, category_id, replies_count=None):
+        if replies_count is not None:
+            return cls(
+                id=id,
+                title=title,
+                is_locked=is_locked,
+                created_at=created_at,
+                author_id=author_id,
+                category_id=category_id,
+                replies_count=replies_count
+            )
         return cls(
             id=id,
             title=title,
@@ -56,5 +66,4 @@ class ViewAllTopics(BaseModel):
             created_at=created_at,
             author_id=author_id,
             category_id=category_id,
-            replies_count=replies_count
         )

@@ -5,13 +5,13 @@ from typing import Optional
 
 
 class Category(BaseModel):
-    id: int # TODO optional int
+    id: Optional[int] = None
     title: str # TODO Field validation
     description: str
     is_private: bool = False
-    is_locked: bool = False
-    created_at: datetime | None = datetime.now()
-    admin_id: int
+    is_locked: Optional[bool] = False
+    created_at: Optional[datetime] = datetime.now()
+    admin_id: Optional[int] = None
     # topics: Optional[list] = None
 
 
@@ -36,3 +36,10 @@ class ViewAllCategories(BaseModel):
     title: str
     description: str
     created_at: datetime = datetime.now() # TODO remove default value
+
+    @classmethod
+    def from_query_result(cls, id, title, description, created_at):
+        return cls(id=id,
+                   title=title,
+                   description=description,
+                   created_at=created_at)

@@ -14,7 +14,7 @@ from common.auth import get_current_user
 users_router = APIRouter(prefix='/users')
 
 
-@users_router.post('/register', status_code=201)
+@users_router.post('/register', status_code=201) # TODO - if someone's logged in, to not create user
 def create_user(user: UserCreate):
     try:
         return user_service.create(user)
