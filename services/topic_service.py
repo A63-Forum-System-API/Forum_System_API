@@ -1,6 +1,6 @@
 from data.database import insert_query, read_query, update_query
 from schemas.reply import Reply
-from schemas.topic import ViewAllTopics, Topic, SingleTopic
+from schemas.topic import ViewAllTopics, Topic, SingleTopic, CreateTopicRequest
 from services import user_service
 
 def get_all_topics(search: str, category_id: int,
@@ -119,7 +119,7 @@ def get_by_id(topic_id: int) -> Topic | None:
 
     return Topic.from_query_result(*topic_data[0])
 
-def create(topic: Topic, user_id: int):
+def create(topic: CreateTopicRequest, user_id: int) -> Topic:
     query = """INSERT INTO topics(title, content, is_locked, category_id, author_id)
                 VALUES(?, ?, ?, ?, ?)"""
 
@@ -156,9 +156,30 @@ def validate_topic_author(topic_id: int, user_id: int) -> bool:
 
     return len(result) > 0
 
-def update_best_reply(topic_id: int, reply_id: int) -> None:
+def update_best_reply(topic_id: int, reply_id: int, prev_best_reply: int | None) -> None:
+    if prev_best_reply is not None:
+        _mark_reply_as_not_best(prev_best_reply)
+
     _update_topic_best_reply(topic_id, reply_id)
     _mark_reply_as_best(reply_id)
+
+def get_topic_best_reply(topic_id: int) -> int | None:
+    query = """SELECT best_reply_id 
+                FROM topics 
+                WHERE id = ?"""
+
+    result = read_query(query, (topic_id,))
+    if not result:
+        return None
+
+    return result[0][0]
+
+def _mark_reply_as_not_best(reply_id: int) -> None:
+    query = """UPDATE replies 
+                SET is_best_reply = False 
+                WHERE id = ?"""
+
+    update_query(query, (reply_id,))
 
 def _update_topic_best_reply(topic_id: int, reply_id: int) -> None:
     query = """UPDATE topics 

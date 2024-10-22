@@ -1,6 +1,5 @@
 from data.database import read_query, insert_query
-from schemas.reply import Reply
-
+from schemas.reply import Reply, CreateReplyRequest
 
 
 def get_by_id(reply_id: int) -> Reply | None:
@@ -33,7 +32,7 @@ def id_exists(reply_id: int) -> bool:
     return len(result) > 0
 
 
-def create(reply: Reply, user_id: int) -> Reply:
+def create(reply: CreateReplyRequest, user_id: int) -> Reply:
 
     query = """INSERT INTO replies(content, topic_id, author_id)
                 VALUES(?, ?, ?)"""

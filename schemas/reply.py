@@ -26,3 +26,7 @@ class Reply(BaseModel):
             author_id=author_id,
             vote_count=vote_count
         )
+
+class CreateReplyRequest(BaseModel):
+    content: str
+    topic_id: int

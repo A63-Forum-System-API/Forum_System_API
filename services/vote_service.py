@@ -1,4 +1,4 @@
-from data.database import read_query, insert_query, update_query
+from data.database import read_query, insert_query, update_query, delete_query
 
 
 def exists(reply_id: int, user_id: int) -> bool:
@@ -28,3 +28,8 @@ def update_vote(reply_id: int, vote_type: int, user_id: int) -> None:
                 WHERE reply_id = ? AND user_id = ?"""
     update_query(query, (vote_type, reply_id, user_id))
 
+def delete_vote(reply_id: int, user_id: int) -> None:
+    query = """DELETE FROM votes 
+                WHERE reply_id = ? AND user_id = ?"""
+
+    delete_query(query, (reply_id, user_id))

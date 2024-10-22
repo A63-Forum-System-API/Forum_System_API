@@ -3,6 +3,7 @@ from common.auth import get_current_user
 from common.custom_responses import ForbiddenAccess, NotFound, OK, Locked, BadRequest
 from schemas.topic import Topic, CreateTopicRequest
 from services import topic_service, reply_service, user_service, category_service
+from services.topic_service import get_topic_best_reply
 
 topics_router = APIRouter(prefix='/topics')
 
@@ -101,8 +102,12 @@ def chose_topic_best_reply(topic_id: int,
     if not topic_service.validate_topic_author(topic_id, current_user_id):
         return ForbiddenAccess()
 
-    if not reply_service.id_exists(reply_id) or reply_service.reply_belongs_to_topic(reply_id, topic_id):
+    if not reply_service.id_exists(reply_id) or not reply_service.reply_belongs_to_topic(reply_id, topic_id):
         return NotFound('Reply')
 
-    topic_service.update_best_reply(topic_id, reply_id)
+    prev_best_reply = get_topic_best_reply(topic_id)
+    if prev_best_reply == reply_id:
+        return BadRequest('Reply is already the best reply for this topic')
+
+    topic_service.update_best_reply(topic_id, reply_id, prev_best_reply)
     return OK(f'Best reply for topic with ID {topic_id} is now reply with ID {reply_id}.')

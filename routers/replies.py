@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends
 from common.auth import get_current_user
 from common.custom_responses import ForbiddenAccess, NotFound, Locked
-from schemas.reply import Reply
+from data.database import read_query
+from schemas.reply import Reply, CreateReplyRequest
 from services import topic_service, reply_service, category_service, user_service
 
 replies_router = APIRouter(prefix='/replies')
 
 
 @replies_router.post('/', status_code=201)
-def create_reply(reply: Reply,
+def create_reply(reply: CreateReplyRequest,
                  current_user_id: int = Depends(get_current_user)):
 
     topic = topic_service.get_by_id(reply.topic_id)
@@ -26,4 +27,3 @@ def create_reply(reply: Reply,
             return ForbiddenAccess()
 
     return reply_service.create(reply, current_user_id)
-

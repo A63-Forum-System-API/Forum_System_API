@@ -40,3 +40,29 @@ def vote(reply_id: int,
     vote_str = "upvote" if vote_type == 1 else "downvote"
 
     return OK(f"Vote is successfully changed to {vote_str}")
+
+@votes_router.delete('/{reply_id}/vote-types')
+def delete_vote(reply_id: int,
+                current_user_id: int = Depends(get_current_user)):
+
+    reply = reply_service.get_by_id(reply_id)
+    if reply is None:
+        return NotFound('Reply')
+
+    topic = topic_service.get_by_id(reply.topic_id)
+    if topic.is_locked:
+        return Locked('topic')
+
+    category = category_service.get_by_id(topic.category_id)
+    if not user_service.is_admin(current_user_id) and category.is_private:
+        access = category_service.validate_user_access(current_user_id, topic.category_id)
+        if access is None:
+            return ForbiddenAccess()
+
+    vote = vote_service.exists(reply_id, current_user_id)
+    if vote is None:
+        return BadRequest("User has not voted for this reply")
+
+    vote_service.delete_vote(reply_id, current_user_id)
+
+    return OK("Vote is successfully deleted")

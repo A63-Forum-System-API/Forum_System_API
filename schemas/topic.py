@@ -34,6 +34,12 @@ class Topic(BaseModel):
             author_id=author_id
         )
 
+class CreateTopicRequest(BaseModel):
+    title: str
+    content: str
+    is_locked: Optional[bool] = False
+    category_id: int
+
 class SingleTopic(BaseModel):
     topic: Topic
     all_replies: list[Reply]
