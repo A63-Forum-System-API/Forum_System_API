@@ -16,7 +16,7 @@ def get_by_id(reply_id: int) -> Reply | None:
 
     reply_data = read_query(query, (reply_id,))
 
-    if reply_data is None:
+    if not reply_data:
         return None
 
     return Reply.from_query_result(*reply_data[0])
