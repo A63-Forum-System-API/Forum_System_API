@@ -7,7 +7,7 @@ def exists(reply_id: int, user_id: int) -> bool:
                 WHERE reply_id = ? AND user_id = ?"""
     result = read_query(query, (reply_id, user_id))
 
-    return result[0][0] if result else None
+    return result[0][0] if result else False
 
 
 def create_vote(reply_id: int, vote_type: int, user_id: int) -> None:
