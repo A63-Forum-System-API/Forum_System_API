@@ -81,14 +81,14 @@ def create(user: UserCreate):
                 )
 
 
-def update(user_id: int, user: UserUpdate):
+def update(user_id: int, is_admin: bool):
     query = """
             UPDATE users
             SET is_admin = ?
             WHERE id = ?
             """
-    insert_query(query, (user.is_admin, user_id))
+    insert_query(query, (is_admin, user_id))
 
-    return {"msg": f"User with #ID {user_id} successfully updated to {'admin' if user.is_admin else 'regular user!'}"}
+    return {"msg": f"User with #ID {user_id} successfully updated to {'admin' if is_admin else 'regular user!'}"}
 
 
