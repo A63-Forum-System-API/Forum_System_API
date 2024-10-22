@@ -4,6 +4,7 @@ from schemas.category import Category
 from services import category_service, user_service
 from common.auth import get_current_user
 from starlette import status
+from common.custom_responses import ForbiddenAccess, NotFound, Locked, Unauthorized, OK, BadRequest, NoContent
 
 
 categories_router = APIRouter(prefix="/categories")
@@ -20,24 +21,23 @@ def get_all_categories(
 ):
     # validation
     if not sort in (None, "asc", "desc"):
-        return Response(
-            content=f"Invalid value for sort: {sort}. Valid values are: asc, desc",
-            status_code=400,
+        return BadRequest(
+            content=f"Invalid value for sort: {sort}. Valid values are: asc, desc"
         )
+    
     if sort and sort_by not in ("title", "created_at"):
-        return Response(
-            content=f"Invalid value for sort_by: {sort_by}. Valid values are: title, created_at",
-            status_code=400,
+        return BadRequest(
+            content=f"Invalid value for sort_by: {sort_by}. Valid values are: title, created_at"
         )
+    
     if limit < 1 or limit > 100:  # fastapi checks if limit is int
-        return Response(
-            content=f"Invalid value for limit: {limit}. Valid values are: int [1-100]",
-            status_code=400,
+        return BadRequest(
+            content=f"Invalid value for limit: {limit}. Valid values are: int [1-100]"
         )
+    
     if offset < 0:
-        return Response(
-            content=f"Invalid value for offset: {offset}. Valid values are: int >= 0",
-            status_code=400,
+        return BadRequest(
+            content=f"Invalid value for offset: {offset}. Valid values are: int >= 0"
         )
 
     return category_service.get_categories(
@@ -45,17 +45,17 @@ def get_all_categories(
     )
 
 
-@categories_router.get("/{id}")
-def get_category_by_id(id: int, current_user_id: int = Depends(get_current_user)):
-    try:
-        category = category_service.get_by_id_with_topics(id, current_user_id)
-    except Exception as e:
-        return Response(content=str(e), status_code=403)
-
+@categories_router.get("/{category_id}")
+def get_category_by_id(category_id: int, current_user_id: int = Depends(get_current_user)):
+    category = category_service.get_by_id(category_id)
     if category is None:
-        return Response(content=f"No category with ID {id} found", status_code=404)
-    else:
-        return category
+        return NotFound("Category")
+    if category.is_private:
+        if not category_service.validate_user_access(current_user_id, category_id):
+            return ForbiddenAccess()
+
+    return category_service.get_by_id_with_topics(category)
+     
 
 
 @categories_router.post("/", status_code=201)
@@ -63,79 +63,109 @@ def create_category(
     category: Category, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not allowed to create categories!",
-        )
-    try:
-        return category_service.create(category, current_user_id)
-    except Exception as e:
-        return Response(content=str(e), status_code=409)
+        return ForbiddenAccess()
+    
+    if category_service.title_exists(category.title):
+        return BadRequest(content=f"Category with title '{category.title}' already exists")
+    
+    return category_service.create(category, current_user_id)
+   
 
 
-@categories_router.put("/{id}/private/{private_status_code}", status_code=204)
+@categories_router.put("/{category_id}/access/{private_status_code}", status_code=204)
 def change_category_private_status(
-    id: int, private_status_code: int, current_user_id: int = Depends(get_current_user)
+    category_id: int, private_status_code: int, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not allowed to update categories!",
-        )
+        return ForbiddenAccess()
+    
     if private_status_code not in (0, 1):
-        return Response(content="Private status code must be 0 or 1", status_code=400)
+        return BadRequest(content="Private status code must be 0 or 1")
+    
+    category = category_service.get_by_id(category_id)
+    if category is None:
+        return NotFound("Category")
+    
+    if category.is_private == private_status_code:
+        # Category with provided id and private status already has the given status. No change needed.
+        return OK(content="This category already was set to the provided private status.")
 
-    try:
-        category_service.change_category_private_status(id, private_status_code)
-        return Response(status_code=204)
-    except Exception as e:
-        return Response(content=str(e), status_code=404)
+    category_service.change_category_private_status(category_id, private_status_code)
+    return OK("Category private status was successfully changed")
+    
 
 
-@categories_router.put("/{id}/lock/{locked_status_code}", status_code=204)
+@categories_router.put("/{category_id}/locked-status/{locked_status_code}", status_code=204)
 def change_category_lock_status(
-    id: int, locked_status_code: int, current_user_id: int = Depends(get_current_user)
+    category_id: int, locked_status_code: int, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not allowed to update categories!",
-        )
+        return ForbiddenAccess()
+    
     if locked_status_code not in (0, 1):
-        return Response(content="Locked status code must be 0 or 1", status_code=400)
+        return BadRequest(content="Locked status code must be 0 or 1")
+    
+    category = category_service.get_by_id(category_id)
+    if category is None:
+        return NotFound("Category")
+    
+    if category.is_locked == locked_status_code:
+        # Category with provided id and lock status already has the given status. No change needed.
+        return OK(content="This category already was set to the provided lock status")
 
-    try:
-        category_service.change_category_lock_status(id, locked_status_code)
-        return Response(status_code=204)
-    except Exception as e:
-        return Response(content=str(e), status_code=404)
+    
+    category_service.change_category_lock_status(category_id, locked_status_code)
+    return OK("Category lock status was successfully changed")
+  
 
 
-@categories_router.put("/{category_id}/users/{user_id}/", status_code=204)
+@categories_router.patch("/{category_id}/users/{user_id}/access-code/{access_code}", status_code=204)
 def manage_user_access_to_private_category(
     category_id: int,
     user_id: int,
-    code_read_access: int,
-    code_write_access: int,
+    access_code: int,
     current_user_id: int = Depends(get_current_user),
 ):
     if not user_service.is_admin(current_user_id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not allowed to add users!",
-        )
-    if code_read_access not in (0, 1) or code_write_access not in (0, 1):
-        return Response(
-            content="Write and read access code must be 0 or 1", status_code=400
-        )
-    try:
-        category_service.manage_user_access_to_private_category(
-            category_id, user_id, code_read_access, code_write_access
-        )
-        return Response(status_code=204)
+        return ForbiddenAccess()
+    if access_code not in (0, 1):
+        return BadRequest(content="Access code must be 0 or 1")
+    
+    category = category_service.get_by_id(category_id)
+    if category is None:
+        return NotFound("Category")
+    if not category.is_private:
+        return BadRequest(content=f"Category ID: {category_id} is public")
+    
+    if not user_service.id_exists(user_id):
+        return NotFound(content=f"User ID: {user_id}")
+        
+    category_service.manage_user_access_to_private_category(
+        category_id, user_id, access_code)
+    return OK("Access was successfully changed")
 
-    except Exception as e:
-        return Response(content=str(e), status_code=404)
+
+@categories_router.delete("/{category_id}/users/{user_id}/", status_code=204)
+def remove_user_access_to_private_category(
+    category_id: int,
+    user_id: int,
+    current_user_id: int = Depends(get_current_user),
+):
+    if not user_service.is_admin(current_user_id):
+        return ForbiddenAccess()
+    
+    category = category_service.get_by_id(category_id)
+    if category is None:
+        return NotFound("Category")
+    if not category.is_private:
+        return BadRequest(content=f"Category ID: {category_id} is public")
+    
+    if not user_service.id_exists(user_id):
+        return NotFound(content=f"User ID: {user_id}")
+        
+    category_service.remove_user_access_to_private_category(category_id, user_id)
+    return OK("Access was successfully deleted")
+        
 
 
 @categories_router.get("/{category_id}/private/users")
@@ -143,11 +173,13 @@ def get_privileged_users_by_category(
     category_id: int, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not allowed to view privileged users!",
-        )
-    try:
-        return category_service.get_privileged_users_by_category(category_id)
-    except Exception as e:
-        return Response(content=str(e), status_code=404)
+        return ForbiddenAccess()
+    
+    category = category_service.get_by_id(category_id)
+    if category is None:
+        return NotFound("Category")
+    if not category.is_private:
+        return BadRequest(content=f"Category ID: {category_id} is public")
+    
+    return category_service.get_privileged_users_by_category(category_id)
+

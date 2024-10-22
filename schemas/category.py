@@ -1,13 +1,19 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from schemas.topic import ViewAllTopics
 from typing import Optional
 
 
 class Category(BaseModel):
     id: Optional[int] = None
-    title: str # TODO Field validation
-    description: str
+    title: str = Field(
+        min_length=5,
+        examples=["Title for category."]
+    )
+    description: str = Field(
+        min_length=5,
+        examples=["Short description of the subject of the category."]
+    )
     is_private: bool = False
     is_locked: Optional[bool] = False
     created_at: Optional[datetime] = datetime.now()
@@ -35,7 +41,7 @@ class ViewAllCategories(BaseModel):
     id: int
     title: str
     description: str
-    created_at: datetime = datetime.now() # TODO remove default value
+    created_at: datetime = datetime.now() 
 
     @classmethod
     def from_query_result(cls, id, title, description, created_at):
