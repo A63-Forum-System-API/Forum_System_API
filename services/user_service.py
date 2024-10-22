@@ -1,3 +1,12 @@
+from tkinter import Image
+from PIL import Image
+import io
+from fastapi import UploadFile, File, HTTPException
+from typing import Union
+
+import data
+from fastapi import HTTPException
+
 from common.auth import get_password_hash
 from data.database import insert_query, read_query
 from schemas.user import UserCreate, User, UserUpdate
@@ -81,14 +90,47 @@ def create(user: UserCreate):
                 )
 
 
-def update(user_id: int, user: UserUpdate):
+def update(user_id: int, is_admin: bool):
     query = """
             UPDATE users
             SET is_admin = ?
             WHERE id = ?
             """
-    insert_query(query, (user.is_admin, user_id))
+    insert_query(query, (is_admin, user_id))
 
-    return {"msg": f"User with #ID {user_id} successfully updated to {'admin' if user.is_admin else 'regular user!'}"}
+    return {"msg": f"User with #ID {user_id} successfully updated to {'admin' if is_admin else 'regular user!'}"}
 
+
+# def compress_image(image_content: bytes, max_size_mb: int = 5) -> bytes:
+#     image = Image.open(io.BytesIO(image_content))
+#     if image.mode == "RGBA":
+#         image = image.convert("RGB")
+#     compressed_image_io = io.BytesIO()
+#     quality = 85
+#     while True:
+#         compressed_image_io.seek(0)
+#         image.save(compressed_image_io, format="JPEG", quality=quality)
+#         size = compressed_image_io.tell()
+#         if size <= max_size_mb * 1024 * 1024:
+#             break
+#         quality -= 5
+#         if quality <= 0:
+#             raise HTTPException(status_code=500, detail="Cannot compress the image to the required size!")
+#     compressed_image_io.seek(0)
+#     compressed_image_content = compressed_image_io.read()
+#
+#     return compressed_image_content
+#
+#
+# def update_user_picture(user_id: int, picture: Union[UploadFile, None] = File(None)):
+#     if picture is None:
+#         raise HTTPException(status_code=400, detail="No picture provided!")
+#     picture_content = picture.file.read()
+#     compressed_picture_content = compress_image(picture_content)
+#     sql = """
+#             UPDATE users SET picture = ?
+#             WHERE id = ?
+#             """
+#     data.database.insert_query(sql, (compressed_picture_content, user_id))
+#     return {"message": "Profile picture updated."}
 
