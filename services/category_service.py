@@ -77,7 +77,7 @@ def get_by_id(category_id: int) -> Category:
     return Category.from_query_result(*data[0])
 
 
-def get_category_topics(category_id: int) -> list[ViewAllTopics]:
+def get_category_topics(category_id: int) -> list[ListOfTopics]:
     data = read_query(
         """SELECT id, title, is_locked, created_at, author_id
             FROM topics
