@@ -119,16 +119,16 @@ def change_category_lock_status(
   
 
 
-@categories_router.patch("/{category_id}/users/{user_id}/access-code/{access_code}", status_code=204)
+@categories_router.patch("/{category_id}/users/{user_id}/write-access/{write_access_code}", status_code=204)
 def manage_user_access_to_private_category(
     category_id: int,
     user_id: int,
-    access_code: int,
+    write_access_code: int,
     current_user_id: int = Depends(get_current_user),
 ):
     if not user_service.is_admin(current_user_id):
         return ForbiddenAccess()
-    if access_code not in (0, 1):
+    if write_access_code not in (0, 1):
         return BadRequest(content="Access code must be 0 or 1")
     
     category = category_service.get_by_id(category_id)
@@ -141,7 +141,7 @@ def manage_user_access_to_private_category(
         return NotFound(content=f"User ID: {user_id}")
         
     category_service.manage_user_access_to_private_category(
-        category_id, user_id, access_code)
+        category_id, user_id, write_access_code)
     return OK("Access was successfully changed")
 
 

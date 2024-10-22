@@ -4,10 +4,10 @@ from pydantic import BaseModel
 class Accesses(BaseModel):
     user_id: int
     category_id: int
-    type_access: bool = True
+    write_access: bool 
 
     @classmethod
-    def from_query_result(cls, user_id, category_id, type_access):
+    def from_query_result(cls, user_id, category_id, write_access):
         return cls(user_id=user_id,
                    category_id=category_id,
-                   type_access=type_access)
+                   write_access=write_access)
