@@ -1,7 +1,7 @@
-from typing import Optional, Literal
+from typing import Optional, Literal, Union
 
 import mariadb
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, UploadFile, File
 from fastapi.openapi.models import Response
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
@@ -10,6 +10,7 @@ from schemas.token import Token
 from schemas.user import UserCreate, UserLogIn, UserUpdate, UserUpdate
 from services import topic_service, reply_service, user_service
 from common.auth import get_current_user
+
 
 users_router = APIRouter(prefix='/users')
 
@@ -82,5 +83,20 @@ def update_user(user_id: int,
         )
 
     return user_service.update(user_id, is_admin)
+
+
+# @users_router.put("/{user_id}/picture")
+# def update_user_picture(user_id: int, picture: Union[UploadFile, None] = File(None)):
+#     if picture is None:
+#         raise HTTPException(status_code=400, detail="No picture provided!")
+#
+#     picture_content = picture.file.read()
+#
+#     compressed_picture_content = compress_image(picture_content)
+#
+#     # Call the service function to update the user picture in the database
+#     update_user_picture(user_id, compressed_picture_content)
+#
+#     return {"message": "Profile picture updated."}
 
 
