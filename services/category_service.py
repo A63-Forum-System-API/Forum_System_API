@@ -218,7 +218,7 @@ def validate_user_access(user_id: int, category_id: int, access_type: str = "rea
     if user_id is None:
         return False
     
-    query = """SELECT read_access
+    query = """SELECT write_access
             FROM category_accesses 
             WHERE category_id = ? 
             AND user_id = ?"""
@@ -235,10 +235,10 @@ def validate_user_access(user_id: int, category_id: int, access_type: str = "rea
 
 # Service for category access
 def manage_user_access_to_private_category(
-    category_id: int, user_id: int, access_code: int
+    category_id: int, user_id: int, write_access_code: int
 ):
     data = read_query(
-        """SELECT user_id, category_id, read_access
+        """SELECT user_id, category_id, write_access
                 FROM category_accesses
                 WHERE category_id = ?
                 AND user_id = ?""",
@@ -247,17 +247,17 @@ def manage_user_access_to_private_category(
     if data:
         access_model_for_user = Accesses.from_query_result(*data[0])
 
-        if access_model_for_user.type_access == access_code:
+        if access_model_for_user.write_access == write_access_code:
             logger.info(
                 f"No access change for user ID {user_id} and category ID {category_id}"
             )
             return
 
         query = """UPDATE category_accesses 
-                SET read_access = ?
+                SET write_access = ?
                 WHERE category_id = ?
                 AND user_id = ?"""
-        update_query(query, (access_code,  category_id, user_id))
+        update_query(query, (write_access_code,  category_id, user_id))
         logger.info(
             f"Access for user ID {user_id} and category ID {category_id} updated"
         )
@@ -265,10 +265,10 @@ def manage_user_access_to_private_category(
         return
     else:
         query = """INSERT INTO category_accesses 
-                (user_id, category_id, read_access)
+                (user_id, category_id, write_access)
                 VALUES (?, ?, ?)"""
 
-        insert_query(query, (user_id, category_id, access_code))
+        insert_query(query, (user_id, category_id, write_access_code))
         logger.info(f"Access for user ID {user_id} and category ID {category_id} added")
 
         return
@@ -278,7 +278,7 @@ def remove_user_access_to_private_category(
     category_id: int, user_id: int,
 ):
     data = read_query(
-        """SELECT user_id, category_id, read_access
+        """SELECT user_id, category_id, write_access
                 FROM category_accesses
                 WHERE category_id = ?
                 AND user_id = ?""",
@@ -291,7 +291,7 @@ def remove_user_access_to_private_category(
 
 def get_privileged_users_by_category(category_id):
     data = read_query(
-        """SELECT user_id, category_id, read_access
+        """SELECT user_id, category_id, write_access
             FROM category_accesses
             WHERE category_id = ?""",
             (category_id,),
@@ -299,17 +299,14 @@ def get_privileged_users_by_category(category_id):
     accesses = [Accesses.from_query_result(*row) for row in data]
     result = []
     for access in accesses:
-        if access.type_access:
+        if access.write_access:
             access = access.model_dump()
             access["read_access"] = True
-            access["write_access"] = True
-            del access["type_access"]
             result.append(access)
         else:
             access = access.model_dump()
             access["read_access"] = True
             access["write_access"] = False
-            del access["type_access"]
             result.append(access)
         
     return result

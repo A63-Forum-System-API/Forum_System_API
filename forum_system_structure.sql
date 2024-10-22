@@ -49,7 +49,6 @@ CREATE TABLE `category_accesses` (
   `user_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `write_access` tinyint(1) NOT NULL DEFAULT 0,
-  `read_access` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`,`category_id`),
   KEY `fk_users_has_categories_categories1_idx` (`category_id`),
   KEY `fk_users_has_categories_users_idx` (`user_id`),
