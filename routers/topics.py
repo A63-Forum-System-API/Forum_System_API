@@ -14,16 +14,15 @@ def get_all_topics(
     category_id: int | None = None,
     author_id: int | None = None,
     is_locked: bool | None = None,
+    current_user_id: int = Depends(get_current_user),
     limit: int = 10,
-    offset: int = 0,
-    current_user_id: int = Depends(get_current_user)
-):
+    offset: int = 0):
 
     topics = topic_service.get_all_topics(search, category_id, author_id,
-                                          is_locked, limit, offset, current_user_id)
+                                          is_locked, current_user_id, limit, offset)
 
     if sort and (sort == 'asc' or sort == 'desc'):
-        return sorted(topics, key=lambda t: t.created_at, reverse=sort == 'desc')
+        return topic_service.sort_topics(topics, key=lambda t: t.created_at, reverse=sort == 'desc')
     else:
         return topics
 

@@ -14,7 +14,7 @@ def vote(reply_id: int,
     if vote_type > 1 or vote_type < 0:
         return BadRequest("Votes-type must be 0 for downvote or 1 for upvote")
 
-    reply = reply_service.get_reply_by_id(reply_id)
+    reply = reply_service.get_by_id(reply_id)
     if reply is None:
         return NotFound('Reply')
 

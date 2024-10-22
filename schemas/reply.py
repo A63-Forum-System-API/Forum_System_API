@@ -16,12 +16,13 @@ class Reply(BaseModel):
     vote_count: Optional[int] = 0
 
     @classmethod
-    def from_query_result(cls, id, content, topic_id, created_at, is_best_reply, author_id):
+    def from_query_result(cls, id, content, topic_id, created_at, is_best_reply, author_id, vote_count):
         return cls(
             id=id,
             content=content,
             topic_id=topic_id,
             created_at=created_at,
             is_best_reply=is_best_reply,
-            author_id=author_id
+            author_id=author_id,
+            vote_count=vote_count
         )
