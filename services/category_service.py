@@ -7,7 +7,7 @@ from data.database import (
 )
 from schemas.category import Category, ViewAllCategories, SingleCategory
 from schemas.category_accesses import Accesses
-from schemas.topic import ViewAllTopics
+from schemas.topic import ViewAllTopics, ListOfTopics
 from services import topic_service
 from services import user_service
 import logging
@@ -86,7 +86,7 @@ def get_category_topics(category_id: int) -> list[ViewAllTopics]:
     )
     topics = []
     for row in data:
-        topic = ViewAllTopics(
+        topic = ListOfTopics(
             id=row[0],
             title=row[1],
             is_locked=row[2],

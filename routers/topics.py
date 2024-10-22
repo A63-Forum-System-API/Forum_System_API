@@ -48,7 +48,7 @@ def get_topic_by_id(topic_id: int,
 def create_topic(topic: Topic,
                  current_user_id: int = Depends(get_current_user)):
 
-    category = category_service.get_by_id_with_topics(topic.category_id)
+    category = category_service.get_by_id(topic.category_id)
 
     if category is None:
         return NotFound('Category')
@@ -73,8 +73,12 @@ def create_topic(topic: Topic,
 def lock_topic(topic_id: int,
                current_user_id: int = Depends(get_current_user)):
 
-    if not topic_service.id_exists(topic_id):
+    topic = topic_service.get_by_id(topic_id)
+    if topic is None:
         return NotFound('Topic')
+
+    if topic.is_locked:
+        return BadRequest('Topic is already locked')
 
     if not user_service.is_admin(current_user_id):
         return ForbiddenAccess()
@@ -88,7 +92,7 @@ def chose_topic_best_reply(topic_id: int,
                            reply_id: int,
                            current_user_id: int = Depends(get_current_user)):
 
-    topic = topic_service.get_by_id_with_replies(topic_id)
+    topic = topic_service.get_by_id(topic_id)
     if topic is None:
         return NotFound('Topic')
 

@@ -49,8 +49,8 @@ def get_all_topics(search: str, category_id: int,
 def get_by_id_with_replies(topic_id: int):
     query = """
     SELECT 
-        t.id, t.title, t.content, t.is_locked, t.created_at, t.category_id, t.author_id, t.best_reply_id,
-        r.id as reply_id, r.content as reply_content, r.created_at as reply_created_at, r.author_id as reply_author_id,
+        t.id, t.title, t.content, t.is_locked, t.category_id, t.created_at, t.best_reply_id, t.author_id,
+        r.id as reply_id, r.content as reply_content, r.topic_id as topic_id, r.created_at as reply_created_at, r.is_best_reply as reply_is_best_reply, r.author_id as reply_author_id,
         SUM(CASE 
                 WHEN v.vote_type = True THEN 1 
                 WHEN v.vote_type = False THEN -1 
@@ -69,16 +69,14 @@ def get_by_id_with_replies(topic_id: int):
         return None
 
     topic_data = data[0]
-    topic = {
-        'id': topic_data[0],
-        'title': topic_data[1],
-        'content': topic_data[2],
-        'is_locked': topic_data[3],
-        'created_at': topic_data[4],
-        'category_id': topic_data[5],
-        'author_id': topic_data[6],
-        'best_reply_id': topic_data[7],
-    }
+    topic = Topic.from_query_result(id=topic_data[0],
+                                    title=topic_data[1],
+                                    content=topic_data[2],
+                                    is_locked=topic_data[3],
+                                    category_id=topic_data[4],
+                                    created_at=topic_data[5],
+                                    best_reply_id=topic_data[6],
+                                    author_id=topic_data[7])
 
     replies = []
     for row in data:
@@ -86,12 +84,13 @@ def get_by_id_with_replies(topic_id: int):
             replies.append(Reply(
                 id=row[8],
                 content=row[9],
-                created_at=row[10],
-                topic_id=topic_id,
-                author_id=row[11],
-                total_votes=int(row[12])))
+                topic_id=row[10],
+                created_at=row[11],
+                is_best_reply=row[12],
+                author_id=row[13],
+                vote_count=int(row[14])))
 
-    return SingleTopic(**topic, all_replies=replies)
+    return SingleTopic(topic=topic, all_replies=replies)
 
 def get_by_id(topic_id: int):
     query = """SELECT id, title, content, is_locked, category_id, created_at, best_reply_id, author_id
