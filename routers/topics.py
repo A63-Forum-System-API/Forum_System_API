@@ -23,7 +23,7 @@ def get_all_topics(
                                           is_locked, current_user_id, limit, offset)
 
     if sort and (sort == 'asc' or sort == 'desc'):
-        return topic_service.sort_topics(topics, key=lambda t: t.created_at, reverse=sort == 'desc')
+        return topic_service.sort_topics(topics, reverse=sort == 'desc')
     else:
         return topics
 

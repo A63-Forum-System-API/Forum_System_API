@@ -3,8 +3,8 @@ from schemas.reply import Reply
 from schemas.topic import ViewAllTopics, Topic, SingleTopic, CreateTopicRequest
 from services import user_service
 
-def get_all_topics(search: str, category_id: int,
-                   author_id: int, is_locked: bool,
+def get_all_topics(search: str | None, category_id: int | None,
+                   author_id: int | None, is_locked: bool | None,
                    user_id: int, limit: int, offset: int) -> list[ViewAllTopics]:
 
     base_query = """SELECT t.id, t.title, t.is_locked, t.created_at, t.author_id , t.category_id, COALESCE(COUNT(r.id), 0) as replies_count
@@ -25,17 +25,15 @@ def get_all_topics(search: str, category_id: int,
 
     return [ViewAllTopics.from_query_result(*topic) for topic in topics]
 
-def _build_conditions_and_params(search: str, category_id: int,
-                                 author_id: int, is_locked: bool,
+def _build_conditions_and_params(search: str | None, category_id: int | None,
+                                 author_id: int | None, is_locked: bool | None,
                                  user_id: int) -> tuple:
     where_conditions = []
     params = []
 
     # check if user is not admin
     if not user_service.is_admin(user_id):
-        where_conditions.append("""(c.is_private = 0 OR (c.is_private = 1 AND EXISTS (
-                                    SELECT 1 FROM category_accesses ca 
-                                    WHERE ca.category_id = t.category_id AND ca.user_id = ?)))""")
+        where_conditions.append("""(c.is_private = 0 OR (c.is_private = 1 AND EXISTS (SELECT 1 FROM category_accesses ca WHERE ca.category_id = t.category_id AND ca.user_id = ?)))""")
         params.append(user_id)
 
     # check for optional parameters
@@ -67,9 +65,9 @@ def _build_final_query(base_query: str, where_conditions: list,
     return final_query, params
 
 def sort_topics(topics: list[ViewAllTopics],
-                key=lambda x: x, reverse=False) -> list[ViewAllTopics]:
+                reverse=False) -> list[ViewAllTopics]:
 
-    return sorted(topics, key=key, reverse=reverse)
+    return sorted(topics,  key=lambda t: t.created_at, reverse=reverse)
 
 def get_by_id_with_replies(topic_id: int) -> SingleTopic | None:
     query = """
@@ -102,9 +100,9 @@ def get_by_id_with_replies(topic_id: int) -> SingleTopic | None:
     return SingleTopic(topic=topic, all_replies=replies)
 
 def _create_reply_from_row(row) -> Reply:
-    reply_data = row[8:14]
+    reply_data = row[8:]
     reply = Reply.from_query_result(*reply_data)
-    reply.total_votes = int(row[14])
+    reply.vote_count = int(row[14])
 
     return reply
 
