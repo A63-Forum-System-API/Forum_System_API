@@ -42,3 +42,15 @@ def create(reply: Reply, user_id: int) -> Reply:
     generated_id = insert_query(query, (*params,))
 
     return get_by_id(generated_id)
+
+
+def reply_belongs_to_topic(reply_id: int, topic_id: int) -> bool:
+    query = """SELECT 1 
+                FROM replies 
+                WHERE id = ? 
+                AND topic_id = ?"""
+
+    result = read_query(query, (reply_id, topic_id))
+
+    return len(result) > 0
+

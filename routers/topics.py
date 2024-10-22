@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from common.auth import get_current_user
 from common.custom_responses import ForbiddenAccess, NotFound, OK, Locked, BadRequest
-from schemas.topic import Topic
+from schemas.topic import Topic, CreateTopicRequest
 from services import topic_service, reply_service, user_service, category_service
 
 topics_router = APIRouter(prefix='/topics')
@@ -44,7 +44,7 @@ def get_topic_by_id(topic_id: int,
 
 
 @topics_router.post('/', status_code=201)
-def create_topic(topic: Topic,
+def create_topic(topic: CreateTopicRequest,
                  current_user_id: int = Depends(get_current_user)):
 
     category = category_service.get_by_id(topic.category_id)
@@ -101,7 +101,7 @@ def chose_topic_best_reply(topic_id: int,
     if not topic_service.validate_topic_author(topic_id, current_user_id):
         return ForbiddenAccess()
 
-    if not reply_service.id_exists(reply_id):
+    if not reply_service.id_exists(reply_id) or reply_service.reply_belongs_to_topic(reply_id, topic_id):
         return NotFound('Reply')
 
     topic_service.update_best_reply(topic_id, reply_id)
