@@ -1,5 +1,5 @@
 from tkinter import Image
-from PIL import Image
+# from PIL import Image
 import io
 from fastapi import UploadFile, File, HTTPException
 from typing import Union

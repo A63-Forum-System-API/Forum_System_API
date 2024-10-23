@@ -1,3 +1,5 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends
 from common.auth import get_current_user
 from common.custom_responses import BadRequest, NotFound, Locked, ForbiddenAccess, Created, OK
@@ -6,9 +8,9 @@ from services import reply_service, vote_service, category_service, user_service
 votes_router = APIRouter(prefix='/votes')
 
 
-@votes_router.put('/{reply_id}/vote-types/{vote_type}')
+@votes_router.put('/{reply_id}')
 def vote(reply_id: int,
-         vote_type: int,
+         vote_type: Literal[0, 1],
          current_user_id: int = Depends(get_current_user)):
 
     if vote_type > 1 or vote_type < 0:
@@ -41,7 +43,7 @@ def vote(reply_id: int,
 
     return OK(f"Vote is successfully changed to {vote_str}")
 
-@votes_router.delete('/{reply_id}/vote-types')
+@votes_router.delete('/{reply_id}')
 def delete_vote(reply_id: int,
                 current_user_id: int = Depends(get_current_user)):
 
