@@ -152,7 +152,7 @@ def remove_user_access_to_private_category(
     current_user_id: int = Depends(get_current_user),
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess()
+        return ForbiddenAccess(content="Only admin can remove user access to private category")
     
     category = category_service.get_by_id(category_id)
     if category is None:
@@ -173,7 +173,7 @@ def get_privileged_users_by_category(
     category_id: int, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess()
+        return ForbiddenAccess(content="Only admin can get privileged users by category")
     
     category = category_service.get_by_id(category_id)
     if category is None:
