@@ -4,7 +4,7 @@ from common.auth import get_password_hash
 from data.database import insert_query, read_query
 
 
-def get_conversation(conversation_id: int, order: str = "asc"):
+def get_conversation(conversation_id: int, order: str = "asc") -> list[dict]:
     query = f"""
             SELECT m.text, m.sender_id, u.first_name, m.sent_at
             FROM messages m
@@ -42,7 +42,7 @@ def get_conversation_id(user1_id: int, user2_id: int) -> int | None:
     return result[0][0] if result else None
 
 
-def get_conversations(user_id: int, order="asc"):
+def get_conversations(user_id: int, order="asc") -> list[dict]:
     query = f"""
             SELECT c.id AS conversation_id,
                    CASE 
@@ -67,8 +67,6 @@ def get_conversations(user_id: int, order="asc"):
             AND (c.user1_id = ? OR c.user2_id = ?)
             ORDER BY m.sent_at {order}
             """
-
-    # TODO its returning random text for last_message
 
     result = read_query(query, (user_id, user_id, user_id, user_id))
     conversations = []

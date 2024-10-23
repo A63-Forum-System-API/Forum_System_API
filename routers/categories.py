@@ -63,7 +63,7 @@ def create_category(
     category: Category, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess()
+        return ForbiddenAccess(content="Only admin can create categories")
     
     if category_service.title_exists(category.title):
         return BadRequest(content=f"Category with title '{category.title}' already exists")
@@ -77,7 +77,7 @@ def change_category_private_status(
     category_id: int, private_status_code: int, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess()
+        return ForbiddenAccess(content="Only admin can change category private status")
     
     if private_status_code not in (0, 1):
         return BadRequest(content="Private status code must be 0 or 1")

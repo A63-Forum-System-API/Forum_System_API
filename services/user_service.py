@@ -12,14 +12,14 @@ from data.database import insert_query, read_query
 from schemas.user import UserCreate, User, UserUpdate
 
 
-def is_admin(user_id: int):
+def is_admin(user_id: int) -> bool:
     query = """SELECT is_admin FROM users WHERE id = ?"""
     result = read_query(query, (user_id,))
 
     return True if result[0][0] else False
 
 
-def id_exists(user_id: int):
+def id_exists(user_id: int) -> bool:
     query = """SELECT id FROM users WHERE id = ?"""
     result = read_query(query, (user_id,))
 
@@ -60,7 +60,7 @@ def get_user_by_id(user_id: int):
                 )
 
 
-def check_if_email_exist(email: str):
+def check_if_email_exist(email: str) -> bool:
     query = """
             SELECT id, username, first_name, last_name, email, is_admin, picture 
             FROM users WHERE email = ?

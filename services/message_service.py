@@ -20,7 +20,7 @@ def create(message: Message, receiver_id: int, sender_id: int):
     return Response(content=f"The message to {first_name} was sent successfully!", status_code=201)
 
 
-def _get_conversation_id(user1_id, user2_id):
+def _get_conversation_id(user1_id, user2_id) -> int:
     result = conversation_service.get_conversation_id(user1_id, user2_id)
 
     if not result:
