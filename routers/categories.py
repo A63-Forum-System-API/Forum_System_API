@@ -7,7 +7,7 @@ from starlette import status
 from common.custom_responses import ForbiddenAccess, NotFound, Locked, Unauthorized, OK, BadRequest, NoContent
 
 
-categories_router = APIRouter(prefix="/categories")
+categories_router = APIRouter(prefix="/categories", tags=['Categories'])
 
 
 @categories_router.get("/")

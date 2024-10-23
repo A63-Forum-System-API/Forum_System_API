@@ -6,7 +6,7 @@ from starlette.responses import Response
 from common.auth import get_current_user
 from services import message_service, user_service, conversation_service
 
-conversations_router = APIRouter(prefix='/conversations')
+conversations_router = APIRouter(prefix='/conversations', tags=['Conversations'])
 
 
 @conversations_router.get('/{receiver_id}')

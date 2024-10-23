@@ -5,7 +5,7 @@ from common.auth import get_current_user
 from schemas.message import Message
 from services import message_service, user_service
 
-messages_router = APIRouter(prefix='/messages')
+messages_router = APIRouter(prefix='/messages', tags=['Messages'])
 
 
 @messages_router.post('/{receiver_id}')

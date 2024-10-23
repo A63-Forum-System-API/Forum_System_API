@@ -4,7 +4,7 @@ from common.custom_responses import ForbiddenAccess, NotFound, OK, Locked, BadRe
 from schemas.topic import CreateTopicRequest
 from services import topic_service, reply_service, user_service, category_service
 
-topics_router = APIRouter(prefix='/topics')
+topics_router = APIRouter(prefix='/topics', tags=['Topics'])
 
 
 @topics_router.get('/')
