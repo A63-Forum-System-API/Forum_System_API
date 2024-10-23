@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends
 from common.auth import get_current_user
 from common.custom_responses import ForbiddenAccess, NotFound, OK, Locked, BadRequest
-from schemas.topic import Topic, CreateTopicRequest
+from schemas.topic import CreateTopicRequest
 from services import topic_service, reply_service, user_service, category_service
-from services.topic_service import get_topic_best_reply
 
 topics_router = APIRouter(prefix='/topics')
 
@@ -19,10 +18,10 @@ def get_all_topics(
     limit: int = 10,
     offset: int = 0):
 
-    if not category_service.exists(category_id):
+    if category_id and not category_service.exists(category_id):
         return NotFound('Category')
 
-    if not user_service.id_exists(author_id):
+    if author_id and not user_service.id_exists(author_id):
         return NotFound('Author')
 
     topics = topic_service.get_all_topics(search, category_id, author_id,
@@ -111,7 +110,7 @@ def chose_topic_best_reply(topic_id: int,
     if not reply_service.id_exists(reply_id) or not reply_service.reply_belongs_to_topic(reply_id, topic_id):
         return NotFound('Reply')
 
-    prev_best_reply = get_topic_best_reply(topic_id)
+    prev_best_reply = topic_service.get_topic_best_reply(topic_id)
     if prev_best_reply == reply_id:
         return BadRequest('Reply is already the best reply for this topic')
 
