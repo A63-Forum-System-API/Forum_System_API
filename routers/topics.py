@@ -19,6 +19,12 @@ def get_all_topics(
     limit: int = 10,
     offset: int = 0):
 
+    if not category_service.exists(category_id):
+        return NotFound('Category')
+
+    if not user_service.id_exists(author_id):
+        return NotFound('Author')
+
     topics = topic_service.get_all_topics(search, category_id, author_id,
                                           is_locked, current_user_id, limit, offset)
 
