@@ -18,10 +18,10 @@ def get_all_topics(
     limit: int = 10,
     offset: int = 0):
 
-    if category_id and not category_service.exists(category_id):
+    if category_id is not None and not category_service.exists(category_id):
         return NotFound('Category')
 
-    if author_id and not user_service.id_exists(author_id):
+    if author_id is not None and not user_service.id_exists(author_id):
         return NotFound('Author')
 
     topics = topic_service.get_all_topics(search, category_id, author_id,
