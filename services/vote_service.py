@@ -1,13 +1,13 @@
 from data.database import read_query, insert_query, update_query, delete_query
 
 
-def exists(reply_id: int, user_id: int) -> bool:
+def get_vote(reply_id: int, user_id: int) -> bool:
     query = """SELECT vote_type 
                 FROM votes 
                 WHERE reply_id = ? AND user_id = ?"""
     result = read_query(query, (reply_id, user_id))
 
-    return result[0][0] if result else False
+    return result[0][0] if result else None
 
 
 def create_vote(reply_id: int, vote_type: int, user_id: int) -> None:

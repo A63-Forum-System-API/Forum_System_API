@@ -28,5 +28,8 @@ class Reply(BaseModel):
         )
 
 class CreateReplyRequest(BaseModel):
-    content: str
+    content: str = Field(
+        min_length=5,
+        examples=["This is the content of the reply."]
+    )
     topic_id: int

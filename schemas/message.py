@@ -5,6 +5,7 @@ from typing import Optional
 
 class Message(BaseModel):
     text: str = Field(
+        min_length=1,
         max_length=500,
         examples=["This is the content of the message."]
     )

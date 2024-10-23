@@ -35,8 +35,15 @@ class Topic(BaseModel):
         )
 
 class CreateTopicRequest(BaseModel):
-    title: str
-    content: str
+    title: str = Field(
+        min_length=5,
+        max_length=45,
+        examples=["Title of topic"]
+    )
+    content: str = Field(
+        min_length=5,
+        examples=["This is the content of the topic."]
+    )
     is_locked: Optional[bool] = False
     category_id: int
 

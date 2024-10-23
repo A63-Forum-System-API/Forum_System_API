@@ -1,6 +1,6 @@
 from typing import Literal
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from common.auth import get_current_user
 from common.custom_responses import BadRequest, NotFound, Locked, ForbiddenAccess, Created, OK
 from services import reply_service, vote_service, category_service, user_service, topic_service
@@ -10,7 +10,7 @@ votes_router = APIRouter(prefix='/votes')
 
 @votes_router.put('/{reply_id}')
 def vote(reply_id: int,
-         vote_type: Literal[0, 1],
+         vote_type: int,
          current_user_id: int = Depends(get_current_user)):
 
     if vote_type > 1 or vote_type < 0:
@@ -27,10 +27,10 @@ def vote(reply_id: int,
     category = category_service.get_by_id(topic.category_id)
     if not user_service.is_admin(current_user_id) and category.is_private:
         access = category_service.validate_user_access(current_user_id, topic.category_id)
-        if access is None:
+        if not access:
             return ForbiddenAccess()
 
-    vote = vote_service.exists(reply_id, current_user_id)
+    vote = vote_service.get_vote(reply_id, current_user_id)
     if vote is None:
         vote_service.create_vote(reply_id, vote_type, current_user_id)
         return Created("User voted successfully")
@@ -58,10 +58,10 @@ def delete_vote(reply_id: int,
     category = category_service.get_by_id(topic.category_id)
     if not user_service.is_admin(current_user_id) and category.is_private:
         access = category_service.validate_user_access(current_user_id, topic.category_id)
-        if access is None:
+        if not access:
             return ForbiddenAccess()
 
-    vote = vote_service.exists(reply_id, current_user_id)
+    vote = vote_service.get_vote(reply_id, current_user_id)
     if vote is None:
         return BadRequest("User has not voted for this reply")
 

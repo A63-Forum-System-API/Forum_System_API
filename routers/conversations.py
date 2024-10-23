@@ -19,7 +19,7 @@ def view_conversation(receiver_id: int,
     conversation_id = conversation_service.get_conversation_id(current_user_id, receiver_id)
 
     if not conversation_id:
-        return Response(content=f"No conversation between users with IDs {current_user_id} and {receiver_id} found!",
+        return Response(content=f"No conversation with user ID {receiver_id} found!",
                         status_code=404)
 
     return conversation_service.get_conversation(conversation_id, order)

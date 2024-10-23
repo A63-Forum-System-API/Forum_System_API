@@ -21,15 +21,15 @@ def create_user(user: UserCreate):
         return user_service.create(user)
 
     except mariadb.IntegrityError as e:
-        if "email_UNIQUE" in str(e):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"User with email '{user.email}' already exists!"
-            )
-        elif "username_UNIQUE" in str(e):
+        if "username_UNIQUE" in str(e):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"User with username '{user.username}' already exists!"
+            )
+        elif "email_UNIQUE" in str(e):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"User with email '{user.email}' already exists!"
             )
         else:
             raise HTTPException(
@@ -45,8 +45,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found!"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid username or password"
         )
 
     access_token = create_access_token(data=user)

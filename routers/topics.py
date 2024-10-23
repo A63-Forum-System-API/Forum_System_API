@@ -43,7 +43,7 @@ def get_topic_by_id(topic_id: int,
         return NotFound('Topic')
 
     if not user_service.is_admin(current_user_id):
-        if not category_service.validate_user_access(current_user_id, topic.category_id):
+        if not category_service.validate_user_access(current_user_id, topic.topic.category_id):
             return ForbiddenAccess()
 
     return topic
@@ -77,16 +77,17 @@ def create_topic(topic: CreateTopicRequest,
 @topics_router.put('/{topic_id}')
 def lock_topic(topic_id: int,
                current_user_id: int = Depends(get_current_user)):
-
+    
+    if not user_service.is_admin(current_user_id):
+        return ForbiddenAccess(content="Only admins can lock topics")
+    
     topic = topic_service.get_by_id(topic_id)
+    
     if topic is None:
         return NotFound('Topic')
 
     if topic.is_locked:
         return BadRequest('Topic is already locked')
-
-    if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess()
 
     topic_service.lock_topic(topic_id)
     return OK('Topic is successfully locked')
@@ -105,7 +106,7 @@ def chose_topic_best_reply(topic_id: int,
         return Locked('topic')
 
     if not topic_service.validate_topic_author(topic_id, current_user_id):
-        return ForbiddenAccess()
+        return ForbiddenAccess("User is not the author of that topic")
 
     if not reply_service.id_exists(reply_id) or not reply_service.reply_belongs_to_topic(reply_id, topic_id):
         return NotFound('Reply')
