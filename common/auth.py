@@ -11,9 +11,9 @@ from schemas.token import TokenData
 
 load_dotenv()
 
-_SECRET_KEY = os.getenv('SECRET_KEY')
-_ALGORITHM = os.getenv('ALGORITHM')
-_ACCESS_TOKEN_EXPIRE = int(os.getenv('ACCESS_TOKEN_EXPIRE'))
+_SECRET_KEY = os.getenv("SECRET_KEY")
+_ALGORITHM = os.getenv("ALGORITHM")
+_ACCESS_TOKEN_EXPIRE = int(os.getenv("ACCESS_TOKEN_EXPIRE"))
 
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -46,7 +46,7 @@ def authenticate_user(
     if not verify_password(password, hash_password):
         return None
 
-    return {'user_id': user[0]}
+    return {"user_id": user[0]}
 
 
 def create_access_token(data: dict):
