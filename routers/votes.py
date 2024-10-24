@@ -45,7 +45,7 @@ def vote(reply_id: int = Path(description="ID of the reply to vote for"),
 
     return OK(f"Vote is successfully changed to {vote_str}")
 
-@votes_router.delete('/{reply_id}')
+@votes_router.delete("/{reply_id}")
 def delete_vote(reply_id: int = Path(description="ID of the reply to delete vote for"),
                 current_user_id: int = Depends(get_current_user)):
 

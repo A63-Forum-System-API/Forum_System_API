@@ -39,7 +39,7 @@ def _build_conditions_and_params(search: str | None, category_id: int | None,
     # check for optional parameters
     if search is not None:
         where_conditions.append("t.title like ?")
-        params.append(f'%{search}%')
+        params.append(f"%{search}%")
 
     if category_id is not None:
         where_conditions.append("t.category_id = ?")

@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from common.auth import authenticate_user, create_access_token
 from schemas.token import Token
 
-token_router = APIRouter(prefix='/token', tags=['Token'])
+token_router = APIRouter(prefix="/token", tags=["Token"])
 
 
 @token_router.post('/')
@@ -18,4 +18,4 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
 
     access_token = create_access_token(data=user)
     return Token(access_token=access_token,
-                 token_type='bearer')
+                 token_type="bearer")
