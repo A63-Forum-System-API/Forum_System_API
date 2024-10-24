@@ -17,7 +17,7 @@ def create(message: Message, receiver_id: int, sender_id: int):
     insert_query(query, (message.text, sender_id, receiver_id, conversation_id))
     first_name = get_user_by_id(receiver_id).first_name
 
-    return Response(content=f"The message to {first_name} was sent successfully!", status_code=201)
+    return f"The message to {first_name} was sent successfully!"
 
 
 def _get_conversation_id(user1_id, user2_id) -> int:
