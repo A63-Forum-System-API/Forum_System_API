@@ -12,7 +12,7 @@ class VoteService_Should(unittest.TestCase):
             mock_read_query.return_value = [(1,)]
 
             # Act
-            result = vote_service.exists(1, 1)
+            result = vote_service.get_vote(1, 1)
 
             # Assert
             self.assertEqual(True, result)
@@ -23,10 +23,10 @@ class VoteService_Should(unittest.TestCase):
             mock_read_query.return_value = []
 
             # Act
-            result = vote_service.exists(1, 1)
+            result = vote_service.get_vote(1, 1)
 
             # Assert
-            self.assertEqual(False, result)
+            self.assertEqual(None, result)
 
     def test_createVote_calls_insertQuery(self):
         # Arrange
