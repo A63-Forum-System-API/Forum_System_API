@@ -6,6 +6,9 @@ class BadRequest(JSONResponse):
     def __init__(self, content=''):
         super().__init__(status_code=400, content={'detail': content})
 
+class Locked(JSONResponse):
+    def __init__(self, content=''):
+        super().__init__(status_code=400, content={'detail': f'This {content} is locked'})
 
 class Unauthorized(JSONResponse):
     def __init__(self, content=''):
@@ -14,11 +17,6 @@ class Unauthorized(JSONResponse):
 class ForbiddenAccess(JSONResponse):
     def __init__(self, content='User does not have access to this category'):
         super().__init__(status_code=403, content={'detail': content})
-
-class Locked(JSONResponse):
-    def __init__(self, content=''):
-        super().__init__(status_code=403, content={'detail': f'This {content} is locked'})
-
 
 class NotFound(JSONResponse):
     def __init__(self, content=''):
