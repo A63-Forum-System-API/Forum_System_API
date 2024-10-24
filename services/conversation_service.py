@@ -44,7 +44,7 @@ def get_conversation_id(user1_id: int, user2_id: int) -> int | None:
 
 def get_conversations(user_id: int, order="asc") -> list[dict]:
     query = f"""
-            SELECT c.id AS conversation_id,
+            SELECT DISTINCT c.id AS conversation_id,
                    CASE 
                        WHEN c.user1_id = ? THEN u2.username 
                        ELSE u1.username 
