@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from common.auth import get_current_user
 from common.custom_responses import ForbiddenAccess, NotFound, Locked
 from data.database import read_query
@@ -9,7 +9,7 @@ replies_router = APIRouter(prefix='/replies', tags=['Replies'])
 
 
 @replies_router.post('/', status_code=201)
-def create_reply(reply: CreateReplyRequest,
+def create_reply(reply: CreateReplyRequest = Body(description='Reply to create'),
                  current_user_id: int = Depends(get_current_user)):
 
     topic = topic_service.get_by_id(reply.topic_id)

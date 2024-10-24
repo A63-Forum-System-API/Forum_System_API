@@ -1,5 +1,5 @@
 from typing import Literal
-from fastapi import APIRouter, Depends, Query, Path
+from fastapi import APIRouter, Depends, Query, Path, Body
 from common.auth import get_current_user
 from common.custom_responses import ForbiddenAccess, NotFound, OK, Locked, BadRequest
 from schemas.topic import CreateTopicRequest
@@ -61,7 +61,7 @@ def get_topic_by_id(topic_id: int = Path(description="ID of the topic to retriev
 
 
 @topics_router.post("/", status_code=201)
-def create_topic(topic: CreateTopicRequest = Query(description="Topic to create"),
+def create_topic(topic: CreateTopicRequest = Body(description="Topic to create"),
                  current_user_id: int = Depends(get_current_user)):
 
     category = category_service.get_by_id(topic.category_id)
@@ -128,4 +128,4 @@ def chose_topic_best_reply(topic_id: int = Path(description="ID of the topic to 
         return BadRequest("Reply is already the best reply for this topic")
 
     topic_service.update_best_reply(topic_id, reply_id, prev_best_reply)
-    return OK(f"Best reply for topic with ID {topic_id} is now reply with ID {reply_id}.")
+    return OK("Best reply is successfully chosen")
