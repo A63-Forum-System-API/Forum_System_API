@@ -115,7 +115,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Author not found', response.json()['detail'])
+            self.assertEqual("User ID: 1 not found", response.json()['detail'])
             mock_id_exists.assert_called_once()
 
     def test_getAllTopics_return_forbiddenAccess_when_categoryId_userNotAdmin_userHasNoAccess(self):
@@ -169,7 +169,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Category not found', response.json()['detail'])
+            self.assertEqual("Category ID: 1 not found", response.json()['detail'])
             mock_exists.assert_called_once_with(1)
 
 
@@ -253,7 +253,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Topic not found', response.json()['detail'])
+            self.assertEqual("Topic ID: 1 not found", response.json()['detail'])
             mock_get_by_id_with_replies.assert_called_once_with(1)
 
     def test_createTopic_return_topic(self):
@@ -327,7 +327,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(403, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Only admins can create locked topics', response.json()['detail'])
+            self.assertEqual("Only admin can create locked topics", response.json()['detail'])
             mock_is_admin.assert_called_once_with(1)
             mock_get_by_id.assert_called_once_with(1)
 
@@ -341,7 +341,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(400, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('This category is locked', response.json()['detail'])
+            self.assertEqual("Category ID: 1 is locked", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
 
     def test_createTopic_return_notFound_when_categoryDoesNotExist(self):
@@ -354,7 +354,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Category not found', response.json()['detail'])
+            self.assertEqual("Category ID: 1 not found", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
 
     def test_lockTopic_return_OK_when_userIsAdmin(self):
@@ -369,7 +369,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(200, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Topic is successfully locked', response.json()['detail'])
+            self.assertEqual("Topic ID: 1 successfully locked", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
             mock_is_admin.assert_called_once_with(1)
 
@@ -386,7 +386,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(400, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Topic is already locked', response.json()['detail'])
+            self.assertEqual("Topic ID: 1 already locked", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
             mock_is_admin.assert_called_once_with(1)
 
@@ -400,7 +400,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Topic not found', response.json()['detail'])
+            self.assertEqual("Topic ID: 1 not found", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
 
     def test_lockTopic_return_forbiddenAccess_when_userNotAdmin(self):
@@ -413,7 +413,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(403, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Only admins can lock topics', response.json()['detail'])
+            self.assertEqual("Only admin can can lock topics", response.json()['detail'])
             mock_is_admin.assert_called_once_with(1)
 
     def test_choseTopicBestReply_return_OK_when_userIsAdmin(self):
@@ -436,7 +436,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(200, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Best reply is successfully chosen', response.json()['detail'])
+            self.assertEqual(f'Reply ID: 1 is now the best reply for topic ID: {self.test_topics[0].id}', response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
             mock_validate_topic_author.assert_called_once_with(1, 1)
             mock_id_exists.assert_called_once_with(1)
@@ -463,7 +463,8 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(400, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Reply is already the best reply for this topic', response.json()['detail'])
+            self.assertEqual(f"Reply ID: 1 is already the best reply for topic ID: {self.test_topics[0].id}",
+                             response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
             mock_validate_topic_author.assert_called_once_with(1, 1)
             mock_id_exists.assert_called_once_with(1)
@@ -487,7 +488,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Reply not found', response.json()['detail'])
+            self.assertEqual(f"Reply ID: 1 not found", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
             mock_validate_topic_author.assert_called_once_with(1, 1)
             mock_id_exists.assert_called_once_with(1)
@@ -508,7 +509,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Reply not found', response.json()['detail'])
+            self.assertEqual("Reply ID: 1 not found", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
             mock_validate_topic_author.assert_called_once_with(1, 1)
             mock_id_exists.assert_called_once_with(1)
@@ -526,7 +527,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(403, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Only the author of the topic can choose the best reply', response.json()['detail'])
+            self.assertEqual(f"Only the author can choose best reply for the topic", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
             mock_validate_topic_author.assert_called_once_with(1, 1)
 
@@ -542,7 +543,7 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(400, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('This topic is locked', response.json()['detail'])
+            self.assertEqual(f"Topic ID: {self.test_topics[0].id} is locked", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
 
 
@@ -556,6 +557,6 @@ class TopicsRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual('Topic not found', response.json()['detail'])
+            self.assertEqual("Topic ID: 1 not found", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
 

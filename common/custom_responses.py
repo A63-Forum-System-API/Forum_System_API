@@ -24,7 +24,7 @@ class OnlyAdminAccess(JSONResponse):
 
 class OnlyAuthorAccess(JSONResponse):
     def __init__(self, content=""):
-        super().__init__(status_code=403, content={"detail": f"Only author can {content}"})
+        super().__init__(status_code=403, content={"detail": f"Only the author can {content}"})
 
 class NotFound(JSONResponse):
     def __init__(self, content=''):

@@ -121,7 +121,7 @@ class RepliesRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(400, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual("This topic is locked", response.json()["detail"])
+            self.assertEqual(f"Topic ID: {self.test_reply.topic_id} is locked", response.json()["detail"])
             mock_topic_service.assert_called_once()
 
     def test_createReply_return_notFound_when_topicDoesNotExist(self):
@@ -135,7 +135,7 @@ class RepliesRouter_Should(unittest.TestCase):
             # Assert
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual("Topic not found", response.json()["detail"])
+            self.assertEqual(f"Topic ID: {self.test_reply.topic_id} not found", response.json()["detail"])
             mock_topic_service.assert_called_once()
 
 

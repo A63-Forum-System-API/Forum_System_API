@@ -118,7 +118,7 @@ def chose_topic_best_reply(topic_id: int = Path(description="ID of the topic to 
         return Locked(f"Topic ID: {topic_id}")
 
     if not topic_service.validate_topic_author(topic_id, current_user_id):
-        return OnlyAuthorAccess("choose best reply for this topic")
+        return OnlyAuthorAccess("choose best reply for the topic")
 
     if not reply_service.id_exists(reply_id) or not reply_service.reply_belongs_to_topic(reply_id, topic_id):
         return NotFound(f"Reply ID: {reply_id}")

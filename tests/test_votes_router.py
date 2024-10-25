@@ -205,7 +205,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.delete("/votes/1")
 
             self.assertEqual(200, response.status_code)
-            self.assertEqual("Vote deleted successfully", response.json()["detail"])
+            self.assertEqual("Vote for reply ID 1 removed successfully", response.json()["detail"])
             mock_reply_service.assert_called_once()
             mock_topic_service.assert_called_once()
             mock_category_service.assert_called_once()
@@ -228,7 +228,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.delete("/votes/1")
 
             self.assertEqual(400, response.status_code)
-            self.assertEqual("User has not voted for this reply", response.json()["detail"])
+            self.assertEqual("User ID: 1 has not voted for reply ID: 1", response.json()["detail"])
             mock_reply_service.assert_called_once()
             mock_topic_service.assert_called_once()
             mock_category_service.assert_called_once()
@@ -276,7 +276,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.delete("/votes/1")
 
             self.assertEqual(200, response.status_code)
-            self.assertEqual("Vote deleted successfully", response.json()["detail"])
+            self.assertEqual("Vote for reply ID 1 removed successfully", response.json()["detail"])
             mock_reply_service.assert_called_once()
             mock_topic_service.assert_called_once()
             mock_category_service.assert_called_once()
@@ -289,7 +289,7 @@ class VotesRouter_Should(unittest.TestCase):
         with (patch("services.reply_service.get_by_id",
                     return_value=fake_reply()) as mock_reply_service,
               patch("services.topic_service.get_by_id",
-                    return_value=fake_topic(is_locked=True)) as mock_topic_service):
+                    return_value=fake_topic(id=1, is_locked=True)) as mock_topic_service):
 
             response = client.delete("/votes/1")
 
