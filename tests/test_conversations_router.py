@@ -7,7 +7,7 @@ from main import app
 
 client = TestClient(app)
 
-class ConversationsRouterShould(unittest.TestCase):
+class TestViewConversation(unittest.TestCase):
 
     def setUp(self):
         app.dependency_overrides = {
@@ -21,14 +21,14 @@ class ConversationsRouterShould(unittest.TestCase):
     def test_view_conversation_returns_404_when_receiver_id_does_not_exist(self, mock_id_exists):
         response = client.get("/conversations/1")
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json(), {"detail": "No user with ID 1 found"})
+        self.assertEqual(response.json(), {"detail": "User ID: 1 not found"})
 
     @patch('services.user_service.id_exists', return_value=True)
     @patch('services.conversation_service.get_conversation_id', return_value=None)
     def test_view_conversation_returns_404_when_no_conversation_found(self, mock_get_conversation_id, mock_id_exists):
         response = client.get("/conversations/1")
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json(), {"detail": "No conversation found with user ID 1"})
+        self.assertEqual(response.json(), {"detail": "Conversation with user ID: 1 not found"})
 
     @patch('services.user_service.id_exists', return_value=True)
     @patch('services.conversation_service.get_conversation_id', return_value=1)
@@ -42,7 +42,7 @@ class ConversationsRouterShould(unittest.TestCase):
     def test_view_conversations_returns_404_when_no_conversations_found(self, mock_get_conversations):
         response = client.get("/conversations/")
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json(), {"detail": "No conversations found"})
+        self.assertEqual(response.json(), {"detail": "Conversations not found"})
 
     @patch('services.conversation_service.get_conversations', return_value=[{"id": 1, "messages": []}])
     def test_view_conversations_success(self, mock_get_conversations):
