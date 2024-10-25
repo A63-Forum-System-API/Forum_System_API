@@ -1,31 +1,42 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+
+from starlette.testclient import TestClient
+
+from common.auth import get_current_user
+from main import app
 from routers import messages as messages_router
+from schemas.message import Message
 
 
-mock_message_service = Mock(spec='services.message_service')
-mock_user_service = Mock(spec='services.user_service')
+client = TestClient(app)
 
+class MessagesRouterShould(unittest.TestCase):
+    def setUp(self):
+        self.message = Message(text="Hello")
+        app.dependency_overrides = {
+            get_current_user: lambda: 1
+        }
 
-messages_router.product_service = mock_message_service
-messages_router.order_service = mock_user_service
+    def tearDown(self):
+        app.dependency_overrides = {}
 
+    @patch('services.user_service.id_exists', return_value=False)
+    def test_create_message_returns_404_when_receiver_id_does_not_exist(self, mock_id_exists):
+        response = client.post("/messages/1", json=self.message.dict())
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.content, b"No user with ID 1 found")
 
-class MessageRouterShould(unittest.TestCase):
+    def test_create_message_returns_400_when_message_is_empty(self):
+        self.message.text = "   "
+        response = client.post("/messages/1", json=self.message.dict())
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content, b"Message cannot be empty")
 
-    def setUp(self) -> None:
-        mock_message_service.reset_mock()
-        mock_user_service.reset_mock()
+    @patch('services.user_service.id_exists', return_value=True)
+    @patch('services.message_service.create', return_value={"id": 1, "text": "Hello"})
+    def test_create_message_success(self, mock_create, mock_id_exists):
+        response = client.post("/messages/1", json=self.message.dict())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"id": 1, "text": "Hello"})
 
-    def test_createMessage_returns404_whenReceiverIdDoesNotExist(self):
-        # Arrange
-        receiver_id = 1
-        message = Mock()
-        message.text = 'text'
-        mock_user_service.id_exists = lambda x: False
-
-        # Act
-        result = messages_router.create_message(receiver_id, message)
-
-        # Assert
-        self.assertEqual(404, result.status_code)
