@@ -17,11 +17,11 @@ def vote(reply_id: int = Path(description="ID of the reply to vote for"),
 
     reply = reply_service.get_by_id(reply_id)
     if reply is None:
-        return NotFound("Reply")
+        return NotFound(f"Reply ID: {reply_id}")
 
     topic = topic_service.get_by_id(reply.topic_id)
     if topic.is_locked:
-        return Locked("topic")
+        return Locked(f"Topic ID: {reply.topic_id}")
 
     category = category_service.get_by_id(topic.category_id)
     if not user_service.is_admin(current_user_id) and category.is_private:
@@ -33,15 +33,15 @@ def vote(reply_id: int = Path(description="ID of the reply to vote for"),
     vote = vote_service.get_vote(reply_id, current_user_id)
     if vote is None:
         vote_service.create_vote(reply_id, vote_type, current_user_id)
-        return Created("User voted successfully")
+        return Created(f"User ID: {current_user_id} voted successfully for reply ID: {reply_id}")
 
     if vote == vote_type:
-        return BadRequest(f"Current user has already voted for this reply")
+        return BadRequest(f"User ID: {current_user_id} has already voted for reply ID: {reply_id}")
 
     vote_service.update_vote(reply_id, vote_type, current_user_id)
     vote_str = "upvote" if vote_type == 1 else "downvote"
 
-    return OK(f"Vote is successfully changed to {vote_str}")
+    return OK(f"Vote for reply ID {reply_id} is successfully changed to {vote_str}")
 
 @votes_router.delete("/{reply_id}")
 def delete_vote(reply_id: int = Path(description="ID of the reply to delete vote for"),
@@ -49,11 +49,11 @@ def delete_vote(reply_id: int = Path(description="ID of the reply to delete vote
 
     reply = reply_service.get_by_id(reply_id)
     if reply is None:
-        return NotFound("Reply")
+        return NotFound(f"Reply ID: {reply_id}")
 
     topic = topic_service.get_by_id(reply.topic_id)
     if topic.is_locked:
-        return Locked("topic")
+        return Locked(f"Topic ID: {reply.topic_id}")
 
     category = category_service.get_by_id(topic.category_id)
     if not user_service.is_admin(current_user_id) and category.is_private:
@@ -64,8 +64,8 @@ def delete_vote(reply_id: int = Path(description="ID of the reply to delete vote
 
     vote = vote_service.get_vote(reply_id, current_user_id)
     if vote is None:
-        return BadRequest("User has not voted for this reply")
+        return BadRequest(f"User ID: {current_user_id} has not voted for reply ID: {reply_id}")
 
     vote_service.delete_vote(reply_id, current_user_id)
 
-    return OK("Vote deleted successfully")
+    return OK(f"Vote for reply ID {reply_id} removed successfully")

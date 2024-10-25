@@ -1,7 +1,7 @@
 from typing import Literal
 from fastapi import APIRouter, Depends, Query, Path, Body
 from common.auth import get_current_user
-from common.custom_responses import ForbiddenAccess, NotFound, OK, Locked, BadRequest
+from common.custom_responses import ForbiddenAccess, NotFound, OK, Locked, BadRequest, OnlyAdminAccess, OnlyAuthorAccess
 from schemas.topic import CreateTopicRequest
 from services import topic_service, reply_service, user_service, category_service
 
@@ -24,7 +24,7 @@ def get_all_topics(
 
     if category_id is not None:
         if not category_service.exists(category_id):
-            return NotFound("Category")
+            return NotFound(f"Category ID: {category_id}")
 
         elif not user_service.is_admin(current_user_id):
             if not category_service.validate_user_access(
@@ -32,13 +32,13 @@ def get_all_topics(
                 return ForbiddenAccess()
 
     if author_id is not None and not user_service.id_exists(author_id):
-        return NotFound("Author")
+        return NotFound(f"User ID: {author_id}")
 
     topics = topic_service.get_all_topics(search, category_id, author_id,
                                           is_locked, current_user_id, limit, offset)
 
     if sort:
-        return topic_service.sort_topics(topics, reverse=sort == 'desc')
+        return topic_service.sort_topics(topics, reverse=sort == "desc")
 
     return topics
 
@@ -50,7 +50,7 @@ def get_topic_by_id(topic_id: int = Path(description="ID of the topic to retriev
     topic = topic_service.get_by_id_with_replies(topic_id)
 
     if topic is None:
-        return NotFound("Topic")
+        return NotFound(f"Topic ID: {topic_id}")
 
     if not user_service.is_admin(current_user_id):
         if not category_service.validate_user_access(
@@ -67,15 +67,15 @@ def create_topic(topic: CreateTopicRequest = Body(description="Topic to create")
     category = category_service.get_by_id(topic.category_id)
 
     if category is None:
-        return NotFound("Category")
+        return NotFound(f"Category ID: {topic.category_id}")
 
     if category.is_locked:
-        return Locked("category")
+        return Locked(f"Category ID: {topic.category_id}")
 
     user_is_admin = user_service.is_admin(current_user_id)
 
     if not user_is_admin and topic.is_locked == True:
-        return ForbiddenAccess("Only admins can create locked topics")
+        return OnlyAdminAccess("create locked topics")
 
     if not user_is_admin and category.is_private:
         access = category_service.validate_user_access(
@@ -91,18 +91,18 @@ def lock_topic(topic_id: int = Path(description="ID of the topic to lock"),
                current_user_id: int = Depends(get_current_user)):
     
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess(content="Only admins can lock topics")
+        return OnlyAdminAccess(content="can lock topics")
     
     topic = topic_service.get_by_id(topic_id)
     
     if topic is None:
-        return NotFound("Topic")
+        return NotFound(f"Topic ID: {topic_id}")
 
     if topic.is_locked:
-        return BadRequest("Topic is already locked")
+        return BadRequest(f"Topic ID: {topic_id} already locked")
 
     topic_service.lock_topic(topic_id)
-    return OK("Topic is successfully locked")
+    return OK(f"Topic ID: {topic_id} successfully locked")
 
 
 @topics_router.put("/{topic_id}/replies/{reply_id}")
@@ -112,20 +112,20 @@ def chose_topic_best_reply(topic_id: int = Path(description="ID of the topic to 
 
     topic = topic_service.get_by_id(topic_id)
     if topic is None:
-        return NotFound("Topic")
+        return NotFound(f"Topic ID: {topic_id}")
 
     if topic.is_locked:
-        return Locked("topic")
+        return Locked(f"Topic ID: {topic_id}")
 
     if not topic_service.validate_topic_author(topic_id, current_user_id):
-        return ForbiddenAccess("Only the author of the topic can choose the best reply")
+        return OnlyAuthorAccess("choose best reply for this topic")
 
     if not reply_service.id_exists(reply_id) or not reply_service.reply_belongs_to_topic(reply_id, topic_id):
-        return NotFound("Reply")
+        return NotFound(f"Reply ID: {reply_id}")
 
     prev_best_reply = topic_service.get_topic_best_reply(topic_id)
     if prev_best_reply == reply_id:
-        return BadRequest("Reply is already the best reply for this topic")
+        return BadRequest(f"Reply ID: {reply_id} is already the best reply for topic ID: {topic_id}")
 
     topic_service.update_best_reply(topic_id, reply_id, prev_best_reply)
-    return OK("Best reply is successfully chosen")
+    return OK(f"Reply ID: {reply_id} is now the best reply for topic ID: {topic_id}")

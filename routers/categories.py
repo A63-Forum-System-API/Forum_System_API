@@ -1,11 +1,8 @@
-from fastapi import APIRouter, Response, Depends, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends
 from schemas.category import Category
 from services import category_service, user_service
 from common.auth import get_current_user
-from starlette import status
-from common.custom_responses import ForbiddenAccess, NotFound, Locked, Unauthorized, OK, BadRequest, NoContent
-
+from common.custom_responses import ForbiddenAccess, NotFound, OK, BadRequest, OnlyAdminAccess
 
 categories_router = APIRouter(prefix="/categories", tags=["Categories"])
 
@@ -63,7 +60,7 @@ def create_category(
     category: Category, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess(content="Only admin can create categories")
+        return OnlyAdminAccess(content="create categories")
     
     if category_service.title_exists(category.title):
         return BadRequest(content=f"Category with title '{category.title}' already exists")
@@ -77,7 +74,7 @@ def change_category_private_status(
     category_id: int, private_status_code: int, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess(content="Only admin can change category private status")
+        return OnlyAdminAccess(content="change category private status")
     
     if private_status_code not in (0, 1):
         return BadRequest(content="Private status code must be 0 or 1")
@@ -152,7 +149,7 @@ def remove_user_access_to_private_category(
     current_user_id: int = Depends(get_current_user),
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess(content="Only admin can remove user access to private category")
+        return OnlyAdminAccess(content="remove user access to private category")
     
     category = category_service.get_by_id(category_id)
     if category is None:
@@ -173,7 +170,7 @@ def get_privileged_users_by_category(
     category_id: int, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess(content="Only admin can get privileged users by category")
+        return OnlyAdminAccess(content="get privileged users by category")
     
     category = category_service.get_by_id(category_id)
     if category is None:

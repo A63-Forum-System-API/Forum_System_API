@@ -15,10 +15,10 @@ def create_reply(reply: CreateReplyRequest = Body(description="Reply to create")
     topic = topic_service.get_by_id(reply.topic_id)
 
     if topic is None:
-        return NotFound("Topic")
+        return NotFound(f"Topic ID: {reply.topic_id}")
 
     if topic.is_locked:
-        return Locked("topic")
+        return Locked(f"Topic ID: {reply.topic_id}")
     
     category = category_service.get_by_id(topic.category_id)
 

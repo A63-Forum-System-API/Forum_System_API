@@ -6,7 +6,7 @@ from schemas.token import Token
 token_router = APIRouter(prefix="/token", tags=["Token"])
 
 
-@token_router.post('/')
+@token_router.post("/")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
 
