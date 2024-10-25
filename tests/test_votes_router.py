@@ -25,6 +25,7 @@ def fake_topic(id=1, is_locked=False):
 
 def fake_reply(id=1):
     reply = Mock()
+    fake_reply.id=id
 
     return reply
 
