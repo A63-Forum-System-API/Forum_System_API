@@ -11,7 +11,7 @@ from schemas.message import Message
 
 client = TestClient(app)
 
-class MessageRouterShould(unittest.TestCase):
+class MessagesRouterShould(unittest.TestCase):
     def setUp(self):
         self.message = Message(text="Hello")
         app.dependency_overrides = {
