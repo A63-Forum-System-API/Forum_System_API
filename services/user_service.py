@@ -60,16 +60,16 @@ def get_user_by_id(user_id: int):
                 )
 
 
-def check_if_email_exist(email: str) -> bool:
-    query = """
-            SELECT id, username, first_name, last_name, email, is_admin, picture 
-            FROM users WHERE email = ?
-            """
-    result = read_query(query, (email,))
-
-    if not result:
-        return False
-    return True
+# def check_if_email_exist(email: str) -> bool:
+#     query = """
+#             SELECT id, username, first_name, last_name, email, is_admin, picture
+#             FROM users WHERE email = ?
+#             """
+#     result = read_query(query, (email,))
+#
+#     if not result:
+#         return False
+#     return True
 
 
 def create(user: UserCreate):
