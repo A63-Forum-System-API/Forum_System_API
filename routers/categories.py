@@ -97,7 +97,7 @@ def change_category_lock_status(
     category_id: int, locked_status_code: int, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess()
+        return OnlyAdminAccess("change lock status of a category")
     
     if locked_status_code not in (0, 1):
         return BadRequest(content="Locked status code must be 0 or 1")
@@ -124,7 +124,7 @@ def manage_user_access_to_private_category(
     current_user_id: int = Depends(get_current_user),
 ):
     if not user_service.is_admin(current_user_id):
-        return ForbiddenAccess()
+        return OnlyAdminAccess("manage user access to private category")
     if write_access_code not in (0, 1):
         return BadRequest(content="Access code must be 0 or 1")
     
