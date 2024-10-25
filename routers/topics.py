@@ -69,19 +69,20 @@ def create_topic(topic: CreateTopicRequest = Body(description="Topic to create")
     if category is None:
         return NotFound(f"Category ID: {topic.category_id}")
 
-    if category.is_locked:
-        return Locked(f"Category ID: {topic.category_id}")
-
     user_is_admin = user_service.is_admin(current_user_id)
-
-    if not user_is_admin and topic.is_locked == True:
-        return OnlyAdminAccess("create locked topics")
 
     if not user_is_admin and category.is_private:
         access = category_service.validate_user_access(
             current_user_id, topic.category_id, "write")
         if not access:
             return ForbiddenAccess()
+
+    if category.is_locked:
+        return Locked(f"Category ID: {topic.category_id}")
+
+    if not user_is_admin and topic.is_locked == True:
+        return OnlyAdminAccess("create locked topics")
+
 
     return topic_service.create(topic, current_user_id)
 
