@@ -9,11 +9,11 @@ from schemas.topic import Topic, SingleTopic, CreateTopicRequest
 
 client = TestClient(app)
 
-def fake_category(id=1):
+def fake_category(id=1, is_locked=False, is_private=False):
     category = Mock()
     category.id = id
-    category.is_locked = False
-    category.is_private = False
+    category.is_locked = is_locked
+    category.is_private = is_private
 
     return category
 
@@ -274,10 +274,8 @@ class TopicsRouter_Should(unittest.TestCase):
 
     def test_createTopic_return_forbiddenAccess_when_userNotAdmin_userHasNoAccess(self):
         # Arrange
-        category = fake_category()
-        category.is_private = True
         with (patch('services.category_service.get_by_id',
-                   return_value=category) as mock_get_by_id,
+                   return_value=fake_category(is_private=True)) as mock_get_by_id,
              patch('services.category_service.validate_user_access',
                    return_value=False) as mock_validate_user_access,
              patch('services.user_service.is_admin',
@@ -295,10 +293,8 @@ class TopicsRouter_Should(unittest.TestCase):
 
     def test_createTopic_return_forbiddenAccess_when_userNotAdmin_userHasAccess(self):
         # Arrange
-        category = fake_category()
-        category.is_private = True
         with (patch('services.category_service.get_by_id',
-                   return_value=category) as mock_get_by_id,
+                   return_value=fake_category(is_private=True)) as mock_get_by_id,
              patch('services.category_service.validate_user_access',
                    return_value=True) as mock_validate_user_access,
              patch('services.user_service.is_admin',
@@ -337,10 +333,8 @@ class TopicsRouter_Should(unittest.TestCase):
 
     def test_createTopic_return_locked_when_categoryIsLocked(self):
         # Arrange
-        category = fake_category()
-        category.is_locked = True
         with patch('services.category_service.get_by_id',
-                   return_value=category) as mock_get_by_id:
+                   return_value=fake_category(is_locked=True)) as mock_get_by_id:
             # Act
             response = client.post("/topics/", json=self.test_create_topic.model_dump())
 

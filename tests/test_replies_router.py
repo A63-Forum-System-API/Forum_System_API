@@ -8,18 +8,18 @@ from schemas.reply import Reply, CreateReplyRequest
 
 client = TestClient(app)
 
-def fake_category(id=1):
+def fake_category(id=1, is_locked=False, is_private=False):
     category = Mock()
     category.id = id
-    category.is_locked = False
-    category.is_private = False
+    category.is_locked = is_locked
+    category.is_private = is_private
 
     return category
 
-def fake_topic(id=1):
+def fake_topic(id=1, is_locked=False):
     topic = Mock()
     topic.id = id
-    topic.is_locked = False
+    topic.is_locked = is_locked
 
     return topic
 
@@ -62,13 +62,11 @@ class RepliesRouter_Should(unittest.TestCase):
             mock_reply_service.assert_called_once()
 
     def test_createReply_return_forbiddenAccess_when_userNotAdmin_userHasNoAccess(self):
-        category = fake_category()
-        category.is_private = True
         # Arrange
         with (patch("services.topic_service.get_by_id",
                    return_value=fake_topic()) as mock_topic_service,
               patch('services.category_service.get_by_id',
-                    return_value=category) as mock_category_service,
+                    return_value=fake_category(is_private=True)) as mock_category_service,
               patch('services.user_service.is_admin',
                     return_value=False) as mock_user_service,
               patch('services.category_service.validate_user_access',
@@ -87,13 +85,11 @@ class RepliesRouter_Should(unittest.TestCase):
             mock_validate_user_access.assert_called_once()
 
     def test_createReply_return_201_when_userNotAdmin_userHasAccess(self):
-        category = fake_category()
-        category.is_private = True
         # Arrange
         with (patch("services.topic_service.get_by_id",
                    return_value=fake_topic()) as mock_topic_service,
               patch('services.category_service.get_by_id',
-                    return_value=category) as mock_category_service,
+                    return_value=fake_category(is_private=True)) as mock_category_service,
               patch('services.user_service.is_admin',
                     return_value=False) as mock_user_service,
               patch('services.category_service.validate_user_access',
@@ -115,11 +111,9 @@ class RepliesRouter_Should(unittest.TestCase):
             mock_reply_service.assert_called_once()
 
     def test_createReply_return_badRequest_when_topicIsLocked(self):
-        topic = fake_topic()
-        topic.is_locked = True
         # Arrange
         with (patch("services.topic_service.get_by_id",
-                   return_value=topic) as mock_topic_service):
+                   return_value=fake_topic(is_locked=True)) as mock_topic_service):
 
             # Act
             response = client.post("/replies", json=self.create_reply.model_dump())

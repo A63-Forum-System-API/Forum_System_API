@@ -14,8 +14,6 @@ def vote(reply_id: int = Path(description="ID of the reply to vote for"),
          current_user_id: int = Depends(get_current_user)):
 
     vote_type = 1 if vote_type == "upvote" else 0
-    if vote_type > 1 or vote_type < 0:
-        return BadRequest("Vote-type must be 0 for downvote or 1 for upvote")
 
     reply = reply_service.get_by_id(reply_id)
     if reply is None:
@@ -38,7 +36,7 @@ def vote(reply_id: int = Path(description="ID of the reply to vote for"),
         return Created("User voted successfully")
 
     if vote == vote_type:
-        return BadRequest(f"Current user has already voted for this reply.")
+        return BadRequest(f"Current user has already voted for this reply")
 
     vote_service.update_vote(reply_id, vote_type, current_user_id)
     vote_str = "upvote" if vote_type == 1 else "downvote"
@@ -70,4 +68,4 @@ def delete_vote(reply_id: int = Path(description="ID of the reply to delete vote
 
     vote_service.delete_vote(reply_id, current_user_id)
 
-    return OK("Vote is successfully deleted")
+    return OK("Vote deleted successfully")
