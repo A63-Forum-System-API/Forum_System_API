@@ -7,7 +7,7 @@ from main import app
 
 client = TestClient(app)
 
-class TestViewConversation(unittest.TestCase):
+class ConversationsRouterShould(unittest.TestCase):
 
     def setUp(self):
         app.dependency_overrides = {

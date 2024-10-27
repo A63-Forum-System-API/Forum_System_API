@@ -8,7 +8,7 @@ from schemas.message import Message
 
 client = TestClient(app)
 
-class TestCreateMessage(unittest.TestCase):
+class MessagesRouterShould(unittest.TestCase):
 
     def setUp(self):
         self.message = Message(text="Hello")
