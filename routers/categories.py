@@ -1,20 +1,21 @@
-from fastapi import APIRouter, Depends
-from schemas.category import Category
+from fastapi import APIRouter, Depends, Query, Path
+from schemas.category import Category, CreateCategoryRequest
 from services import category_service, user_service
 from common.auth import get_current_user
 from common.custom_responses import ForbiddenAccess, NotFound, OK, BadRequest, OnlyAdminAccess
+from typing import Literal
 
 categories_router = APIRouter(prefix="/categories", tags=["Categories"])
 
 
 @categories_router.get("/")
 def get_all_categories(
-    sort: str | None = None,
-    sort_by: str | None = None,
-    search: str | None = None,
-    limit: int = 10,
-    offset: int = 0,
-    current_user_id: int = Depends(get_current_user),
+    search: str | None = Query(description="Search for categories by title", default=None),
+    sort_by: Literal["title", "created_at"] | None = Query(description="Sort categories by title or created_at", default=None),
+    sort: Literal["asc", "desc"] | None = Query(description="Sort categories asc or desc", default=None),
+    limit: int = Query(description="Limit the number of categories returned", default=10, ge=1, le=100),
+    offset: int = Query(description="Offset the number of categories returned", default=0, ge=0),
+    current_user_id: int = Depends(get_current_user)
 ):
     # validation
     if not sort in (None, "asc", "desc"):
@@ -43,7 +44,8 @@ def get_all_categories(
 
 
 @categories_router.get("/{category_id}")
-def get_category_by_id(category_id: int, current_user_id: int = Depends(get_current_user)):
+def get_category_by_id(category_id: int = Path(description="ID of the category to retrieve"), 
+                       current_user_id: int = Depends(get_current_user)):
     category = category_service.get_by_id(category_id)
     if category is None:
         return NotFound("Category")
@@ -57,7 +59,7 @@ def get_category_by_id(category_id: int, current_user_id: int = Depends(get_curr
 
 @categories_router.post("/", status_code=201)
 def create_category(
-    category: Category, current_user_id: int = Depends(get_current_user)
+    category: CreateCategoryRequest, current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
         return OnlyAdminAccess(content="create categories")
@@ -69,15 +71,19 @@ def create_category(
    
 
 
-@categories_router.put("/{category_id}/access/{private_status_code}", status_code=204)
+@categories_router.put("/{category_id}/access/{access_type}", status_code=204)
 def change_category_private_status(
-    category_id: int, private_status_code: int, current_user_id: int = Depends(get_current_user)
+    category_id: int = Path(description="ID of the category to manage access"), 
+    access_type: Literal["public", "private"] = Path(description="Access type for category"),  
+    current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
         return OnlyAdminAccess(content="change category private status")
     
-    if private_status_code not in (0, 1):
-        return BadRequest(content="Private status code must be 0 or 1")
+    private_status_code = 0 if access_type == "public" else 1
+    
+    # if private_status_code not in (0, 1):
+    #     return BadRequest(content="Private status code must be 0 or 1")
     
     category = category_service.get_by_id(category_id)
     if category is None:
@@ -85,22 +91,24 @@ def change_category_private_status(
     
     if category.is_private == private_status_code:
         # Category with provided id and private status already has the given status. No change needed.
-        return OK(content="This category already was set to the provided private status.")
+        return OK(content=f"This category was already set to {access_type}.")
 
     category_service.change_category_private_status(category_id, private_status_code)
     return OK("Category private status was successfully changed")
     
 
-
-@categories_router.put("/{category_id}/locked-status/{locked_status_code}", status_code=204)
+@categories_router.put("/{category_id}/locked-status/{locked_status}", status_code=204)
 def change_category_lock_status(
-    category_id: int, locked_status_code: int, current_user_id: int = Depends(get_current_user)
+    category_id: int = Path(description="ID of the category to manage locked status"), 
+    locked_status: Literal["lock", "unlock"] = Path(description="Locked status for category"), 
+    current_user_id: int = Depends(get_current_user)
 ):
     if not user_service.is_admin(current_user_id):
-        return OnlyAdminAccess("change lock status of a category")
+        return OnlyAdminAccess("change locked status of a category")
     
-    if locked_status_code not in (0, 1):
-        return BadRequest(content="Locked status code must be 0 or 1")
+    locked_status_code = 0 if locked_status == "unlock" else 1
+    # if locked_status_code not in (0, 1):
+    #     return BadRequest(content="Locked status code must be 0 or 1")
     
     category = category_service.get_by_id(category_id)
     if category is None:
@@ -108,25 +116,27 @@ def change_category_lock_status(
     
     if category.is_locked == locked_status_code:
         # Category with provided id and lock status already has the given status. No change needed.
-        return OK(content="This category already was set to the provided lock status")
+        return OK(content=f"This category was already set to {locked_status}")
 
     
     category_service.change_category_lock_status(category_id, locked_status_code)
-    return OK("Category lock status was successfully changed")
+    return OK("Category locked status was successfully changed")
   
 
 
-@categories_router.patch("/{category_id}/users/{user_id}/write-access/{write_access_code}", status_code=204)
+@categories_router.patch("/{category_id}/users/{user_id}/user-access/{user_access}", status_code=204)
 def manage_user_access_to_private_category(
-    category_id: int,
-    user_id: int,
-    write_access_code: int,
+    category_id: int = Path(description="ID of the category"),
+    user_id: int = Path(description="ID of the user"),
+    user_access: Literal["read_only", "read_and_write"] = Path(description="User access type"),
     current_user_id: int = Depends(get_current_user),
 ):
     if not user_service.is_admin(current_user_id):
         return OnlyAdminAccess("manage user access to private category")
-    if write_access_code not in (0, 1):
-        return BadRequest(content="Access code must be 0 or 1")
+    
+    write_access_code = 0 if user_access == "read_only" else 1
+    # if write_access_code not in (0, 1):
+    #     return BadRequest(content="Access code must be 0 or 1")
     
     category = category_service.get_by_id(category_id)
     if category is None:
@@ -139,13 +149,13 @@ def manage_user_access_to_private_category(
         
     category_service.manage_user_access_to_private_category(
         category_id, user_id, write_access_code)
-    return OK("Access was successfully changed")
+    return OK("User access was successfully changed")
 
 
 @categories_router.delete("/{category_id}/users/{user_id}/", status_code=204)
 def remove_user_access_to_private_category(
-    category_id: int,
-    user_id: int,
+    category_id: int = Path(description="ID of the category"),
+    user_id: int = Path(description="ID of the user"),
     current_user_id: int = Depends(get_current_user),
 ):
     if not user_service.is_admin(current_user_id):
@@ -160,8 +170,8 @@ def remove_user_access_to_private_category(
     if not user_service.id_exists(user_id):
         return NotFound(content=f"User ID: {user_id}")
         
-    category_service.remove_user_access_to_private_category(category_id, user_id)
-    return OK("Access was successfully deleted")
+    message = category_service.remove_user_access_to_private_category(category_id, user_id)
+    return OK(message)
         
 
 

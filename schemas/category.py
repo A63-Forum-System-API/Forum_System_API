@@ -8,11 +8,12 @@ class Category(BaseModel):
     id: Optional[int] = None
     title: str = Field(
         min_length=5,
+        max_length=45,
         examples=["Title for category."]
     )
     description: str = Field(
         min_length=5,
-        examples=["Short description of the subject of the category."]
+        examples=["Short description of the category."]
     )
     is_private: bool = False
     is_locked: Optional[bool] = False
@@ -49,3 +50,16 @@ class ViewAllCategories(BaseModel):
                    title=title,
                    description=description,
                    created_at=created_at)
+
+
+class CreateCategoryRequest(BaseModel):
+    title: str = Field(
+        min_length=5,
+        max_length=45,
+        examples=["Title for category."]
+    )
+    description: str = Field(
+        min_length=5,
+        examples=["Short description of the category."]
+    )
+    is_private: bool = False

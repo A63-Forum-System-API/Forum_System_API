@@ -276,7 +276,7 @@ def manage_user_access_to_private_category(
 
 def remove_user_access_to_private_category(
     category_id: int, user_id: int,
-):
+) -> str:
     data = read_query(
         """SELECT user_id, category_id, write_access
                 FROM category_accesses
@@ -286,6 +286,11 @@ def remove_user_access_to_private_category(
     )
     if data:
         _remove_access_from_category_for_user(category_id, user_id)
+        message = "Access was successfully deleted"
+    else:
+        message = "User has no access to the category"
+    
+    return message
 
     
 
