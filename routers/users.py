@@ -61,7 +61,7 @@ def update_user(user_id: int,
         return BadRequest("You are not allowed to update your own user status")
 
     if user_service.is_admin(user_id) and current_user_id != 1:
-        return ForbiddenAccess("You are not allowed to update an admin user to a regular user!")
+        return ForbiddenAccess("This user is already an admin")
 
     return user_service.update(user_id, is_admin)
 
