@@ -87,22 +87,24 @@ def create_topic(topic: CreateTopicRequest = Body(description="Topic to create")
     return topic_service.create(topic, current_user_id)
 
 
-@topics_router.put("/{topic_id}")
-def lock_topic(topic_id: int = Path(description="ID of the topic to lock"),
-               current_user_id: int = Depends(get_current_user)):
+@topics_router.put("/{topic_id}/locked-status/{locked_status}")
+def change_topic_lock_status(topic_id: int = Path(description="ID of the topic to lock/unlock"),
+                             locked_status: Literal["lock", "unlock"] = Path(description="Lock status for the topic"),
+                             current_user_id: int = Depends(get_current_user)):
     
     if not user_service.is_admin(current_user_id):
-        return OnlyAdminAccess(content="can lock topics")
+        return OnlyAdminAccess(content="change locked status for topics")
+
+    locked_status_code = 1 if locked_status == "lock" else 0
     
     topic = topic_service.get_by_id(topic_id)
-    
     if topic is None:
         return NotFound(f"Topic ID: {topic_id}")
 
-    if topic.is_locked:
-        return BadRequest(f"Topic ID: {topic_id} already locked")
+    if topic.is_locked == locked_status_code:
+        return OK(f"Topic ID: {topic_id} is already {locked_status}ed")
 
-    topic_service.lock_topic(topic_id)
+    topic_service.change_topic_lock_status(locked_status_code, topic_id)
     return OK(f"Topic ID: {topic_id} successfully locked")
 
 

@@ -334,7 +334,7 @@ class TopicService_Should(unittest.TestCase):
             mock_update_query.return_value = None
 
             # Act
-            topic_service.lock_topic(test_topic_id)
+            topic_service.change_topic_lock_status(test_topic_id, 1)
 
             # Assert
             mock_update_query.assert_called_once()

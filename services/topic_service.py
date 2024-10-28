@@ -137,12 +137,12 @@ def id_exists(topic_id: int) -> bool:
     return len(result) > 0
 
 
-def lock_topic(topic_id: int) -> None:
+def change_topic_lock_status(topic_id: int, locked_status_code: int) -> None:
     query = """UPDATE topics 
-                SET is_locked = True 
+                SET is_locked = ? 
                 WHERE id = ?"""
 
-    update_query(query, (topic_id,))
+    update_query(query, (locked_status_code, topic_id))
 
 
 def validate_topic_author(topic_id: int, user_id: int) -> bool:

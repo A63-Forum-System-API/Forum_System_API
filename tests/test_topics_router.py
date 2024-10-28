@@ -360,11 +360,13 @@ class TopicsRouter_Should(unittest.TestCase):
     def test_lockTopic_return_OK_when_userIsAdmin(self):
         # Arrange
         with (patch('services.topic_service.get_by_id',
-                   return_value=self.test_topics[0]) as mock_get_by_id,
-              patch('services.user_service.is_admin',
-                    return_value=True) as mock_is_admin):
+                     return_value=self.test_topics[0]) as mock_get_by_id,
+                patch('services.user_service.is_admin',
+                        return_value=True) as mock_is_admin,
+                patch('services.topic_service.change_topic_lock_status',
+                        return_value=None) as mock_change_topic_lock_status):
             # Act
-            response = client.put("/topics/1")
+            response = client.put("/topics/1/locked-status/lock")
 
             # Assert
             self.assertEqual(200, response.status_code)
@@ -372,8 +374,10 @@ class TopicsRouter_Should(unittest.TestCase):
             self.assertEqual("Topic ID: 1 successfully locked", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
             mock_is_admin.assert_called_once_with(1)
+            mock_change_topic_lock_status.assert_called_once_with(1, 1)
 
-    def test_lockTopic_return_badRequest_when_topicAlreadyLocked(self):
+
+    def test_lockTopic_return_OK_when_topicAlreadyLocked(self):
         # Arrange
         with (patch('services.topic_service.get_by_id',
                    return_value=self.test_topics[0]) as mock_get_by_id,
@@ -381,12 +385,12 @@ class TopicsRouter_Should(unittest.TestCase):
                     return_value=True) as mock_is_admin):
             self.test_topics[0].is_locked = True
             # Act
-            response = client.put("/topics/1")
+            response = client.put("/topics/1/locked-status/lock")
 
             # Assert
-            self.assertEqual(400, response.status_code)
+            self.assertEqual(200, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual("Topic ID: 1 already locked", response.json()['detail'])
+            self.assertEqual("Topic ID: 1 is already locked", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
             mock_is_admin.assert_called_once_with(1)
 
@@ -395,7 +399,7 @@ class TopicsRouter_Should(unittest.TestCase):
         with patch('services.topic_service.get_by_id',
                    return_value=None) as mock_get_by_id:
             # Act
-            response = client.put("/topics/1")
+            response = client.put("/topics/1/locked-status/lock")
 
             # Assert
             self.assertEqual(404, response.status_code)
@@ -408,12 +412,12 @@ class TopicsRouter_Should(unittest.TestCase):
         with (patch('services.user_service.is_admin',
                     return_value=False) as mock_is_admin):
             # Act
-            response = client.put("/topics/1")
+            response = client.put("/topics/1/locked-status/lock")
 
             # Assert
             self.assertEqual(403, response.status_code)
             self.assertIsInstance(response.json(), dict)
-            self.assertEqual("Only admin can can lock topics", response.json()['detail'])
+            self.assertEqual("Only admin can change locked status for topics", response.json()['detail'])
             mock_is_admin.assert_called_once_with(1)
 
     def test_choseTopicBestReply_return_OK_when_userIsAdmin(self):

@@ -87,14 +87,14 @@ def change_category_private_status(
     
     category = category_service.get_by_id(category_id)
     if category is None:
-        return NotFound("Category")
+        return NotFound("Category ID: {category_id}")
     
     if category.is_private == private_status_code:
         # Category with provided id and private status already has the given status. No change needed.
-        return OK(content=f"This category was already set to {access_type}.")
+        return OK(content=f"Category ID: {category_id} was already set to {access_type}.")
 
     category_service.change_category_private_status(category_id, private_status_code)
-    return OK("Category private status was successfully changed")
+    return OK(f"Category ID: {category_id} private status was successfully changed")
     
 
 @categories_router.put("/{category_id}/locked-status/{locked_status}", status_code=204)
@@ -112,15 +112,15 @@ def change_category_lock_status(
     
     category = category_service.get_by_id(category_id)
     if category is None:
-        return NotFound("Category")
+        return NotFound(f"Category ID: {category_id}")
     
     if category.is_locked == locked_status_code:
         # Category with provided id and lock status already has the given status. No change needed.
-        return OK(content=f"This category was already set to {locked_status}")
+        return OK(content=f"Category ID: {category_id} is already {locked_status}ed")
 
     
     category_service.change_category_lock_status(category_id, locked_status_code)
-    return OK("Category locked status was successfully changed")
+    return OK(f"Category ID: {category_id} locked status was successfully changed")
   
 
 
