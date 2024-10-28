@@ -23,9 +23,10 @@ def fake_topic(id=1, is_locked=False):
 
     return topic
 
-def fake_reply(id=1):
+def fake_reply(id=1, topic_id=1):
     reply = Mock()
-    fake_reply.id=id
+    reply.id=id
+    reply.topic_id=topic_id
 
     return reply
 
@@ -61,7 +62,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.put("/votes/1?vote_type=upvote")
 
             self.assertEqual(200, response.status_code)
-            self.assertEqual("Vote is successfully changed to upvote", response.json()["detail"])
+            self.assertEqual("Vote for reply ID 1 is successfully changed to upvote", response.json()["detail"])
             mock_reply_service.assert_called_once()
             mock_topic_service.assert_called_once()
             mock_category_service.assert_called_once()
@@ -84,7 +85,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.put("/votes/1?vote_type=upvote")
 
             self.assertEqual(400, response.status_code)
-            self.assertEqual("Current user has already voted for this reply", response.json()["detail"])
+            self.assertEqual("User ID: 1 has already voted for reply ID: 1", response.json()["detail"])
             mock_reply_service.assert_called_once()
             mock_topic_service.assert_called_once()
             mock_category_service.assert_called_once()
@@ -108,7 +109,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.put("/votes/1?vote_type=upvote")
 
             self.assertEqual(201, response.status_code)
-            self.assertEqual("User voted successfully", response.json()["detail"])
+            self.assertEqual("User ID: 1 voted successfully for reply ID: 1", response.json()["detail"])
             mock_reply_service.assert_called_once()
             mock_topic_service.assert_called_once()
             mock_category_service.assert_called_once()
@@ -157,7 +158,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.put("/votes/1?vote_type=upvote")
 
             self.assertEqual(201, response.status_code)
-            self.assertEqual("User voted successfully", response.json()["detail"])
+            self.assertEqual("User ID: 1 voted successfully for reply ID: 1", response.json()["detail"])
             mock_reply_service.assert_called_once()
             mock_topic_service.assert_called_once()
             mock_category_service.assert_called_once()
@@ -175,7 +176,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.put("/votes/1?vote_type=upvote")
 
             self.assertEqual(400, response.status_code)
-            self.assertEqual("This topic is locked", response.json()["detail"])
+            self.assertEqual("Topic ID: 1 is locked", response.json()["detail"])
             mock_reply_service.assert_called_once()
             mock_topic_service.assert_called_once()
 
@@ -186,7 +187,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.put("/votes/1?vote_type=upvote")
 
             self.assertEqual(404, response.status_code)
-            self.assertEqual("Reply not found", response.json()["detail"])
+            self.assertEqual("Reply ID: 1 not found", response.json()["detail"])
             mock_reply_service.assert_called_once()
 
     def test_deleteVote_return_OK_when_voteExists(self):
@@ -295,7 +296,7 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.delete("/votes/1")
 
             self.assertEqual(400, response.status_code)
-            self.assertEqual("This topic is locked", response.json()["detail"])
+            self.assertEqual("Topic ID: 1 is locked", response.json()["detail"])
             mock_reply_service.assert_called_once()
             mock_topic_service.assert_called_once()
 
@@ -306,5 +307,5 @@ class VotesRouter_Should(unittest.TestCase):
             response = client.delete("/votes/1")
 
             self.assertEqual(404, response.status_code)
-            self.assertEqual("Reply not found", response.json()["detail"])
+            self.assertEqual("Reply ID: 1 not found", response.json()["detail"])
             mock_reply_service.assert_called_once()
