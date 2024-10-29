@@ -5,6 +5,16 @@ from data.database import insert_query, read_query
 
 
 def get_conversation(conversation_id: int, order: str = "asc") -> list[dict]:
+    """
+    Retrieve messages for a given conversation ID, ordered by the message sent time.
+
+    Parameters:
+        conversation_id (int): The ID of the conversation.
+        order (str): The order in which to sort the messages (asc or desc).
+
+    Returns:
+        list[dict]: A list of messages with text, sender's first name, and sent time.
+    """
     query = f"""
             SELECT m.text, m.sender_id, u.first_name, m.sent_at
             FROM messages m
@@ -25,6 +35,16 @@ def get_conversation(conversation_id: int, order: str = "asc") -> list[dict]:
 
 
 def get_conversation_id(user1_id: int, user2_id: int) -> int | None:
+    """
+    Retrieve the conversation ID for the given user IDs.
+
+    Parameters:
+        user1_id (int): The ID of the first user.
+        user2_id (int): The ID of the second user.
+
+    Returns:
+        int | None: The ID of the conversation between the two users, or None if no conversation exists.
+    """
     if user1_id == user2_id:
         query = """
                     SELECT id FROM conversations
@@ -43,6 +63,16 @@ def get_conversation_id(user1_id: int, user2_id: int) -> int | None:
 
 
 def get_conversations(user_id: int, order="asc") -> list[dict]:
+    """
+    Retrieve all conversations for a given user ID, ordered by the last message sent time.
+
+    Parameters:
+        user_id (int): The ID of the user.
+        order (str): The order in which to sort the conversations (asc or desc).
+
+    Returns:
+        list[dict]: A list of conversations with conversation ID, username, first name, last message, and sent time.
+    """
     query = f"""
             SELECT DISTINCT c.id AS conversation_id,
                    CASE 
@@ -81,7 +111,16 @@ def get_conversations(user_id: int, order="asc") -> list[dict]:
     return conversations
 
 
-def _get_last_message(conversation_id: int):
+def _get_last_message(conversation_id: int) -> tuple | None:
+    """
+    Retrieve the last message for a given conversation ID.
+
+    Parameters:
+        conversation_id (int): The ID of the conversation.
+
+    Returns:
+        tuple | None: A tuple containing the text and sent time of the last message, or None if no messages are found.
+    """
     query = """
             SELECT text, sent_at
             FROM messages

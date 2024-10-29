@@ -8,6 +8,16 @@ token_router = APIRouter(prefix="/token", tags=["Token"])
 
 @token_router.post("/")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    Authenticate the user and return an access token.
+
+    Parameters:
+        form_data (OAuth2PasswordRequestForm): The form data containing the username and password.
+
+    Returns:
+        Token: An access token if authentication is successful, or an HTTPException if authentication fails.
+    """
+
     user = authenticate_user(form_data.username, form_data.password)
 
     if not user:

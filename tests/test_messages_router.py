@@ -25,7 +25,8 @@ class MessagesRouterShould(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json(), {"detail": "User ID: 1 not found"})
 
-    def test_create_message_returns_400_when_message_is_empty(self):
+    @patch('services.user_service.id_exists', return_value=True)
+    def test_create_message_returns_400_when_message_is_empty(self, mock_id_exists):
         self.message.text = "   "
         response = client.post("/messages/1", json=self.message.dict())
         self.assertEqual(response.status_code, 400)
