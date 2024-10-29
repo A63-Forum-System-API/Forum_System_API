@@ -7,7 +7,18 @@ from services import conversation_service
 from services.user_service import get_user_by_id
 
 
-def create(message: Message, receiver_id: int, sender_id: int):
+def create(message: Message, receiver_id: int, sender_id: int) -> str:
+    """
+    Create a new message.
+
+    Parameters:
+        message (Message): The message to be sent.
+        receiver_id (int): The ID of the receiver.
+        sender_id (int): The ID of the sender.
+
+    Returns:
+        str: A confirmation message indicating the message was sent successfully.
+    """
     conversation_id = _get_conversation_id(sender_id, receiver_id)
 
     query = """
@@ -20,7 +31,17 @@ def create(message: Message, receiver_id: int, sender_id: int):
     return f"The message to {first_name} was sent successfully!"
 
 
-def _get_conversation_id(user1_id, user2_id) -> int:
+def _get_conversation_id(user1_id: int, user2_id: int) -> int:
+    """
+     Retrieve or create a conversation ID for the given user IDs.
+
+     Parameters:
+         user1_id (int): The ID of the first user.
+         user2_id (int): The ID of the second user.
+
+     Returns:
+         int: The ID of the conversation between the two users.
+     """
     result = conversation_service.get_conversation_id(user1_id, user2_id)
 
     if not result:

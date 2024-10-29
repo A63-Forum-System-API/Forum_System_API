@@ -14,6 +14,18 @@ conversations_router = APIRouter(prefix="/conversations", tags=["Conversations"]
 def view_conversation(receiver_id: int,
                       order: Optional[str] = Query("asc", pattern="^(asc|desc)$"),
                       current_user_id: int = Depends(get_current_user)):
+    """
+    View a conversation between the current user and the specified receiver.
+
+    Parameters:
+        receiver_id (int): The ID of the receiver.
+        order (Optional[str]): The order in which to sort the messages (asc or desc).
+        current_user_id (int): The ID of the current user (retrieved from the authentication dependency).
+
+    Returns:
+        Response: The conversation details or a NotFound response if the user or conversation does not exist.
+    """
+
     if not user_service.id_exists(receiver_id):
         return NotFound(f"User ID: {receiver_id}")
 
@@ -28,6 +40,16 @@ def view_conversation(receiver_id: int,
 @conversations_router.get('/')
 def view_conversations(current_user_id: int = Depends(get_current_user),
                        order: Optional[str] = Query("asc", pattern="^(asc|desc)$")):
+    """
+    View all conversations for the current user.
+
+    Parameters:
+        current_user_id (int): The ID of the current user (retrieved from the authentication dependency).
+        order (Optional[str]): The order in which to sort the conversations (asc or desc).
+
+    Returns:
+        Response: A list of conversations or a NotFound response if no conversations are found.
+    """
 
     conversations = conversation_service.get_conversations(current_user_id, order)
 
