@@ -19,6 +19,16 @@ users_router = APIRouter(prefix="/users", tags=["Users"])
 
 @users_router.post("/register", status_code=201)
 def create_user(user: UserCreate):
+    """
+    Create a new user.
+
+    Parameters:
+        user (UserCreate): The user data for creating a new user.
+
+    Returns:
+        Response: The created user or an error response
+        if the user already exists or an internal server error occurs.
+    """
     try:
         return user_service.create(user)
 
@@ -36,6 +46,15 @@ def create_user(user: UserCreate):
 # TODO add logout
 @users_router.post('/login')
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    Authenticate the user and return an access token.
+
+    Parameters:
+        form_data (OAuth2PasswordRequestForm): The form data containing the username and password.
+
+    Returns:
+        Token: An access token if authentication is successful, or an Unauthorized response if authentication fails.
+    """
     user = authenticate_user(form_data.username, form_data.password)
 
     if not user:
@@ -50,6 +69,19 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 def update_user(user_id: int,
                 is_admin: bool = Query(description="is_admin must be either false (not admin) or true (admin)"),
                 current_user_id: int = Depends(get_current_user)):
+    """
+     Update the admin status of a user.
+
+     Parameters:
+         user_id (int): The ID of the user to be updated.
+         is_admin (bool): The new admin status (true for admin, false for not admin).
+         current_user_id (int): The ID of the current user (retrieved from the authentication dependency).
+
+     Returns:
+         Response: A confirmation message indicating the user status was updated successfully,
+         or an error response if the current user is not an admin, the user ID does not exist,
+         the user is trying to update their own status, or the user to be updated is already an admin.
+     """
 
     if not user_service.is_admin(current_user_id):
         return OnlyAdminAccess("update user status")
