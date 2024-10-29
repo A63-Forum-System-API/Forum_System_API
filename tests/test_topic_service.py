@@ -11,12 +11,18 @@ from services import topic_service
 class TopicService_Should(unittest.TestCase):
 
     def test_getAllTopics_returns_listOfTopics_when_dataIsPresent(self):
-        with patch('services.topic_service.read_query') as mock_read_query:
-            # Arrange
-            test_topic_1 = (1, td.TEST_TITLE, False, td.TEST_CREATED_AT, 1, 1, 5)
-            test_topic_2 = (2, td.TEST_TITLE, True, td.TEST_CREATED_AT, 2, 1, 3)
+        # Arrange
+        test_topic_1 = (1, td.TEST_TITLE, False, td.TEST_CREATED_AT, 1, 1, 5)
+        test_topic_2 = (2, td.TEST_TITLE, True, td.TEST_CREATED_AT, 2, 1, 3)
 
-            mock_read_query.return_value = [test_topic_1, test_topic_2]
+        with (patch('services.topic_service.read_query',
+                    return_value=[test_topic_1, test_topic_2]) as mock_read_query,
+              patch('services.topic_service._build_conditions_and_params',
+                    return_value=([], [])) as mock_build_conditions_and_params,
+              patch('services.topic_service._build_final_query',
+                    return_value=('', [])) as mock_build_final_query):
+
+
 
             expected = [
                 ViewAllTopics.from_query_result(*test_topic_1),
@@ -32,6 +38,8 @@ class TopicService_Should(unittest.TestCase):
             # Assert
             self.assertEqual(expected, result)
             mock_read_query.assert_called_once()
+            mock_build_conditions_and_params.assert_called_once()
+            mock_build_final_query.assert_called_once()
 
     def test_getAllTopics_returns_emptyList_when_dataIsNotPresent(self):
         with patch('services.topic_service.read_query') as mock_read_query:
