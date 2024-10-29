@@ -22,8 +22,6 @@ class TopicService_Should(unittest.TestCase):
               patch('services.topic_service._build_final_query',
                     return_value=('', [])) as mock_build_final_query):
 
-
-
             expected = [
                 ViewAllTopics.from_query_result(*test_topic_1),
                 ViewAllTopics.from_query_result(*test_topic_2)
@@ -42,9 +40,13 @@ class TopicService_Should(unittest.TestCase):
             mock_build_final_query.assert_called_once()
 
     def test_getAllTopics_returns_emptyList_when_dataIsNotPresent(self):
-        with patch('services.topic_service.read_query') as mock_read_query:
-            # Arrange
-            mock_read_query.return_value = []
+        # Arrange
+        with (patch('services.topic_service.read_query',
+                    return_value=[]) as mock_read_query,
+              patch('services.topic_service._build_conditions_and_params',
+                    return_value=([], [])) as mock_build_conditions_and_params,
+              patch('services.topic_service._build_final_query',
+                    return_value=('', [])) as mock_build_final_query):
 
             # Act
             result = topic_service.get_all_topics(
@@ -55,6 +57,8 @@ class TopicService_Should(unittest.TestCase):
             # Assert
             self.assertEqual([], result)
             mock_read_query.assert_called_once()
+            mock_build_conditions_and_params.assert_called_once()
+            mock_build_final_query.assert_called_once()
 
     def test_buildConditionsAndParams_returns_correctTuple_when_searchIsPresent(self):
         with patch('services.topic_service.user_service') as mock_user_service:

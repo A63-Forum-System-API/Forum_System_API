@@ -259,7 +259,9 @@ class TopicsRouter_Should(unittest.TestCase):
     def test_createTopic_return_topic(self):
         # Arrange
         with (patch('services.category_service.get_by_id',
-                   return_value=fake_category()) as mock_get_by_id,
+                    return_value=fake_category()) as mock_get_by_id,
+              patch('services.user_service.is_admin',
+                    return_value=True) as mock_is_admin,
              patch('services.topic_service.create',
                    return_value=self.test_topics[0]) as mock_create):
             # Act
@@ -270,6 +272,7 @@ class TopicsRouter_Should(unittest.TestCase):
             self.assertIsInstance(response.json(), dict)
             self.assertEqual(self.test_topics[0].model_dump(), response.json())
             mock_get_by_id.assert_called_once_with(1)
+            mock_is_admin.assert_called_once_with(1)
             mock_create.assert_called_once()
 
     def test_createTopic_return_forbiddenAccess_when_userNotAdmin_userHasNoAccess(self):
@@ -333,8 +336,10 @@ class TopicsRouter_Should(unittest.TestCase):
 
     def test_createTopic_return_locked_when_categoryIsLocked(self):
         # Arrange
-        with patch('services.category_service.get_by_id',
-                   return_value=fake_category(is_locked=True)) as mock_get_by_id:
+        with (patch('services.category_service.get_by_id',
+                   return_value=fake_category(is_locked=True)) as mock_get_by_id,
+              patch('services.user_service.is_admin',
+                    return_value=True) as mock_is_admin):
             # Act
             response = client.post("/topics/", json=self.test_create_topic.model_dump())
 
@@ -343,6 +348,7 @@ class TopicsRouter_Should(unittest.TestCase):
             self.assertIsInstance(response.json(), dict)
             self.assertEqual("Category ID: 1 is locked", response.json()['detail'])
             mock_get_by_id.assert_called_once_with(1)
+            mock_is_admin.assert_called_once_with(1)
 
     def test_createTopic_return_notFound_when_categoryDoesNotExist(self):
         # Arrange
@@ -396,8 +402,10 @@ class TopicsRouter_Should(unittest.TestCase):
 
     def test_lockTopic_return_notFound_when_topicDoesNotExist(self):
         # Arrange
-        with patch('services.topic_service.get_by_id',
-                   return_value=None) as mock_get_by_id:
+        with (patch('services.user_service.is_admin',
+                   return_value=True) as mock_is_admin,
+              patch('services.topic_service.get_by_id',
+                   return_value=None) as mock_get_by_id):
             # Act
             response = client.put("/topics/1/locked-status/lock")
 
@@ -405,6 +413,7 @@ class TopicsRouter_Should(unittest.TestCase):
             self.assertEqual(404, response.status_code)
             self.assertIsInstance(response.json(), dict)
             self.assertEqual("Topic ID: 1 not found", response.json()['detail'])
+            mock_is_admin.assert_called_once_with(1)
             mock_get_by_id.assert_called_once_with(1)
 
     def test_lockTopic_return_forbiddenAccess_when_userNotAdmin(self):
