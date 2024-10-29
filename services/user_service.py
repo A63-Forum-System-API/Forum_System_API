@@ -13,6 +13,15 @@ from schemas.user import UserCreate, User, UserUpdate
 
 
 def is_admin(user_id: int) -> bool:
+    """
+    Check if a user is an admin.
+
+    Parameters:
+        user_id (int): The ID of the user.
+
+    Returns:
+        bool: True if the user is an admin, False otherwise.
+    """
     query = """SELECT is_admin FROM users WHERE id = ?"""
     result = read_query(query, (user_id,))
 
@@ -20,32 +29,31 @@ def is_admin(user_id: int) -> bool:
 
 
 def id_exists(user_id: int) -> bool:
+    """
+    Check if a user ID exists in the users table.
+
+    Parameters:
+        user_id (int): The ID of the user.
+
+    Returns:
+        bool: True if the user ID exists, False otherwise.
+    """
     query = """SELECT id FROM users WHERE id = ?"""
     result = read_query(query, (user_id,))
 
     return True if result else False
 
 
-# def get_by_username(username: str):
-#     query = """
-#             SELECT id, username, first_name, last_name, email, is_admin, picture
-#             FROM users WHERE username = ?
-#             """
-#     result = read_query(query, (username,))
-#
-#     if not result:
-#         return None
-#     result = result[0]
-#
-#     return User(
-#         username=result[1],
-#         first_name=result[2],
-#         last_name=result[3],
-#         email=result[4],
-#         picture=result[5]
-#     )
+def get_user_by_id(user_id: int) -> User:
+    """
+    Retrieve user details by user ID.
 
-def get_user_by_id(user_id: int):
+    Parameters:
+        user_id (int): The ID of the user.
+
+    Returns:
+        User: A User object containing the user's details.
+    """
     query = """
             SELECT username, first_name, last_name, email, picture
             FROM users WHERE id = ?
@@ -60,19 +68,16 @@ def get_user_by_id(user_id: int):
                 )
 
 
-# def check_if_email_exist(email: str) -> bool:
-#     query = """
-#             SELECT id, username, first_name, last_name, email, is_admin, picture
-#             FROM users WHERE email = ?
-#             """
-#     result = read_query(query, (email,))
-#
-#     if not result:
-#         return False
-#     return True
+def create(user: UserCreate) -> User:
+    """
+    Create a new user.
 
+    Parameters:
+        user (UserCreate): The user data for creating a new user.
 
-def create(user: UserCreate):
+    Returns:
+        User: A User object containing the created user's details.
+    """
     hash_password = get_password_hash(user.password)
     query = """
             INSERT INTO users(username, first_name, last_name, email, hash_password, picture)
@@ -90,7 +95,17 @@ def create(user: UserCreate):
                 )
 
 
-def update(user_id: int, is_admin: bool):
+def update(user_id: int, is_admin: bool) -> dict:
+    """
+    Update the admin status of a user.
+
+    Parameters:
+        user_id (int): The ID of the user to be updated.
+        is_admin (bool): The new admin status (true for admin, false for not admin).
+
+    Returns:
+        dict: A confirmation message indicating the user status was updated successfully.
+    """
     query = """
             UPDATE users
             SET is_admin = ?
