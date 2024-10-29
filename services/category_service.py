@@ -5,7 +5,7 @@ from data.database import (
     update_query,
     delete_query,
 )
-from schemas.category import Category, ViewAllCategories, SingleCategory
+from schemas.category import Category, ViewAllCategories, SingleCategory, CreateCategoryRequest
 from schemas.category_accesses import Accesses
 from schemas.topic import ViewAllTopics, ListOfTopics
 from services import topic_service
@@ -24,6 +24,24 @@ def get_categories(
     offset: int = 0,
     current_user_id: int = None,
 ):
+    """
+    Retrieve from the database a list of categories with optional filtering and sorting.
+    The visibility of categories is determined based on the user's access level. 
+    Admin users can see all categories, while non-admin users can only view public categories 
+    or categories they have access to.
+
+    Parameters:
+        search (str, optional): A string to filter categories by title. Defaults to None.
+        sort (str, optional): Specifies the sorting order, either 'asc' or 'desc'. Defaults to None, meaning no sorting is applied.
+        sort_by (str, optional): Specifies the field by which to sort the results, possible values are: 'title' or 'created_at'. Defaults to None, meaning no sorting is 
+        applied.
+        limit (int, optional): The maximum number of categories to return. Defaults to 10, with a minimum value of 1 and a maximum of 100.
+        offset (int, optional): The number of categories to skip before returning results. Defaults to 0.
+        current_user_id (int, optional): The ID of the currently authenticated user. Defaults to None, indicating an unauthenticated user.
+
+    Returns:
+        lst: A list of `ViewAllCategories` instances, each representing a category that matches the query criteria.
+    """
 
     query = """SELECT id, title, description, created_at 
                FROM categories
@@ -58,6 +76,17 @@ def get_categories(
 
 
 def get_by_id_with_topics(category: Category):
+    """
+    Retrieve a category along with its associated topics.
+    Takes a `Category` object as input and fetches all topics related to that category. 
+    
+    Parameters:
+        category (Category): An instance of the `Category` class.
+
+    Returns:
+        SingleCategory: An instance of `SingleCategory` containing the category details
+        and a list of its associated topics.
+    """
     
     topics = get_category_topics(category.id)
 
@@ -71,6 +100,16 @@ def get_by_id(category_id: int) -> Category:
             WHERE id = ?""",
         (category_id,),
     )
+    """
+    Retrieve from the databasa a category by its ID.
+
+    Parameters:
+        category_id (int): The ID of the category to retrieve.
+
+    Returns:
+        Category: An instance of the `Category` class or None.
+    """
+
     if not data:
         return None
 
@@ -78,6 +117,17 @@ def get_by_id(category_id: int) -> Category:
 
 
 def get_category_topics(category_id: int) -> list[ListOfTopics]:
+    """
+    Retrieve from the database a list of topics associated with a specific category.
+
+    Parameters:
+        category_id (int): The ID of the category for which to retrieve topics.
+
+    Returns:
+        lst: A list of `ListOfTopics` instances representing the topics associated with 
+        the specified category or an empty list if no topics are found.
+    """
+        
     data = read_query(
         """SELECT id, title, is_locked, created_at, author_id
             FROM topics
@@ -100,6 +150,16 @@ def get_category_topics(category_id: int) -> list[ListOfTopics]:
 
 
 def exists(category_id: int) -> bool:
+    """
+    Check if a category exists in the database by its ID.
+
+    Parameters:
+        category_id (int): The ID of the category to check for existence.
+
+    Returns:
+        bool: True if the category exists or False if not found.
+    """
+
     return (
         query_count(
             """SELECT COUNT(*)
@@ -112,6 +172,16 @@ def exists(category_id: int) -> bool:
 
 
 def title_exists(category_title: str) -> bool:
+    """
+    Check if a category with the specified title exists in the database.
+
+    Parameters:
+        category_title (str): The title of the category to check for existence.
+
+    Returns:
+        bool: True if a category with the specified title exists or False otherwise.
+    """
+
     return (
         query_count(
             """SELECT COUNT(*) 
@@ -124,6 +194,17 @@ def title_exists(category_title: str) -> bool:
 
 
 def is_private(category_id: int) -> bool:
+    """
+    Check in the database if a category is private based on its ID.
+
+    Parameters:
+        category_id (int): The ID of the category to check for privacy status.
+
+    Returns:
+        bool: True if the category is private or False otherwise. Raises an exception if no category 
+        is found with that ID.
+    """
+
     result = read_query(
         """SELECT is_private FROM categories 
            WHERE id = ?""",
@@ -135,7 +216,19 @@ def is_private(category_id: int) -> bool:
     return result[0][0] == 1
 
 
-def create(category: Category, current_user_id: int):
+def create(category: CreateCategoryRequest, current_user_id: int):
+    """
+    Create a new category in the database, using the provided CreateCategoryRequest object 
+    and the current user ID.
+
+    Parameters:
+        category (CreateCategoryRequest): An instance of the `CreateCategoryRequest` class.
+        current_user_id (int): The ID of the user creating the category.
+
+    Returns:
+        Category: An instance of the `Category` class with all attributes of the newly created category.
+    """
+        
     query = """INSERT INTO categories (title, description, is_private, admin_id)
                 VALUES (?, ?, ?, ? )"""
 
@@ -155,6 +248,18 @@ def create(category: Category, current_user_id: int):
 
 
 def change_category_private_status(category_id: int, private_status_code: int):
+    """
+    Change the privacy status of a category in the database.
+    If the category is changed from private to public, all user access associated with that category
+    will be removed, because public categories are accessible to everyone.
+
+    Parameters:
+        category_id (int): The ID of the category whose privacy status is to be modified.
+        private_status_code (int): The privacy status code (0 for public and 1 for private).
+
+    Returns:
+        None: The function does not return a value. It performs an update on the database and may modify user access.
+    """
   
     query = """UPDATE categories 
             SET is_private = ? 
@@ -167,9 +272,18 @@ def change_category_private_status(category_id: int, private_status_code: int):
         # In case the category is changed back to private, no previous user access will exist.
         _remove_access_from_category(category_id)
   
-  
 
 def _remove_access_from_category(category_id: int):
+    """
+    Remove from the database all user access associated with a specific category ID.
+
+    Parameters:
+        category_id (int): The ID of the category for which all user access should be removed.
+
+    Returns:
+        None: This function does not return a value. It performs a deletion operation on the database.
+    """
+        
     query = """DELETE FROM category_accesses 
             WHERE category_id = ?"""
     deleted_rows = delete_query(query, (category_id,))
@@ -177,6 +291,17 @@ def _remove_access_from_category(category_id: int):
 
 
 def _remove_access_from_category_for_user(category_id: int, user_id: int):
+    """
+    Remove from the database a user access entry for the specified user and category.
+
+    Parameters:
+        category_id (int): The ID of the category from which to remove user access.
+        user_id (int): The ID of the user to be revoked.
+
+    Returns:
+        None: This function does not return a value. It performs a deletion operation on the database.
+    """
+
     query = """DELETE FROM category_accesses 
             WHERE category_id = ?
             AND user_id = ?"""
@@ -185,6 +310,17 @@ def _remove_access_from_category_for_user(category_id: int, user_id: int):
 
 
 def change_category_lock_status(category_id: int, locked_status_code: int):
+    """
+    Update the locked status of a specific category in the database.
+
+    Parameters:
+        category_id (int): The ID of the category whose locked status is to be updated.
+        locked_status_code (int): The locked status code (1 to lock and 0 to unlock).
+
+    Returns:
+        None: This function does not return a value. It performs an update operation on the database.
+    """
+
     query = """UPDATE categories 
             SET is_locked = ? 
             WHERE id = ?"""
@@ -237,6 +373,21 @@ def validate_user_access(user_id: int, category_id: int, access_type: str = "rea
 def manage_user_access_to_private_category(
     category_id: int, user_id: int, write_access_code: int
 ):
+    """
+    Manage a user's access level for a specific private category. 
+    If the access record exists but the write access level differs from the given `write_access_code`, 
+    it updates the user's access level. If no access record exists, it creates a new record 
+    with the specified access level.
+
+    Parameters:
+        category_id (int): The ID of the private category to manage access for.
+        user_id (int): The ID of the user whose access level is being managed.
+        write_access_code (int): The access level code (1 for read-and-write access and 0 for read-only).
+
+    Returns:
+        None: This function does not return a value. It either updates or inserts a record in the database.
+    """
+        
     data = read_query(
         """SELECT user_id, category_id, write_access
                 FROM category_accesses
@@ -277,6 +428,17 @@ def manage_user_access_to_private_category(
 def remove_user_access_to_private_category(
     category_id: int, user_id: int,
 ) -> str:
+    """
+    Remove a user's access to a specific private category.
+
+    Parameters:
+        category_id (int): The ID of the private category to remove access from.
+        user_id (int): The ID of the user whose access is being removed.
+
+    Returns:
+        str: A message indicating the result of the operation.
+    """
+
     data = read_query(
         """SELECT user_id, category_id, write_access
                 FROM category_accesses
@@ -295,6 +457,18 @@ def remove_user_access_to_private_category(
     
 
 def get_privileged_users_by_category(category_id):
+    """
+    Retrieve from the database a list of all users with their access details 
+    to a specified private category.
+
+    Parameters:
+        category_id (int): The ID of the category to retrieve privileged users for.
+
+    Returns:
+        list[dict]: A list of dictionaries, each representing a user's access permissions 
+        for the specified category.
+    """
+
     data = read_query(
         """SELECT user_id, category_id, write_access
             FROM category_accesses
