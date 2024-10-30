@@ -42,18 +42,31 @@
 
             </div>
         {% else %}
-            <h2>Latest Gossip</h2>
-                {% if error %}
-                    <div class="error-message">
-                        {{ error }}
-                    </div>
-                {% endif %}
-            {% if latest_topic %}
-                <div class="topic-card">
-                    <h3>{{ latest_topic.title }}</h3>
-                    <p>{{ latest_topic.content }}</p>
+            {% if error %}
+                <div class="error-message">
+                    {{ error }}
                 </div>
             {% endif %}
+            <div class="welcome-letter">
+                <div class="letter-content">
+                    <h2 class="letter-header">Dear {{ first_name if first_name else "Gossiper" }},</h2>
+
+                    <p>Welcome to our Gossip Society!</p>
+
+                    <p>Where secrets are served hot and gossip never gets cold... 🫖</p>
+
+                    <p>Here you'll find all the juiciest stories, freshly spilled tea, and scandalous whispers from our elite members.</p>
+
+                    <p>Remember darling, in this society:</p>
+                    <ul class="society-rules">
+                        <li>Every secret has a story,</li>
+                        <li>Every whisper matters,</li>
+                        <li>And the tea is always piping hot.</li>
+                    </ul>
+
+                    <p class="letter-closing">Gossip Society 💋</p>
+                </div>
+            </div>
         {% endif %}
            <a href="easter-egg.html" class="icon-animation">✗♡✗♡</a>
         </div>

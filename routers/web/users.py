@@ -26,13 +26,6 @@ def login(request: Request,
         response.set_cookie('token', access_token)
         return response
 
-
-@users_router.post('/logout')
-def logout():
-    response = RedirectResponse(url='/', status_code=302)
-    response.delete_cookie('token')
-    return response
-
 @users_router.get('/register')
 def serve_register(request: Request):
     return templates.TemplateResponse(request=request, name='register.html')
