@@ -5,7 +5,7 @@ from common.auth import get_current_user
 from common.custom_responses import ForbiddenAccess, NotFound, OK, BadRequest, OnlyAdminAccess
 from typing import Literal
 
-categories_router = APIRouter(prefix="/categories", tags=["Categories"])
+categories_router = APIRouter(prefix="/api/categories", tags=["Categories"])
 
 
 @categories_router.get("/")
