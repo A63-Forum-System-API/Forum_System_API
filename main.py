@@ -1,13 +1,13 @@
 import uvicorn
 from fastapi import FastAPI
-from routers.categories import categories_router
-from routers.replies import replies_router
-from routers.tokens import token_router
-from routers.topics import topics_router
-from routers.users import users_router
-from routers.votes import votes_router
-from routers.messages import messages_router
-from routers.conversations import conversations_router
+from routers.api.categories import categories_router
+from routers.api.replies import replies_router
+from routers.api.tokens import token_router
+from routers.api.topics import topics_router
+from routers.api.users import users_router
+from routers.api.votes import votes_router
+from routers.api.messages import messages_router
+from routers.api.conversations import conversations_router
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

@@ -1,11 +1,10 @@
 import unittest
 from unittest.mock import Mock, patch
-from routers import topics as topics_router
+from routers.api import topics as topics_router
 
 from fastapi.testclient import TestClient
 from main import app
 from schemas.reply import Reply, CreateReplyRequest
-from services.category_service import is_private
 
 client = TestClient(app)
 
