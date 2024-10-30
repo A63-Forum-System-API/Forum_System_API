@@ -1,1 +1,44 @@
-<!--all categories-->
+{% import 'macros.html' as macros %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Categories - Gossip Forum</title>
+    <link rel="stylesheet" href="/static/css/categories.css">
+</head>
+<body>
+    {{ macros.header(request) }}
+
+   <div class="container">
+        <h1>♡₊˚ CATEGORIES ・₊✧</h1>
+
+        <form class="search-form" method="get" action="/categories">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search for title...">
+            <button type="submit">SEARCH</button>
+        </form>
+
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
+
+        {% if categories %}
+            <div class="categories-grid">
+                {% for category in categories %}
+                    <div class="category-card">
+                        <h3>{{ category.title }}</h3>
+                        <p class="description-preview">{{ category.description }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-gossip-message">
+                Sweetie, this category is giving crickets...
+                <br>
+                Be the first to drop the tea! 💅🏻
+            </div>
+        {% endif %}
+    </div>
+    {{ macros.footer() }}
+</body>
+</html>

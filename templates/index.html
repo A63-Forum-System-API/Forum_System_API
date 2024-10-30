@@ -43,7 +43,11 @@
             </div>
         {% else %}
             <h2>Latest Gossip</h2>
-            <!-- Add content for logged in users -->
+                {% if error %}
+                    <div class="error-message">
+                        {{ error }}
+                    </div>
+                {% endif %}
             {% if latest_topic %}
                 <div class="topic-card">
                     <h3>{{ latest_topic.title }}</h3>

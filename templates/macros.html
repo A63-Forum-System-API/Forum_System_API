@@ -14,7 +14,12 @@
 
             <a href="/" class="nav-link">⋆HOME⋆</a>
             <a href="products.html" class="nav-link">⋆HOT GOSSIP⋆</a>
-            <a href="categories.html" class="nav-link">⋆CATEGORIES⋆</a>
+            {% if request.cookies.get("token") %}
+                <a href="/categories" class="nav-link">⋆CATEGORIES⋆</a>
+            {% else %}
+                <a href="/?error=not_authorized_categories" class="nav-link">⋆CATEGORIES⋆</a>
+            {% endif %}
+
             <a href="login.html" class="nav-link">⋆GOSSIP I STARTED⋆</a>
             <div class="conversation-icon">
                 <a href="conversations.html" class="conversations-link">

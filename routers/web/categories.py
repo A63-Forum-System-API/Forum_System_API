@@ -1,60 +1,61 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request, Query, Depends
+from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
+from common.auth import get_current_user
+from services import category_service
 
 categories_router = APIRouter(prefix='/categories')
 templates = Jinja2Templates(directory='templates')
 
 
 @categories_router.get("/")
-def get_all_categories(
-        search: str | None = Query(description="Search for categories by title", default=None),
-        sort_by: Literal["title", "created_at"] | None = Query(description="Sort categories by title or created_at",
-                                                               default=None),
-        sort: Literal["asc", "desc"] | None = Query(description="Sort categories asc or desc", default=None),
-        limit: int = Query(description="Limit the number of categories returned", default=10, ge=1, le=100),
-        offset: int = Query(description="Offset the number of categories returned", default=0, ge=0),
-        current_user_id: int = Depends(get_current_user)
+async def get_categories(
+        request: Request,
+        search: str = Query(default=""),
 ):
-    """
-    View all categories based on optional search, sorting, and pagination parameters if the user
-    has access to the categories. Params sort_by and sort must be included together or neither of them.
+    try:
+        token = request.cookies.get("token")
+        if not token:
+            return RedirectResponse(
+                url="/?error=not_authorized_categories",
+                status_code=302
+            )
 
-    Parameters:
-        search (str | None): A string to filter categories by title. Defaults to None.
-        sort_by (Literal["title", "created_at"] | None): The field to sort the categories by. Defaults to None.
-        sort (Literal["asc", "desc"] | None): The direction of the sorting. Defaults to None.
-        limit (int): The maximum number of categories to return. Defaults to 10.
-        offset (int): The number of categories to skip before starting to collect the result
-        set. Defaults to 0.
-        current_user_id (int): The ID of the current user, provided by the authentication
-        dependency.
+        try:
+            current_user_id = get_current_user(token)
 
-    Returns:
-        Response: List of categories based on the provided parameters or BadRequest error messages
-        for invalid inputs.
-    """
+        except:
+            return RedirectResponse(
+                url="/?error=invalid_token",
+                status_code=302
+            )
 
-    # validation
-    if not sort in (None, "asc", "desc"):
-        return BadRequest(
-            content=f"Invalid value for sort: {sort}. Valid values are: asc, desc"
+
+        categories = category_service.get_categories(
+            search=search,
+            sort="asc",
+            sort_by="title",
+            limit=100,
+            offset=0,
+            current_user_id=current_user_id
         )
 
-    if sort and sort_by not in ("title", "created_at"):
-        return BadRequest(
-            content=f"Invalid value for sort_by: {sort_by}. Valid values are: title, created_at"
+        return templates.TemplateResponse(
+            request=request, name='categories.html',
+            context={
+                "request": request,
+                "categories": categories,
+                "search": search
+            }
         )
 
-    if limit < 1 or limit > 100:  # fastapi checks if limit is int
-        return BadRequest(
-            content=f"Invalid value for limit: {limit}. Valid values are: int [1-100]"
+    except Exception as e:
+        return templates.TemplateResponse(
+            request=request, name="categories.html",
+            context={
+                "request": request,
+                "error": "Oops! Something went wrong while loading categories 🙈",
+                "categories": [],
+                "search": search
+            }
         )
-
-    if offset < 0:
-        return BadRequest(
-            content=f"Invalid value for offset: {offset}. Valid values are: int >= 0"
-        )
-
-    return category_service.get_categories(
-        search, sort, sort_by, limit, offset, current_user_id
-    )
