@@ -3,6 +3,15 @@ from schemas.reply import Reply, CreateReplyRequest
 
 
 def get_by_id(reply_id: int) -> Reply | None:
+    """
+    Retrieve a reply by its ID.
+
+    Parameters:
+        reply_id (int): The ID of the reply to retrieve.
+
+    Returns:
+         Reply | None: The Reply object if found, otherwise None.
+     """
     query = """SELECT r.id, r.content, r.topic_id, r.created_at, r.is_best_reply, r.author_id,
             SUM(CASE 
                 WHEN v.vote_type = True THEN 1 
@@ -23,6 +32,15 @@ def get_by_id(reply_id: int) -> Reply | None:
 
 
 def id_exists(reply_id: int) -> bool:
+    """
+    Check if a reply exists by its ID.
+
+    Parameters:
+        reply_id (int): The ID of the reply to check.
+
+    Returns:
+        bool: True if the reply exists, otherwise False.
+    """
     query = """SELECT 1 
                 FROM replies 
                 WHERE id = ?"""
@@ -33,6 +51,16 @@ def id_exists(reply_id: int) -> bool:
 
 
 def create(reply: CreateReplyRequest, user_id: int) -> Reply:
+    """
+    Create a new reply.
+
+    Parameters:
+        reply (CreateReplyRequest): The reply data to create.
+         user_id (int): The ID of the user creating the reply.
+
+    Returns:
+        Reply: The created Reply object.
+    """
 
     query = """INSERT INTO replies(content, topic_id, author_id)
                 VALUES(?, ?, ?)"""
@@ -44,6 +72,16 @@ def create(reply: CreateReplyRequest, user_id: int) -> Reply:
 
 
 def reply_belongs_to_topic(reply_id: int, topic_id: int) -> bool:
+    """
+    Check if a reply belongs to a specific topic.
+
+    Parameters:
+         reply_id (int): The ID of the reply to check.
+         topic_id (int): The ID of the topic to check.
+
+    Returns:
+        bool: True if the reply belongs to the topic, otherwise False.
+    """
     query = """SELECT 1 
                 FROM replies 
                 WHERE id = ? 
