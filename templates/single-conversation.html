@@ -5,37 +5,77 @@
 <head>
     <meta charset="UTF-8">
     <title>Gossip Forum | Conversation</title>
-    <link rel="stylesheet" href="/static/css/conversations.css">
+    <link rel="stylesheet" href="/static/css/single-conversation.css">
 </head>
 <body>
     {{ macros.header(request) }}
 
    <div class="container">
 
+
+
         {% if error %}
-            <div class="error-message">{{ error }}</div>
+            <div class="no-gossip-message">{{ error }}</div>
         {% endif %}
 
         {% if conversation %}
-               <div class="conversation-card">
-                   <div class="avatar-container">
-                       <img src="{{ conversation.get('picture') }}" alt="Profile Picture" class="profile-avatar">
-                   </div>
-                   <div class="conversation-content">
-                       <div class="conversation-header">
-                           <h3 class="contact-name">{{ conversation.get("with") }}</h3>
-                           <span class="timestamp">{{ conversation.get("sent_at").strftime('%d/%m/%y') }}</span>
-                       </div>
-                       <div class="message-container">
-                           <p class="message-preview">{{ conversation.get("last_message") }}</p>
-                           <span class="message-time">{{ conversation.get("sent_at").strftime('%H:%M') }}</span>
-                       </div>
-                   </div>
-               </div>
-
+        <div class="messages-container">
+                {% for message in conversation %}
+                    {% if message["from_id"] == receiver_id %}
+                        <div class="conversation-card-receiver">
+                            <div class="avatar-container">
+                                <img src="{{ message.get('picture') }}" alt="Profile Picture" class="profile-avatar">
+                            </div>
+                                <div class="conversation-content">
+                                    <div class="conversation-header">
+                                        <h3 class="message-preview">{{ message.get("from") }}</h3>
+                                        <span class="timestamp">{{ message.get("sent_at").strftime('%d/%m/%y') }}</span>
+                                    </div>
+                                    <div class="message-container">
+                                        <p class="contact-name">{{ message.get("text") }}</p>
+                                        <span class="message-time">{{ message.get("sent_at").strftime('%H:%M') }}</span>
+                                    </div>
+                                </div>
+                        </div>
+                    {% else %}
+                        <div class="conversation-card-sender">
+                            <div class="avatar-container">
+                                <img src="{{ message.get('picture') }}" alt="Profile Picture" class="profile-avatar">
+                            </div>
+                                <div class="conversation-content">
+                                    <div class="conversation-header">
+                                        <h3 class="message-preview">{{ message.get("from") }}</h3>
+                                        <span class="timestamp">{{ message.get("sent_at").strftime('%d/%m/%y') }}</span>
+                                    </div>
+                                    <div class="message-container">
+                                        <p class="contact-name">{{ message.get("text") }}</p>
+                                        <span class="message-time">{{ message.get("sent_at").strftime('%H:%M') }}</span>
+                                    </div>
+                                </div>
+                        </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+                {% if not error %}
+                <div class="no-gossip-message">
+                    Sweetie, you don't have any messages... 💅🏻
+                </div>
+                {% endif %}
         {% endif %}
 
     </div>
+
+    <br>
+
+    <div class="container-send-message">
+        <form action="/send-message" method="post" class="message-form">
+            <input type="hidden" name="receiver_id" value="{{ receiver_id }}">
+            <textarea name="message" id="message" placeholder="Type your message here..." required></textarea>
+            <button type="submit" class="send-message-button">Send</button>
+        </form>
+    </div>
+
     {{ macros.footer() }}
 </body>
 </html>

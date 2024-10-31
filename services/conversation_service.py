@@ -27,6 +27,7 @@ def get_conversation(conversation_id: int, order: str = "asc") -> list[dict]:
     for message in result:
         messages.append({
             "text": message[0],
+            "from_id": message[1],
             "from": message[2],
             "sent_at": message[3],
             "picture": message[4]

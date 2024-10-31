@@ -82,12 +82,13 @@ def view_conversation(request: Request,
             )
 
         conversation_id = conversation_service.get_conversation_id(current_user_id, receiver_id)
-        conversation = conversation_service.get_conversation(conversation_id, "asc")
+        conversation = conversation_service.get_conversation(conversation_id, "desc")
 
         return templates.TemplateResponse(
-            request=request, name='conversations.html',
+            request=request, name='single-conversation.html',
             context={
-                "conversation": conversation
+                "conversation": conversation,
+                "receiver_id": receiver_id
             }
         )
 
