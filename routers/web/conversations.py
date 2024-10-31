@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 from common.auth import get_current_user
-from services import conversation_service
+from services import conversation_service, user_service
 
 conversations_router = APIRouter(prefix='/conversations')
 templates = Jinja2Templates(directory='templates')
@@ -83,12 +83,13 @@ def view_conversation(request: Request,
 
         conversation_id = conversation_service.get_conversation_id(current_user_id, receiver_id)
         conversation = conversation_service.get_conversation(conversation_id, "desc")
-
+        receiver = user_service.get_user_by_id(receiver_id)
         return templates.TemplateResponse(
             request=request, name='single-conversation.html',
             context={
                 "conversation": conversation,
-                "receiver_id": receiver_id
+                "receiver_id": receiver_id,
+                "receiver_username": receiver.username
             }
         )
 

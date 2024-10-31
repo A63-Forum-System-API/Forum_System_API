@@ -69,23 +69,24 @@
     <br>
 
     <div class="container-send-message">
-        <input type="checkbox" id="toggle" class="toggle-input">
+        <form action="/messages" method="post" class="send-message-form">
+            <input type="hidden" name="username" value="{{ receiver_username }}">
 
-        <label for="toggle" class="new-conversation-button">
-
-        </label>
-
-        <form action="/messages" method="post" class="new-message-form">
-
-            <input
-                type="text"
-                name="message"
-                placeholder="Say something..."
-                required
-                autocomplete="off"
-                class="message-input"
-            >
-            <button type="submit" class="gossip-button">Let's gossip!</button>
+            <div class="input-with-button">
+                <textarea
+                    name="message"
+                    placeholder="Say something..."
+                    required
+                    autocomplete="off"
+                    class="message-input"
+                    rows="3"
+                ></textarea>
+                <button type="submit" class="send-button">
+                    <svg width="34" height="34" viewBox="0 0 24 24" class="send-icon">
+                        <path fill="#fa057e" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
         </form>
     </div>
 

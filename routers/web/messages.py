@@ -10,7 +10,7 @@ templates = Jinja2Templates(directory='templates')
 
 
 @messages_router.post('/')
-async def create_new_message(
+def create_new_message(
         request: Request,
         message: str = Form(...),
         username: str = Form(...)):
