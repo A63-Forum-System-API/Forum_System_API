@@ -38,7 +38,7 @@ def create_new_message(
         message_service.create(message, receiver_user["id"], current_user_id)
 
         return RedirectResponse(
-            url=f"/conversations/{receiver_user["id"]}",
+            url=f"/conversations/{receiver_user['id']}",
             status_code=302
         )
 
