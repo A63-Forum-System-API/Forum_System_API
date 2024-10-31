@@ -9,10 +9,11 @@ from routers.api.topics import topics_router
 from routers.api.users import users_router as api_users_router
 from routers.api.votes import votes_router
 from routers.api.messages import messages_router
-from routers.api.conversations import conversations_router
+from routers.api.conversations import conversations_router as api_conversations_router
 import logging
 
 from routers.web.categories import categories_router
+from routers.web.conversations import conversations_router
 from routers.web.home import index_router
 from routers.web.users import users_router
 
@@ -29,13 +30,14 @@ app.include_router(api_users_router)
 app.include_router(votes_router)
 app.include_router(token_router)
 app.include_router(messages_router)
-app.include_router(conversations_router)
+app.include_router(api_conversations_router)
 
 
 # web routers
 app.include_router(index_router)
 app.include_router(users_router)
 app.include_router(categories_router)
+app.include_router(conversations_router)
 
 
 

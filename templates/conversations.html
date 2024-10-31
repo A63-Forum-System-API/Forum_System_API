@@ -1,2 +1,47 @@
-<!--list of all conversations and they refer to single-conversation with all messages-->
-<!--style like categories-->
+{% import 'macros.html' as macros %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gossip Forum | Conversations</title>
+    <link rel="stylesheet" href="/static/css/conversations.css">
+</head>
+<body>
+    {{ macros.header(request) }}
+
+   <div class="container">
+        <h1>♡₊˚ GOSSIP CHAT ・₊✧</h1>
+
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
+
+        {% if conversations %}
+            {% for conversation in conversations %}
+               <div class="conversation-card">
+                   <div class="avatar-container">
+                       <img src="{{ conversation.get('picture') }}" alt="Profile Picture" class="profile-avatar">
+                   </div>
+                   <div class="conversation-content">
+                       <div class="conversation-header">
+                           <h3 class="contact-name">{{ conversation.get("with") }}</h3>
+                           <span class="timestamp">{{ conversation.get("sent_at").strftime('%d/%m/%y') }}</span>
+                       </div>
+                       <div class="message-container">
+                           <p class="message-preview">{{ conversation.get("last_message") }}</p>
+                           <span class="message-time">{{ conversation.get("sent_at").strftime('%H:%M') }}</span>
+                       </div>
+                   </div>
+               </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-gossip-message">
+                Sweetie, you don't have any messages... 💅🏻
+            </div>
+        {% endif %}
+
+    </div>
+    {{ macros.footer() }}
+</body>
+</html>

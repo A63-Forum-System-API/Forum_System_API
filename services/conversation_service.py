@@ -13,10 +13,10 @@ def get_conversation(conversation_id: int, order: str = "asc") -> list[dict]:
         order (str): The order in which to sort the messages (asc or desc).
 
     Returns:
-        list[dict]: A list of messages with text, sender's first name, and sent time.
+        list[dict]: A list of messages with text, sent time, sender's first name and picture
     """
     query = f"""
-            SELECT m.text, m.sender_id, u.first_name, m.sent_at
+            SELECT m.text, m.sender_id, u.first_name, m.sent_at, u.picture
             FROM messages m
             JOIN users u ON m.sender_id = u.id
             WHERE m.conversation_id = ?
@@ -29,6 +29,7 @@ def get_conversation(conversation_id: int, order: str = "asc") -> list[dict]:
             "text": message[0],
             "from": message[2],
             "sent_at": message[3],
+            "picture": message[4]
         })
 
     return messages
@@ -83,6 +84,10 @@ def get_conversations(user_id: int, order="asc") -> list[dict]:
                        WHEN c.user1_id = ? THEN u2.first_name 
                        ELSE u1.first_name 
                    END AS first_name,
+                   CASE 
+                       WHEN c.user1_id = ? THEN u2.picture 
+                       ELSE u1.picture
+                   END AS picture,
                    m.text AS last_message,
                    m.sent_at AS last_sent_at
             FROM conversations c
@@ -98,14 +103,15 @@ def get_conversations(user_id: int, order="asc") -> list[dict]:
             ORDER BY m.sent_at {order}
             """
 
-    result = read_query(query, (user_id, user_id, user_id, user_id))
+    result = read_query(query, (user_id, user_id, user_id, user_id, user_id))
     conversations = []
     for conversation in result:
         conversations.append({
             "conversation_id": conversation[0],
             "with": f"{conversation[2]}",
-            "last_message": conversation[3],
-            "sent_at": conversation[4],
+            "picture": None if conversation[3] == 1 else f"{conversation[3]}",
+            "last_message": conversation[4],
+            "sent_at": conversation[5],
         })
 
     return conversations

@@ -32,6 +32,8 @@ body {
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 0 20px #fa057e;
+    align-items: center;
+    flex-direction: column;
 }
 
 h1 {
@@ -225,4 +227,141 @@ h1 {
 .icon {
     vertical-align: middle;
     margin-right: 8px;
+}
+
+/*--------------------------------------------*/
+
+
+
+/*.conversation-card {*/
+/*    background: rgba(0, 0, 0, 0.8);*/
+/*    border: 2px solid #fa057e;*/
+/*    border-radius: 100px;*/
+/*    padding: 15px;*/
+/*    text-align: center;*/
+/*    transition: all 0.3s ease;*/
+/*    position: relative;*/
+/*    overflow: hidden;*/
+/*    height: 100px;*/
+/*    cursor: pointer;*/
+/*}*/
+
+/*.conversation-card:hover {*/
+/*    transform: translateY(-5px);*/
+/*    box-shadow: 0 0 15px #fa057e;*/
+/*}*/
+
+
+/*.no-gossip-message {*/
+/*    text-align: center;*/
+/*    font-size: 1.2em;*/
+/*    color: #ffd700;*/
+/*    padding: 40px;*/
+/*    margin: 20px auto;*/
+/*    max-width: 600px;*/
+/*}*/
+
+
+.conversation-card {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #fa057e;
+    border-radius: 15px;
+    padding: 15px;
+    margin-top: 15px;
+    margin-left: 150px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 465px;
+}
+
+.conversation-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px #fa057e;
+}
+
+.avatar-container {
+    flex-shrink: 0;
+}
+
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #fa057e;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(250, 5, 126, 0.3);
+}
+
+.conversation-content {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.conversation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.contact-name {
+    color: #ffd700;
+    font-size: 1.2em;
+    margin: 0;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+}
+
+.timestamp {
+    color: #888;
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+.message-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.message-preview {
+    flex-grow: 1;
+    color: #fff;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+
+.message-time {
+    color: #888;
+    font-size: 0.8em;
+    font-style: italic;
+    flex-shrink: 0;
+}
+
+.conversation-card:hover .contact-name {
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.conversation-card:hover .profile-avatar {
+    box-shadow: 0 0 15px rgba(250, 5, 126, 0.5);
+}
+
+
+.no-gossip-message {
+    text-align: center;
+    font-size: 1.2em;
+    color: #ffd700;
+    padding: 40px;
+    margin: 20px auto;
+    font-style: italic;
 }

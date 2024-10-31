@@ -9,7 +9,7 @@ templates = Jinja2Templates(directory='templates')
 
 
 @categories_router.get("/")
-async def get_categories(
+def get_categories(
         request: Request,
         search: str = Query(default=""),
 ):
@@ -43,7 +43,6 @@ async def get_categories(
         return templates.TemplateResponse(
             request=request, name='categories.html',
             context={
-                "request": request,
                 "categories": categories,
                 "search": search
             }
@@ -53,7 +52,6 @@ async def get_categories(
         return templates.TemplateResponse(
             request=request, name="categories.html",
             context={
-                "request": request,
                 "error": "Oops! Something went wrong while loading categories 🙈",
                 "categories": [],
                 "search": search
