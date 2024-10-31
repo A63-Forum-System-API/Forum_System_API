@@ -37,15 +37,24 @@ def register(request: Request,
              first_name: str = Form(...),
              last_name: str = Form(...),
              email: str = Form(...),
-             password: str = Form(...)):
+             password: str = Form(...),
+             picture: str = Form(...)):
 
     try:
+        picture_paths = {
+            "girl_avatar": "/static/images/girl.png",
+            "boy_avatar": "/static/images/boy.png"
+        }
+
+        selected_picture = picture_paths.get(picture)
+
         user_data = UserCreate(
             username=username,
             first_name=first_name,
             last_name=last_name,
             email=email,
-            password=password
+            password=password,
+            picture=selected_picture
         )
     except ValidationError as e:
         return templates.TemplateResponse(
