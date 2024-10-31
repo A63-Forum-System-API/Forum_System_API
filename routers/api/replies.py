@@ -11,7 +11,20 @@ replies_router = APIRouter(prefix="/replies", tags=["Replies"])
 @replies_router.post("/", status_code=201)
 def create_reply(reply: CreateReplyRequest = Body(description="Reply to create"),
                  current_user_id: int = Depends(get_current_user)):
+    """
+    Create a new reply to a topic.
 
+    Parameters:
+        reply (CreateReplyRequest): The reply data to create.
+        current_user_id (int): The ID of the current user, obtained from the authentication dependency.
+
+    Returns:
+        JSONResponse: A response indicating the result of the reply creation.
+        - 201 Created: If the reply is successfully created.
+        - 404 Not Found: If the topic ID does not exist.
+        - 423 Locked: If the topic is locked.
+        - 403 Forbidden: If the user does not have access to the category.
+    """
     topic = topic_service.get_by_id(reply.topic_id)
 
     if topic is None:

@@ -12,7 +12,23 @@ votes_router = APIRouter(prefix="/votes", tags=["Votes"])
 def vote(reply_id: int = Path(description="ID of the reply to vote for"),
          vote_type: Literal["downvote", "upvote"] = Query(description="Vote ot change vote type"),
          current_user_id: int = Depends(get_current_user)):
+    """
+    Cast or change a vote for a reply.
 
+    Parameters:
+        reply_id (int): The ID of the reply to vote for.
+        vote_type (Literal["downvote", "upvote"]): The type of vote to cast or change to.
+        current_user_id (int): The ID of the current user, obtained from the authentication dependency.
+
+    Returns:
+        JSONResponse: A response indicating the result of the vote operation.
+        - 201 Created: If the vote is successfully created.
+        - 200 OK: If the vote is successfully changed.
+        - 400 Bad Request: If the user has already voted with the same vote type.
+        - 404 Not Found: If the reply ID does not exist.
+        - 423 Locked: If the topic is locked.
+        - 403 Forbidden: If the user does not have access to the category.
+    """
     vote_type = 1 if vote_type == "upvote" else 0
 
     reply = reply_service.get_by_id(reply_id)
@@ -43,9 +59,25 @@ def vote(reply_id: int = Path(description="ID of the reply to vote for"),
 
     return OK(f"Vote for reply ID {reply_id} is successfully changed to {vote_str}")
 
+
 @votes_router.delete("/{reply_id}")
 def delete_vote(reply_id: int = Path(description="ID of the reply to delete vote for"),
                 current_user_id: int = Depends(get_current_user)):
+    """
+    Delete a vote for a specific reply and user.
+
+    Parameters:
+        reply_id (int): The ID of the reply to delete the vote for.
+        current_user_id (int): The ID of the current user, obtained from the authentication dependency.
+
+    Returns:
+        JSONResponse: A response indicating the result of the vote deletion.
+        - 200 OK: If the vote is successfully deleted.
+        - 400 Bad Request: If the user has not voted for the reply.
+        - 404 Not Found: If the reply ID does not exist.
+        - 423 Locked: If the topic is locked.
+        - 403 Forbidden: If the user does not have access to the category.
+    """
 
     reply = reply_service.get_by_id(reply_id)
     if reply is None:

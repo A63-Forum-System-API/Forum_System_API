@@ -18,6 +18,25 @@ def get_all_topics(
     current_user_id: int = Depends(get_current_user),
     limit: int = Query(description="Limit the number of topics returned", default=10, ge=1, le=100),
     offset: int = Query(description="Offset the number of topics returned", default=0, ge=0)):
+    """
+    Retrieve all topics based on the provided filters.
+
+    Parameters:
+        sort (Literal["asc", "desc"] | None): Sort topics by date.
+        search (str | None): Search for topics by title.
+        category_id (int | None): Filter topics by category ID.
+        author_id (int | None): Filter topics by author ID.
+        is_locked (Literal["true", "false"] | None): Filter topics by locked status.
+        current_user_id (int): The ID of the current user, obtained from the authentication dependency.
+        limit (int): Limit the number of topics returned.
+        offset (int): Offset the number of topics returned.
+
+    Returns:
+        JSONResponse: A response containing the list of topics matching the filters.
+        - 200 OK: If the topics are successfully retrieved.
+        - 404 Not Found: If the category or author ID does not exist.
+        - 403 Forbidden: If the user does not have access to the category.
+    """
 
     if is_locked is not None:
         is_locked = is_locked == "true"
@@ -46,6 +65,19 @@ def get_all_topics(
 @topics_router.get("/{topic_id}")
 def get_topic_by_id(topic_id: int = Path(description="ID of the topic to retrieve"),
                     current_user_id: int = Depends(get_current_user)):
+    """
+    Retrieve a topic by its ID along with its replies.
+
+    Parameters:
+        topic_id (int): The ID of the topic to retrieve.
+        current_user_id (int): The ID of the current user, obtained from the authentication dependency.
+
+    Returns:
+        JSONResponse: A response containing the topic and its replies.
+        - 200 OK: If the topic is successfully retrieved.
+        - 404 Not Found: If the topic ID does not exist.
+        - 403 Forbidden: If the user does not have access to the category.
+    """
 
     topic = topic_service.get_by_id_with_replies(topic_id)
 
@@ -63,7 +95,21 @@ def get_topic_by_id(topic_id: int = Path(description="ID of the topic to retriev
 @topics_router.post("/", status_code=201)
 def create_topic(topic: CreateTopicRequest = Body(description="Topic to create"),
                  current_user_id: int = Depends(get_current_user)):
+    """
+    Create a new topic.
 
+    Parameters:
+        topic (CreateTopicRequest): The topic data to create.
+        current_user_id (int): The ID of the current user (retrieved from the authentication dependency).
+
+    Returns:
+        JSONResponse: A response indicating the result of the topic creation.
+        - 201 Created: If the topic is successfully created.
+        - 404 Not Found: If the category ID does not exist.
+        - 423 Locked: If the category is locked.
+        - 403 Forbidden: If the user does not have access to the category.
+        - 403 OnlyAdminAccess: If a non-admin user tries to create a locked topic.
+    """
     category = category_service.get_by_id(topic.category_id)
 
     if category is None:
@@ -83,7 +129,6 @@ def create_topic(topic: CreateTopicRequest = Body(description="Topic to create")
     if not user_is_admin and topic.is_locked == True:
         return OnlyAdminAccess("create locked topics")
 
-
     return topic_service.create(topic, current_user_id)
 
 
@@ -91,7 +136,20 @@ def create_topic(topic: CreateTopicRequest = Body(description="Topic to create")
 def change_topic_lock_status(topic_id: int = Path(description="ID of the topic to lock/unlock"),
                              locked_status: Literal["lock", "unlock"] = Path(description="Lock status for the topic"),
                              current_user_id: int = Depends(get_current_user)):
-    
+    """
+    Change the lock status of a topic.
+
+    Parameters:
+        topic_id (int): The ID of the topic to lock/unlock.
+        locked_status (Literal["lock", "unlock"]): The lock status for the topic.
+        current_user_id (int): The ID of the current user, obtained from the authentication dependency.
+
+    Returns:
+        JSONResponse: A response indicating the result of the lock status change.
+        - 200 OK: If the lock status is successfully changed.
+        - 404 Not Found: If the topic ID does not exist.
+        - 403 OnlyAdminAccess: If the user is not an admin.
+    """
     if not user_service.is_admin(current_user_id):
         return OnlyAdminAccess(content="change locked status for topics")
 
@@ -112,7 +170,22 @@ def change_topic_lock_status(topic_id: int = Path(description="ID of the topic t
 def chose_topic_best_reply(topic_id: int = Path(description="ID of the topic to choose the best reply for"),
                            reply_id: int = Path(description="ID of the reply to choose as the best reply"),
                            current_user_id: int = Depends(get_current_user)):
+    """
+    Choose the best reply for a topic.
 
+    Parameters:
+        topic_id (int): The ID of the topic to choose the best reply for.
+        reply_id (int): The ID of the reply to choose as the best reply.
+        current_user_id (int): The ID of the current user, obtained from the authentication dependency.
+
+    Returns:
+        JSONResponse: A response indicating the result of the best reply selection.
+        - 200 OK: If the best reply is successfully chosen.
+        - 400 Bad Request: If the reply is already the best reply.
+        - 404 Not Found: If the topic or reply ID does not exist.
+        - 423 Locked: If the topic is locked.
+        - 403 OnlyAuthorAccess: If the user is not the author of the topic.
+    """
     topic = topic_service.get_by_id(topic_id)
     if topic is None:
         return NotFound(f"Topic ID: {topic_id}")
