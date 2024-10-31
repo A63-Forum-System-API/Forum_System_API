@@ -77,9 +77,9 @@ def get_conversations(user_id: int, order="asc") -> list[dict]:
     query = f"""
             SELECT DISTINCT c.id AS conversation_id,
                    CASE 
-                       WHEN c.user1_id = ? THEN u2.username 
-                       ELSE u1.username 
-                   END AS username,
+                       WHEN c.user1_id = ? THEN u2.id 
+                       ELSE u1.id 
+                   END AS user_id,
                    CASE 
                        WHEN c.user1_id = ? THEN u2.first_name 
                        ELSE u1.first_name 
@@ -108,6 +108,7 @@ def get_conversations(user_id: int, order="asc") -> list[dict]:
     for conversation in result:
         conversations.append({
             "conversation_id": conversation[0],
+            "user_id": conversation[1],
             "with": f"{conversation[2]}",
             "picture": None if conversation[3] == 1 else f"{conversation[3]}",
             "last_message": conversation[4],

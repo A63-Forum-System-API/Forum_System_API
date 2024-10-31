@@ -6,7 +6,7 @@ from common.custom_responses import NotFound, BadRequest
 from schemas.message import Message
 from services import message_service, user_service
 
-messages_router = APIRouter(prefix="/messages", tags=["Messages"])
+messages_router = APIRouter(prefix="/api/messages", tags=["Messages"])
 
 
 @messages_router.post("/{receiver_id}")

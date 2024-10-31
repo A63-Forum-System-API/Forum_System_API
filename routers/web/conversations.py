@@ -46,30 +46,57 @@ def view_conversations(request: Request):
         )
 
 
-#
-# @conversations_router.get("/{receiver_id}")
-# def view_conversation(receiver_id: int,
-#                       order: Optional[str] = Query("asc", pattern="^(asc|desc)$"),
-#                       current_user_id: int = Depends(get_current_user)):
-#     """
-#     View a conversation between the current user and the specified receiver.
-#
-#     Parameters:
-#         receiver_id (int): The ID of the receiver.
-#         order (Optional[str]): The order in which to sort the messages (asc or desc).
-#         current_user_id (int): The ID of the current user (retrieved from the authentication dependency).
-#
-#     Returns:
-#         Response: The conversation details or a NotFound response if the user or conversation does not exist.
-#     """
-#
-#     if not user_service.id_exists(receiver_id):
-#         return NotFound(f"User ID: {receiver_id}")
-#
-#     conversation_id = conversation_service.get_conversation_id(current_user_id, receiver_id)
-#
-#     if not conversation_id:
-#         return NotFound(f"Conversation with user ID: {receiver_id}")
-#
-#     return conversation_service.get_conversation(conversation_id, order)
-#
+@conversations_router.get('/count')
+def get_conversations_count(request: Request):
+    try:
+        token = request.cookies.get("token")
+        if not token:
+            return {"count": 0}
+
+        current_user_id = get_current_user(token)
+        count = len(conversation_service.get_conversations(current_user_id))
+        return {"count": count}
+
+    except Exception:
+        return {"count": 0}
+
+@conversations_router.get("/{receiver_id}")
+def view_conversation(request: Request,
+                      receiver_id: int):
+
+    try:
+        token = request.cookies.get("token")
+        if not token:
+            return RedirectResponse(
+                url="/?error=not_authorized_categories",
+                status_code=302
+            )
+
+        try:
+            current_user_id = get_current_user(token)
+
+        except:
+            return RedirectResponse(
+                url="/?error=invalid_token",
+                status_code=302
+            )
+
+        conversation_id = conversation_service.get_conversation_id(current_user_id, receiver_id)
+        conversation = conversation_service.get_conversation(conversation_id, "asc")
+
+        return templates.TemplateResponse(
+            request=request, name='conversations.html',
+            context={
+                "conversation": conversation
+            }
+        )
+
+    except Exception:
+        return templates.TemplateResponse(
+            request=request, name="conversations.html",
+            context={
+                "error": "Oops! Something went wrong while loading conversations 🙈",
+                "conversations": [],
+            }
+        )
+

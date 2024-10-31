@@ -24,7 +24,7 @@
             <div class="conversation-icon">
                 <a href="/conversations/" class="conversations-link">
                     🤫
-                    <span class="conversations-count">1</span>
+                    <span class="conversations-count" id="conversationsCount">0</span>
                 </a>
             {% if request.cookies.get("token") %}
                 <a href="/users/logout">
@@ -52,6 +52,22 @@
             </div>
         </nav>
     </header>
+
+    <script>
+    async function updateConversationsCount() {
+        try {
+            const response = await fetch('/conversations/count');
+            const data = await response.json();
+            document.getElementById('conversationsCount').textContent = data.count;
+        } catch (error) {
+            console.error('Error fetching conversations count:', error);
+        }
+    }
+
+    updateConversationsCount();
+
+    setInterval(updateConversationsCount, 30000); // обновява на всеки 30 секунди
+    </script>
 {% endmacro %}
 
 {% macro footer() %}

@@ -11,14 +11,49 @@
     {{ macros.header(request) }}
 
    <div class="container">
-        <h1>♡₊˚ GOSSIP CHAT ・₊✧</h1>
+
+
+
+        <div class="header-container">
+            <h1>♡₊˚ GOSSIP CHAT ・₊✧</h1>
+            <div class="new-message-container">
+                <input type="checkbox" id="toggle" class="toggle-input">
+
+                <label for="toggle" class="new-conversation-button">
+                    <svg width="40" height="40" viewBox="0 0 24 24" class="new-message-icon">
+                        <path fill="#fa057e" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12zm-3-7h-2V7h-2v2h-2v2h2v2h2v-2h2v-2z"/>
+                    </svg>
+                </label>
+
+                <form action="/messages" method="post" class="new-message-form">
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Who do you want to gossip with?"
+                        required
+                        autocomplete="off"
+                        class="message-input"
+                    >
+                    <input
+                        type="text"
+                        name="message"
+                        placeholder="Say something..."
+                        required
+                        autocomplete="off"
+                        class="message-input"
+                    >
+                    <button type="submit" class="gossip-button">Let's gossip!</button>
+                </form>
+            </div>
+        </div>
 
         {% if error %}
-            <div class="error-message">{{ error }}</div>
+            <div class="no-gossip-message">{{ error }}</div>
         {% endif %}
 
         {% if conversations %}
             {% for conversation in conversations %}
+           <a href="/conversations/{{ conversation.get('user_id') }}" class="conversation-link">
                <div class="conversation-card">
                    <div class="avatar-container">
                        <img src="{{ conversation.get('picture') }}" alt="Profile Picture" class="profile-avatar">
@@ -34,11 +69,14 @@
                        </div>
                    </div>
                </div>
+            </a>
             {% endfor %}
         {% else %}
+            {% if not error %}
             <div class="no-gossip-message">
                 Sweetie, you don't have any messages... 💅🏻
             </div>
+            {% endif %}
         {% endif %}
 
     </div>
