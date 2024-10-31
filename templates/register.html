@@ -21,7 +21,7 @@
             {% if error %}
                 <div class="error-message">{{ error }}</div>
             {% endif %}
-            <form class="login-form" method="post" action="/users/register">
+            <form class="login-form" method="post" action="/users/register" autocomplete="off">
                 <div class="form-columns">
                     <!-- Лява колона -->
                     <div class="form-column">
@@ -63,11 +63,11 @@
                             <div class="avatar-options">
                                 <label class="avatar-option">
                                     <input type="radio" name="picture" value="boy_avatar" required>
-                                    <img src="/static/images/boy.png" alt="Avatar 1" class="avatar-img">
+                                    <img src="/static/images/boy.png" alt="Boy Avatar" class="avatar-img">
                                 </label>
                                 <label class="avatar-option">
                                     <input type="radio" name="picture" value="girl_avatar" required>
-                                    <img src="/static/images/girl.png" alt="Avatar 2" class="avatar-img">
+                                    <img src="/static/images/girl.png" alt="Girl Avatar" class="avatar-img">
                                 </label>
                             </div>
                         </div>
