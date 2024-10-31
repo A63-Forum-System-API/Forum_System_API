@@ -243,13 +243,13 @@ def id_exists(topic_id: int) -> bool:
     return len(result) > 0
 
 
-def change_topic_lock_status(topic_id: int, locked_status_code: int) -> None:
+def change_topic_lock_status(topic_id: int, locked_status_code: bool) -> None:
     """
     Change the lock status of a topic.
 
     Parameters:
         topic_id (int): The ID of the topic to update.
-        locked_status_code (int): The new lock status code to set.
+        locked_status_code (bool): The new lock status code to set.
 
     Returns:
         None
