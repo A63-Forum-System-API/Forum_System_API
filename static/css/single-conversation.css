@@ -34,7 +34,7 @@ body {
     box-shadow: 0 0 20px #fa057e;
     align-items: center;
     flex-direction: column;
-    height: 50vh;
+    height: 420px;
 }
 
 h1 {
@@ -388,7 +388,7 @@ h1 {
 
 
 .messages-container {
-    height: calc(100vh - 420px);
+    height: 420px;
     overflow-y: auto;
     display: flex;
     flex-direction: column-reverse;
@@ -446,5 +446,5 @@ h1 {
     box-shadow: 0 0 20px #fa057e;
     align-items: center;
     flex-direction: column;
-    height: 15vh;
+    height: 150px;
 }

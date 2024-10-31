@@ -69,10 +69,23 @@
     <br>
 
     <div class="container-send-message">
-        <form action="/send-message" method="post" class="message-form">
-            <input type="hidden" name="receiver_id" value="{{ receiver_id }}">
-            <textarea name="message" id="message" placeholder="Type your message here..." required></textarea>
-            <button type="submit" class="send-message-button">Send</button>
+        <input type="checkbox" id="toggle" class="toggle-input">
+
+        <label for="toggle" class="new-conversation-button">
+
+        </label>
+
+        <form action="/messages" method="post" class="new-message-form">
+
+            <input
+                type="text"
+                name="message"
+                placeholder="Say something..."
+                required
+                autocomplete="off"
+                class="message-input"
+            >
+            <button type="submit" class="gossip-button">Let's gossip!</button>
         </form>
     </div>
 
