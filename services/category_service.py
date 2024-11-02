@@ -43,7 +43,7 @@ def get_categories(
         lst: A list of `ViewAllCategories` instances, each representing a category that matches the query criteria.
     """
 
-    query = """SELECT id, title, description, created_at 
+    query = """SELECT id, title, description, is_private, is_locked, created_at 
                FROM categories
                """
     params = []

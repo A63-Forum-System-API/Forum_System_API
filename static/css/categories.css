@@ -307,3 +307,37 @@ h1 {
     margin: 20px auto;
     max-width: 600px;
 }
+
+/* Lock button styling */
+.lock-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+.locked {
+    color: red;
+}
+.unlocked {
+    color: green;
+}
+
+/* Access button styling */
+.access-btn {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+.private {
+    color: red;
+}
+.public {
+    color: green;
+}

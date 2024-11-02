@@ -42,13 +42,17 @@ class ViewAllCategories(BaseModel):
     id: int
     title: str
     description: str
+    is_private: bool
+    is_locked: bool
     created_at: datetime = datetime.now() 
 
     @classmethod
-    def from_query_result(cls, id, title, description, created_at):
+    def from_query_result(cls, id, title, description, is_private, is_locked, created_at):
         return cls(id=id,
                    title=title,
                    description=description,
+                   is_private=is_private,
+                   is_locked=is_locked,
                    created_at=created_at)
 
 

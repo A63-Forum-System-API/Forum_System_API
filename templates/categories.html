@@ -22,12 +22,50 @@
             <div class="error-message">{{ error }}</div>
         {% endif %}
 
+        {% if flash_message %}
+            <div class="error-message">{{ flash_message }}</div>
+        {% endif %}
+
         {% if categories %}
             <div class="categories-grid">
                 {% for category in categories %}
                     <div class="category-card">
-                        <h3>{{ category.title }}</h3>
-                        <p class="description-preview">{{ category.description }}</p>
+                        <div>
+                            <h3>{{ category.title }}</h3>
+                            <p class="description-preview">{{ category.description }}</p>
+                        </div>
+                        {% if is_admin %}
+                            <div>
+                                <form action="/categories/toggle-lock" method="POST">
+                                    <input type="hidden" name="category_id" value="{{ category.id }}">
+                                    {% if category.is_locked %}
+                                        <input type="hidden" name="locked_status" value="unlock">
+                                        <button type="submit" class="lock-btn locked" title="Click to unlock category">
+                                            Locked 🔒
+                                    {% else %}
+                                        <input type="hidden" name="locked_status" value="lock">
+                                        <button type="submit" class="lock-btn unlocked" title="Click to lock category">
+                                            Unlocked 🔓
+                                    {% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                            <div>
+                                <form action="/categories/toggle-access" method="POST">
+                                    <input type="hidden" name="category_id" value="{{ category.id }}">
+                                    {% if category.is_private %}
+                                        <input type="hidden" name="access_type" value="public">
+                                        <button type="submit" class="access-btn private" title="Click to make Public">
+                                            Private 🛑 
+                                    {% else %}
+                                        <input type="hidden" name="access_type" value="lock">
+                                        <button type="submit" class="access-btn public" title="Click to make Private">
+                                            Public 📢
+                                    {% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
