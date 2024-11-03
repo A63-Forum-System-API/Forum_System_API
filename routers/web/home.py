@@ -12,7 +12,8 @@ def index(request: Request,
           error: str | None = None):
     error_messages = {
         "not_authorized_categories": "You need to login to view categories!",
-        "invalid_token": "Your sesh has expired! Please login again!"
+        "invalid_token": "Your sesh has expired! Please login again!",
+        "something_went_wrong": "Oops! Something went wrong while loading categories 🙈",
     }
     token = request.cookies.get("token")
     user = None

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Query, Depends, Form, HTTPException, sta
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 from common.auth import get_current_user
+from schemas.category import CreateCategoryRequest
 from services import category_service
 from services import user_service
 from common.custom_responses import ForbiddenAccess, NotFound, OK, BadRequest, OnlyAdminAccess
@@ -203,3 +204,45 @@ def toggle_access(
                 url="/categories/?error=unknown_error",
                 status_code=302
             )
+
+
+
+@categories_router.post('/')
+def create_new_category(
+        request: Request,
+        title: str = Form(...),
+        description: str = Form(...)):
+
+    try:
+        token = request.cookies.get("token")
+        if not token:
+            return RedirectResponse(
+                url="/?error=not_authorized",
+                status_code=302
+            )
+
+        current_user_id = get_current_user(token)
+
+        if category_service.title_exists(title):
+            return templates.TemplateResponse(
+                request=request, name="categories.html",
+                context={
+                    "error": f"Category with title '{title}' already exists!"
+                }
+            )
+
+        category = CreateCategoryRequest(title=title, description=description)
+        category_service.create(category, current_user_id)
+
+        return RedirectResponse(
+            url=f"/categories",
+            status_code=302
+        )
+
+    except Exception:
+        return templates.TemplateResponse(
+            request=request, name="conversations.html",
+            context={
+                "error": "Oops! Something went wrong 🙈",
+            }
+        )

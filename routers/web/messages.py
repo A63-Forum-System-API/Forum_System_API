@@ -46,6 +46,6 @@ def create_new_message(
         return templates.TemplateResponse(
             request=request, name="conversations.html",
             context={
-                "error": "Oops! Something went wrong while loading conversations 🙈",
+                "error": "Oops! Something went wrong 🙈",
             }
         )

@@ -360,116 +360,6 @@ h1 {
     width: 100%;
 }
 
-/*.new-message-container {*/
-/*    position: relative;*/
-/*}*/
-
-/*.new-conversation-form {*/
-/*    margin-left: auto;*/
-/*}*/
-
-/*.new-conversation-button {*/
-/*    background: none;*/
-/*    border: none;*/
-/*    cursor: pointer;*/
-/*    padding: 15px;*/
-/*    border-radius: 50%;*/
-/*    transition: all 0.3s ease;*/
-/*}*/
-
-/*.new-conversation-button:hover {*/
-/*    transform: scale(1.1);*/
-/*    background: rgba(250, 5, 126, 0.1);*/
-/*    box-shadow: 0 0 15px #fa057e;*/
-/*}*/
-
-/*.new-message-icon {*/
-/*    width: 40px;*/
-/*    height: 40px;*/
-/*    transition: all 0.3s ease;*/
-/*}*/
-
-/*@keyframes pulse {*/
-/*    0% { transform: scale(1); }*/
-/*    50% { transform: scale(1.1); }*/
-/*    100% { transform: scale(1); }*/
-/*}*/
-
-/*.new-conversation-button:hover .new-message-icon {*/
-/*    animation: pulse 2s infinite;*/
-/*}*/
-
-
-/*.new-message-form {*/
-/*    display: none;*/
-/*    position: absolute;*/
-/*    right: 0;*/
-/*    top: 100%;*/
-/*    background: rgba(0, 0, 0, 0.9);*/
-/*    border: 2px solid #fa057e;*/
-/*    border-radius: 15px;*/
-/*    padding: 15px;*/
-/*    margin-top: 10px;*/
-/*    flex-direction: column;*/
-/*    gap: 10px;*/
-/*    min-width: 250px;*/
-/*    box-shadow: 0 0 15px rgba(250, 5, 126, 0.3);*/
-/*    z-index: 1000;*/
-/*}*/
-
-/*.new-message-form input {*/
-/*    padding: 8px 15px;*/
-/*    border: 1px solid #fa057e;*/
-/*    border-radius: 8px;*/
-/*    background: rgba(0, 0, 0, 0.8);*/
-/*    color: white;*/
-/*    outline: none;*/
-/*}*/
-
-/*.new-message-form input:focus {*/
-/*    box-shadow: 0 0 10px #fa057e;*/
-/*}*/
-
-/*.gossip-button {*/
-/*    background: #fa057e;*/
-/*    color: white;*/
-/*    border: none;*/
-/*    padding: 8px 15px;*/
-/*    border-radius: 8px;*/
-/*    cursor: pointer;*/
-/*    transition: all 0.3s ease;*/
-/*}*/
-
-/*.gossip-button:hover {*/
-/*    background: #ff2e90;*/
-/*    box-shadow: 0 0 10px #fa057e;*/
-/*}*/
-
-
-/*.new-message-form.show {*/
-/*    display: flex;*/
-/*    animation: slideDown 0.3s ease;*/
-/*}*/
-
-/*@keyframes slideDown {*/
-/*    from {*/
-/*        opacity: 0;*/
-/*        transform: translateY(-10px);*/
-/*    }*/
-/*    to {*/
-/*        opacity: 1;*/
-/*        transform: translateY(0);*/
-/*    }*/
-/*}*/
-
-/*.toggle-input {*/
-/*    display: none;*/
-/*}*/
-
-/*.toggle-input:checked ~ .new-message-form {*/
-/*    display: flex;*/
-/*}*/
-
 
 .new-message-container {
     position: relative;
@@ -484,7 +374,7 @@ h1 {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 15px;
+    padding: 15px 16px 8px 16px;
     border-radius: 50%;
     transition: all 0.3s ease;
     display: block;
@@ -497,7 +387,7 @@ h1 {
 }
 
 .new-message-form {
-    display: none; /* скрита по подразбиране */
+    display: none;
     position: absolute;
     right: 0;
     top: 100%;

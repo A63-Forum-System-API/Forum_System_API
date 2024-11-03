@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Form
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 from common.auth import get_current_user
+from routers.api.categories import categories_router
 from services import conversation_service, user_service
 
 conversations_router = APIRouter(prefix='/conversations')
@@ -101,4 +102,6 @@ def view_conversation(request: Request,
                 "conversations": [],
             }
         )
+
+
 
