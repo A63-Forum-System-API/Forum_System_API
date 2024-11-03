@@ -226,3 +226,196 @@ h1 {
     vertical-align: middle;
     margin-right: 8px;
 }
+
+/*--------------------------------------------*/
+
+.login-section {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.login-form {
+    background-color: rgba(37, 1, 19, 0.56);
+    border: 2px solid #fa057e;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 20px #fa057e;
+}
+
+.form-group {
+    margin-bottom: 30px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 1px;
+    color: #ffd700;
+    font-size: 1.5em;
+    text-shadow: 0 0 5px #ffd700;
+    text-align: center;
+}
+
+.login-input {
+    width: 90%;
+    padding: 10px;
+    background-color: #000000;
+    border: 2px solid #ffd700;
+    border-radius: 5px;
+    color: #ffd700;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+}
+
+.login-input:focus {
+    outline: none;
+    box-shadow: 0 0 10px #ffd700;
+    border-color: #ffd700;
+}
+
+.login-button {
+    width: 100%;
+    margin: 20px 0 0 0;
+    font-size: 1.2em;
+}
+
+.error-message {
+    color: #ffd700;
+    font-size: 1.3em;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px solid #fa057e;
+    border-radius: 5px;
+    background-color: rgba(255, 215, 0, 0);
+}
+
+.welcome-letter {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #fa057e;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(250, 5, 126, 0.3);
+    color: white;
+}
+
+.letter-content {
+    line-height: 1.6;
+}
+
+.letter-header {
+    color: #fa057e;
+    font-size: 1.8em;
+    margin-bottom: 25px;
+    font-family: 'Dancing Script', cursive;
+    text-shadow: 0 0 5px #fa057e;
+}
+
+.society-rules {
+    list-style: none;
+    padding-left: 20px;
+    margin: 20px 0;
+}
+
+.society-rules li {
+    margin: 10px 0;
+    font-style: italic;
+    color: #fa057e;
+}
+
+.letter-closing {
+    margin-top: 30px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.3em;
+    color: #fa057e;
+    text-align: right;
+}
+
+.welcome-letter {
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.welcome-letter:hover {
+    box-shadow: 0 0 30px rgba(250, 5, 126, 0.5);
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+
+#easter-egg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 412px;
+    height: 640px;
+}
+
+.form-columns {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 20px;
+}
+
+.form-column {
+    flex: 1;
+}
+
+.avatar-selection {
+    margin-top: 20px;
+}
+
+.avatar-selection p {
+    margin-bottom: 10px;
+    color: #fa057e;
+}
+
+.avatar-options {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.avatar-option {
+    cursor: pointer;
+    position: relative;
+}
+
+.avatar-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.avatar-option input {
+    position: absolute;
+    opacity: 0;
+}
+
+.avatar-option input:checked + .avatar-img {
+    border-color: #fa057e;
+    box-shadow: 0 0 15px #fa057e;
+}
+
+.form-buttons {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .form-columns {
+        flex-direction: column;
+    }
+}

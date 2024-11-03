@@ -14,7 +14,7 @@ from services import topic_service, reply_service, user_service
 from common.auth import get_current_user
 
 
-users_router = APIRouter(prefix="/users", tags=["Users"])
+users_router = APIRouter(prefix="/api/users", tags=["Users"])
 
 
 @users_router.post("/register", status_code=201)

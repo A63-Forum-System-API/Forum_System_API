@@ -115,6 +115,31 @@ def update(user_id: int, is_admin: bool) -> dict:
 
     return {"msg": f"User with #ID {user_id} successfully updated to {'admin' if is_admin else 'regular user!'}"}
 
+def get_user_by_username(username: str) -> dict | None:
+    """
+    Retrieve user details by username.
+
+    Parameters:
+        username (str): The username of the user.
+
+    Returns:
+        User: A User object containing the user's details.
+    """
+    query = """
+            SELECT id, first_name, last_name, email, picture
+            FROM users WHERE username = ?
+            """
+    result = read_query(query, (username,))
+    if result:
+        return {
+            "id": result[0][0],
+            "first_name": result[0][1],
+            "last_name": result[0][2],
+            "email": result[0][3],
+            "picture": result[0][4]
+        }
+    return None
+
 
 # def compress_image(image_content: bytes, max_size_mb: int = 5) -> bytes:
 #     image = Image.open(io.BytesIO(image_content))

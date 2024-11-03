@@ -7,7 +7,7 @@ from common.auth import get_current_user
 from common.custom_responses import NotFound
 from services import message_service, user_service, conversation_service
 
-conversations_router = APIRouter(prefix="/conversations", tags=["Conversations"])
+conversations_router = APIRouter(prefix="/api/conversations", tags=["Conversations"])
 
 
 @conversations_router.get("/{receiver_id}")

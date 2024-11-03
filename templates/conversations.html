@@ -1,2 +1,82 @@
-<!--list of all conversations and they refer to single-conversation with all messages-->
-<!--style like categories-->
+{% import 'macros.html' as macros %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gossip Forum | Conversations</title>
+    <link rel="stylesheet" href="/static/css/conversations.css">
+</head>
+<body>
+    {{ macros.header(request) }}
+
+   <div class="container">
+        <div class="header-container">
+            <h1>♡₊˚ GOSSIP CHAT ・₊✧</h1>
+            <div class="new-message-container">
+                <input type="checkbox" id="toggle" class="toggle-input">
+
+                <label for="toggle" class="new-conversation-button">
+                    <svg width="40" height="40" viewBox="0 0 24 24" class="new-message-icon">
+                        <path fill="#fa057e" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12zm-3-7h-2V7h-2v2h-2v2h2v2h2v-2h2v-2z"/>
+                    </svg>
+                </label>
+
+                <form action="/messages" method="post" class="new-message-form">
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Who do you want to gossip with?"
+                        required
+                        autocomplete="off"
+                        class="message-input"
+                    >
+                    <input
+                        type="text"
+                        name="message"
+                        placeholder="Say something..."
+                        required
+                        autocomplete="off"
+                        class="message-input"
+                    >
+                    <button type="submit" class="gossip-button">Let's gossip!</button>
+                </form>
+            </div>
+        </div>
+
+        {% if error %}
+            <div class="no-gossip-message">{{ error }}</div>
+        {% endif %}
+
+        {% if conversations %}
+            {% for conversation in conversations %}
+           <a href="/conversations/{{ conversation.get('user_id') }}" class="conversation-link">
+               <div class="conversation-card">
+                   <div class="avatar-container">
+                       <img src="{{ conversation.get('picture') }}" alt="Profile Picture" class="profile-avatar">
+                   </div>
+                   <div class="conversation-content">
+                       <div class="conversation-header">
+                           <h3 class="contact-name">{{ conversation.get("with") }}</h3>
+                           <span class="timestamp">{{ conversation.get("sent_at").strftime('%d/%m/%y') }}</span>
+                       </div>
+                       <div class="message-container">
+                           <p class="message-preview">{{ conversation.get("last_message") }}</p>
+                           <span class="message-time">{{ conversation.get("sent_at").strftime('%H:%M') }}</span>
+                       </div>
+                   </div>
+               </div>
+            </a>
+            {% endfor %}
+        {% else %}
+            {% if not error %}
+            <div class="no-gossip-message">
+                Sweetie, you don't have any messages... 💅🏻
+            </div>
+            {% endif %}
+        {% endif %}
+
+    </div>
+    {{ macros.footer() }}
+</body>
+</html>

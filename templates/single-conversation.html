@@ -1,0 +1,95 @@
+{% import 'macros.html' as macros %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gossip Forum | Conversation</title>
+    <link rel="stylesheet" href="/static/css/single-conversation.css">
+</head>
+<body>
+    {{ macros.header(request) }}
+
+   <div class="container">
+
+
+
+        {% if error %}
+            <div class="no-gossip-message">{{ error }}</div>
+        {% endif %}
+
+        {% if conversation %}
+        <div class="messages-container">
+                {% for message in conversation %}
+                    {% if message["from_id"] == receiver_id %}
+                        <div class="conversation-card-receiver">
+                            <div class="avatar-container">
+                                <img src="{{ message.get('picture') }}" alt="Profile Picture" class="profile-avatar">
+                            </div>
+                                <div class="conversation-content">
+                                    <div class="conversation-header">
+                                        <h3 class="message-preview">{{ message.get("from") }}</h3>
+                                        <span class="timestamp">{{ message.get("sent_at").strftime('%d/%m/%y') }}</span>
+                                    </div>
+                                    <div class="message-container">
+                                        <p class="contact-name">{{ message.get("text") }}</p>
+                                        <span class="message-time">{{ message.get("sent_at").strftime('%H:%M') }}</span>
+                                    </div>
+                                </div>
+                        </div>
+                    {% else %}
+                        <div class="conversation-card-sender">
+                            <div class="avatar-container">
+                                <img src="{{ message.get('picture') }}" alt="Profile Picture" class="profile-avatar">
+                            </div>
+                                <div class="conversation-content">
+                                    <div class="conversation-header">
+                                        <h3 class="message-preview">{{ message.get("from") }}</h3>
+                                        <span class="timestamp">{{ message.get("sent_at").strftime('%d/%m/%y') }}</span>
+                                    </div>
+                                    <div class="message-container">
+                                        <p class="contact-name">{{ message.get("text") }}</p>
+                                        <span class="message-time">{{ message.get("sent_at").strftime('%H:%M') }}</span>
+                                    </div>
+                                </div>
+                        </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+                {% if not error %}
+                <div class="no-gossip-message">
+                    Sweetie, you don't have any messages... 💅🏻
+                </div>
+                {% endif %}
+        {% endif %}
+
+    </div>
+
+    <br>
+
+    <div class="container-send-message">
+        <form action="/messages" method="post" class="send-message-form">
+            <input type="hidden" name="username" value="{{ receiver_username }}">
+
+            <div class="input-with-button">
+                <textarea
+                    name="message"
+                    placeholder="Say something..."
+                    required
+                    autocomplete="off"
+                    class="message-input"
+                    rows="3"
+                ></textarea>
+                <button type="submit" class="send-button">
+                    <svg width="34" height="34" viewBox="0 0 24 24" class="send-icon">
+                        <path fill="#fa057e" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {{ macros.footer() }}
+</body>
+</html>
