@@ -29,7 +29,7 @@ def get_categories(
         flash_message = request.cookies.get("flash_message")
         if not token:
             return RedirectResponse(
-                url="/?error=not_authorized_categories",
+                url="/?error=not_authorized",
                 status_code=302
             )
 

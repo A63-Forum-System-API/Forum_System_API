@@ -11,7 +11,7 @@ templates = Jinja2Templates(directory='templates')
 def index(request: Request,
           error: str | None = None):
     error_messages = {
-        "not_authorized_categories": "You need to login to view categories!",
+        "not_authorized": "You need to login first!",
         "invalid_token": "Your sesh has expired! Please login again!",
         "something_went_wrong": "Oops! Something went wrong while loading categories 🙈",
     }

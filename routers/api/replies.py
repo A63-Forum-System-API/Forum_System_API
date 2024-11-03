@@ -5,7 +5,7 @@ from data.database import read_query
 from schemas.reply import Reply, CreateReplyRequest
 from services import topic_service, reply_service, category_service, user_service
 
-replies_router = APIRouter(prefix="/replies", tags=["Replies"])
+replies_router = APIRouter(prefix="/api/replies", tags=["Replies"])
 
 
 @replies_router.post("/", status_code=201)

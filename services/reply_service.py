@@ -91,3 +91,27 @@ def reply_belongs_to_topic(reply_id: int, topic_id: int) -> bool:
 
     return len(result) > 0
 
+
+def get_authors_of_replies(replies: list[Reply]) -> dict[int, str]:
+    """
+    Retrieve the authors of a list of replies.
+
+    Parameters:
+        replies (list[Reply]): The list of replies to retrieve the authors for.
+
+    Returns:
+        dict[int, str]: A dictionary mapping reply IDs to their usernames.
+    """
+    reply_ids = [reply.id for reply in replies]
+
+    if not reply_ids:
+        return {}
+
+    query = """SELECT r.id, u.username 
+                FROM replies r 
+                JOIN users u ON r.author_id = u.id
+                WHERE r.id IN ({})""".format(", ".join("?" * len(reply_ids)))
+
+    author_data = read_query(query, tuple(reply_ids))
+
+    return {reply_id: username for reply_id, username in author_data}

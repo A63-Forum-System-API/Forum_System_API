@@ -5,7 +5,7 @@ from common.auth import get_current_user
 from common.custom_responses import BadRequest, NotFound, Locked, ForbiddenAccess, Created, OK
 from services import reply_service, vote_service, category_service, user_service, topic_service
 
-votes_router = APIRouter(prefix="/votes", tags=["Votes"])
+votes_router = APIRouter(prefix="/api/votes", tags=["Votes"])
 
 
 @votes_router.put("/{reply_id}")
