@@ -246,3 +246,129 @@ def create_new_category(
                 "error": "Oops! Something went wrong 🙈",
             }
         )
+
+@categories_router.get("/{category_id}/manage-access")
+def manage_access(request: Request, category_id: int, error: str | None = None,):
+
+    error_messages = {
+        "not_authorized": "You are not authorized!",
+        "unknown_error": "Oops! Something went wrong while loading categories 🙈",
+        "not_found": "Category not found",
+    }
+
+    try:
+        referer_url = request.headers.get("referer", "/categories/")
+        flash_message = request.cookies.get("flash_message")
+        token = request.cookies.get("token")
+        if not token:
+            return RedirectResponse(
+                url="/?error=not_authorized_categories",
+                status_code=302
+            )
+
+        try:
+            current_user_id = get_current_user(token)
+
+        except:
+            return RedirectResponse(
+                url="/?error=invalid_token",
+                status_code=302
+            )
+        
+        is_admin = user_service.is_admin(current_user_id)
+        if not is_admin:
+            return RedirectResponse(
+                url="/categories/?error=not_authorized",
+                status_code=302
+            )
+        
+        category = category_service.get_by_id(category_id)
+        if category is None:
+            return RedirectResponse(
+                url="/categories/?error=not_found",
+                status_code=302
+            )
+        if not category.is_private:
+            return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )
+        
+        accesses = category_service.get_privileged_users_by_category(category_id)
+
+        response = templates.TemplateResponse(
+            request=request, name='access_category.html',
+            context={
+                "category": category,
+                "accesses": accesses,
+                "error": error_messages.get(error),
+                "flash_message": flash_message,
+            }
+        )
+        response.delete_cookie("flash_message")
+        return response
+        
+    except Exception as e:
+        return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )
+
+
+@categories_router.post("/remove-access")
+def remove_access(
+    request: Request,
+    category_id: int = Form(...),
+    user_id: int = Form(...),
+):
+    try:
+        referer_url = request.headers.get("referer", "/categories/")
+        token = request.cookies.get("token")
+        if not token:
+            return RedirectResponse(
+                url="/?error=not_authorized_categories",
+                status_code=302
+            )
+
+        try:
+            current_user_id = get_current_user(token)
+
+        except:
+            return RedirectResponse(
+                url="/?error=invalid_token",
+                status_code=302
+            )
+        
+        is_admin = user_service.is_admin(current_user_id)
+        if not is_admin:
+            return RedirectResponse(
+                url="/categories/?error=not_authorized",
+                status_code=302
+            )
+             
+        if not category_service.exists(category_id):
+            return RedirectResponse(
+                url="/categories/?error=not_found",
+                status_code=302
+            )
+        
+        if not user_service.id_exists(user_id):
+            return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )
+    
+        category_service.remove_user_access_to_private_category(category_id, user_id)
+        response = RedirectResponse(
+                url=referer_url,
+                status_code=303,
+            )
+        response.set_cookie(key="flash_message", value=f"User id {user_id} was successfully removed!")
+        return response
+        
+
+    except Exception as e:
+        return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )

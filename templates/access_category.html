@@ -1,0 +1,49 @@
+{% import 'macros.html' as macros %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gossip Forum | manage user access </title>
+    <link rel="stylesheet" href="/static/css/categories.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</head>
+<body>
+    {{ macros.header(request) }}
+
+   <div class="container">
+        <div class="header-container">
+            <h1>♡₊˚ MANAGE ACCESS ・₊✧</h1>
+        </div>
+       
+        <h2 style="text-align: center;"> {{ category.title}} </h2>
+
+        {% if flash_message %}
+            <div class="error-message">{{ flash_message }}</div>
+        {% endif %}
+       
+        <div class="categories-grid">
+            {% for access in accesses %}
+                <div class="category-card">
+                    <div> 
+                        <h3> username: {{ access["username"] }}</h3>
+                        <p class="description-preview"> read_access {{ access["read_access"] }}</p>
+                        <p class="description-preview"> write_access {{ access["write_access"] }}</p>
+                    </div>
+                    <div>
+                        <form action="/categories/remove-access" method="POST">
+                            <input type="hidden" name="category_id" value="{{ category.id }}">
+                            <input type="hidden" name="user_id" value="{{ access['user_id'] }}">
+                            <button type="submit" class="access-btn private" title="Remove Access">
+                                <i class="fa-solid fa-xmark"></i> Remove Access
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {{ macros.footer() }}
+</body>
+</html>

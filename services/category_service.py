@@ -470,9 +470,11 @@ def get_privileged_users_by_category(category_id):
     """
 
     data = read_query(
-        """SELECT user_id, category_id, write_access
-            FROM category_accesses
-            WHERE category_id = ?""",
+        """SELECT ca.user_id, u.username, ca.category_id, ca.write_access
+            FROM category_accesses ca
+            LEFT JOIN users u 
+            ON ca.user_id = u.id
+            WHERE ca.category_id = ?""",
             (category_id,),
     )
     accesses = [Accesses.from_query_result(*row) for row in data]
