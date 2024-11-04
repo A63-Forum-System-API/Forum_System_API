@@ -6,11 +6,11 @@ from schemas.category import CreateCategoryRequest
 from services import category_service
 from services import user_service
 from common.custom_responses import ForbiddenAccess, NotFound, OK, BadRequest, OnlyAdminAccess
-
+import logging
 
 categories_router = APIRouter(prefix='/categories')
 templates = Jinja2Templates(directory='templates')
-
+logger = logging.getLogger(__name__)
 
 @categories_router.get("/")
 def get_categories(
@@ -309,6 +309,7 @@ def manage_access(request: Request, category_id: int, error: str | None = None,)
         return response
         
     except Exception as e:
+        logger.exception(e)
         return RedirectResponse(
                 url="/categories/?error=unknown_error",
                 status_code=302
@@ -368,6 +369,153 @@ def remove_access(
         
 
     except Exception as e:
+        return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )
+
+@categories_router.post("/change-user-access")
+def change_user_access(
+    request: Request,
+    category_id: int = Form(...),
+    user_id: int = Form(...),
+    access_type: str = Form(...),
+):
+    try:
+        referer_url = request.headers.get("referer", "/categories/")
+        token = request.cookies.get("token")
+        if not token:
+            return RedirectResponse(
+                url="/?error=not_authorized_categories",
+                status_code=302
+            )
+
+        try:
+            current_user_id = get_current_user(token)
+
+        except:
+            return RedirectResponse(
+                url="/?error=invalid_token",
+                status_code=302
+            )
+        
+        is_admin = user_service.is_admin(current_user_id)
+        if not is_admin:
+            return RedirectResponse(
+                url="/categories/?error=not_authorized",
+                status_code=302
+            )
+        
+        category = category_service.get_by_id(category_id)
+        if category is None:
+            return RedirectResponse(
+                url="/categories/?error=not_found",
+                status_code=302
+            )
+        if not category.is_private:
+            return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )
+        
+        if not user_service.id_exists(user_id):
+            return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )
+        
+        access_type = 1 if access_type == "read_and_write" else 0
+    
+        category_service.manage_user_access_to_private_category(category_id, user_id, access_type)
+        response = RedirectResponse(
+                url=referer_url,
+                status_code=303,
+            )
+        response.set_cookie(key="flash_message", value=f"User id {user_id} was successfully updated")
+        return response 
+
+    except Exception as e:
+        logger.exception(e)
+        return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )
+
+
+@categories_router.post("/add-user-access")
+def change_user_access(
+    request: Request,
+    category_id: int = Form(...),
+    username: str = Form(...),
+    access_type: str = Form(...),
+):
+    try:
+        referer_url = request.headers.get("referer", "/categories/")
+        token = request.cookies.get("token")
+        if not token:
+            return RedirectResponse(
+                url="/?error=not_authorized_categories",
+                status_code=302
+            )
+
+        try:
+            current_user_id = get_current_user(token)
+
+        except:
+            return RedirectResponse(
+                url="/?error=invalid_token",
+                status_code=302
+            )
+        
+        is_admin = user_service.is_admin(current_user_id)
+        if not is_admin:
+            return RedirectResponse(
+                url="/categories/?error=not_authorized",
+                status_code=302
+            )
+        
+        category = category_service.get_by_id(category_id)
+        if category is None:
+            return RedirectResponse(
+                url="/categories/?error=not_found",
+                status_code=302
+            )
+        if not category.is_private:
+            return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )
+        
+        user = user_service.get_user_by_username(username)
+        
+        if not user:
+            return RedirectResponse(
+                url="/categories/?error=unknown_error",
+                status_code=302
+            )
+        
+        user_id: int = user["id"]
+        if category_service.has_access(category_id, user_id):
+            response = RedirectResponse(
+                url=referer_url,
+                status_code=303,
+            )
+            response.set_cookie(key="flash_message", value=f"User id {user_id} already is added to the category")
+            return response 
+
+        
+        access_type = 1 if access_type == "read_and_write" else 0
+    
+        category_service.manage_user_access_to_private_category(category_id, user_id, access_type)
+        response = RedirectResponse(
+                url=referer_url,
+                status_code=303,
+            )
+        response.set_cookie(key="flash_message", value=f"User id {user_id} was successfully added")
+        return response 
+
+    except Exception as e:
+        logger.exception(e)
         return RedirectResponse(
                 url="/categories/?error=unknown_error",
                 status_code=302
