@@ -6,7 +6,7 @@ from data.database import (
     delete_query,
 )
 from schemas.category import Category, ViewAllCategories, SingleCategory, CreateCategoryRequest
-from schemas.category_accesses import Accesses
+from schemas.category_accesses import Accesses, Access_with_usernames
 from schemas.topic import ViewAllTopics, ListOfTopics
 from services import topic_service
 from services import user_service
@@ -456,7 +456,7 @@ def remove_user_access_to_private_category(
 
     
 
-def get_privileged_users_by_category(category_id):
+def get_privileged_users_by_category(category_id) -> list[dict]:
     """
     Retrieve from the database a list of all users with their access details 
     to a specified private category.
@@ -470,12 +470,14 @@ def get_privileged_users_by_category(category_id):
     """
 
     data = read_query(
-        """SELECT user_id, category_id, write_access
-            FROM category_accesses
-            WHERE category_id = ?""",
+        """SELECT ca.user_id, u.username, ca.category_id, ca.write_access
+            FROM category_accesses ca
+            LEFT JOIN users u 
+            ON ca.user_id = u.id
+            WHERE ca.category_id = ?""",
             (category_id,),
     )
-    accesses = [Accesses.from_query_result(*row) for row in data]
+    accesses = [Access_with_usernames.from_query_result(*row) for row in data]
     result = []
     for access in accesses:
         if access.write_access:
@@ -490,4 +492,14 @@ def get_privileged_users_by_category(category_id):
         
     return result
 
+
+def has_access(category_id, user_id) -> bool:
+    data = query_count(
+        """SELECT COUNT(*)
+            FROM category_accesses
+            WHERE category_id = ?
+            AND user_id = ?""",
+        (category_id, user_id),
+    )
+    return bool(data)
 
