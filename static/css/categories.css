@@ -327,18 +327,24 @@ h1 {
     color: green;
 }
 
-/* Access button styling */
 .access-btn {
-    position: absolute;
-    bottom: 10px;
+    position: relative;
+    bottom: 5px;
     right: 10px;
     background-color: transparent;
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
+    font-family: 'Courier New', monospace;
 }
-.private {
+
+.access-btn:hover {
     color: #40e7ed;
+    text-shadow: 0 0 5px #40e7ed;
+}
+
+.private {
+    color: #b6eef1;
 }
 
 /*--------------------------------------------*/

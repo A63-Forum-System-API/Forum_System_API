@@ -78,19 +78,20 @@
                                 </div>
                             </div>
                         {% endif %}
-                        <div>
-                            <h3>{{ category.title }}</h3>
-                            <p class="description-preview">{{ category.description }}</p>
-                        </div>
                         {% if is_admin and category.is_private %}
                             <div>
                                 <a href="/categories/{{ category.id }}/manage-access">
                                     <button class="access-btn private" title="Manage Access">
-                                        <i class="fas fa-cog"></i> Manage Access
+                                        <i class="fas fa-cog"></i> manage access
                                     </button>
                                 </a>
                             </div>
                         {% endif %}
+                        <div>
+                            <h3>{{ category.title }}</h3>
+                            <p class="description-preview">{{ category.description }}</p>
+                        </div>
+
                     </div>
                 {% endfor %}
                     
