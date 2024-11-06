@@ -1,1 +1,71 @@
-<!--newest topics visible by user-->
+{% import 'macros.html' as macros %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gossip Forum | Topics</title>
+    <link rel="stylesheet" href="/static/css/newest-topics.css">
+</head>
+<body>
+    {{ macros.header(request) }}
+
+   <div class="container">
+       <div class="header-container">
+        <h1>♡₊˚ TOPICS ・₊✧</h1>
+
+
+            <div class="new-topic-container">
+                <input type="checkbox" id="new-topic-toggle" class="toggle-input">
+                <label for="new-topic-toggle" class="new-topic-button">
+                    <svg width="40" height="40" viewbox="0 0 24 24" class="new-topic-icon">
+                        <path fill="#fa057e" d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2 7h-3v3h-2v-3h-3v-2h3V8h2v3h3v2z"/>
+                    </svg>
+                </label>
+
+                <form method="POST" action="/topics/" class="new-topic-form">
+                    <input type="text" name="title" placeholder="Topic title..." required autocomplete="off">
+                    <textarea name="content" placeholder="Topic content..." required></textarea>
+                    <button type="submit" class="submit-new-topic-button">Create new topic</button>
+                </form>
+            </div>
+
+        </div>
+
+        <form class="search-form" method="get" action="/topics">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search for title..." autocomplete="off">
+            <button type="submit">SEARCH</button>
+        </form>
+
+        {% if error %}
+            <div class="no-gossip-message">{{ error }}</div>
+        {% endif %}
+
+        {% if flash_message %}
+            <div class="error-message">{{ flash_message }}</div>
+        {% endif %}
+
+        {% if topics %}
+            <div class="topics-grid">
+                {% for topic in topics %}
+                    <div class="topic-card">
+                        <div>
+                            <h3>{{ topic.title }}</h3>
+                            <p class="description-preview">{{ topic.content }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+       {% if not error %}
+            <div class="no-gossip-message">
+                Sweetie, this page is giving crickets...
+                <br>
+                Be the first to drop the tea! 💅🏻
+            </div>
+        {% endif %}
+        {% endif %}
+    </div>
+    {{ macros.footer() }}
+</body>
+</html>

@@ -13,14 +13,15 @@
         <nav class="nav-menu">
 
             <a href="/" class="nav-link">⋆TEA ROOM⋆</a>
-            <a href="products.html" class="nav-link">⋆LATEST BUZZ⋆</a>
+            <a href="/topics/" class="nav-link">⋆LATEST BUZZ⋆</a>
             {% if request.cookies.get("token") %}
                 <a href="/categories" class="nav-link">⋆DRAMA MENU⋆</a>
+                <a href="/topics?author_id=true" class="nav-link">⋆MY SPILLS⋆</a>
             {% else %}
                 <a href="/?error=not_authorized_categories" class="nav-link">⋆DRAMA MENU⋆</a>
             {% endif %}
 
-            <a href="login.html" class="nav-link">⋆MY SPILLS⋆</a>
+
             <div class="conversation-icon">
                 <a href="/conversations/" class="conversations-link">
                     🤫

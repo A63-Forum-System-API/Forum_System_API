@@ -372,4 +372,50 @@ def _mark_reply_as_best(reply_id: int) -> None:
 
     update_query(query, (reply_id,))
 
+def get_authors_of_topics(topics: list[ViewAllTopics]) -> dict[int, str]:
+    """
+    Retrieve the authors of a list of topics.
 
+    Parameters:
+        topics (list[Topic]): The list of topics to retrieve the authors for.
+
+    Returns:
+        dict[int, str]: A dictionary mapping topic IDs to their usernames.
+    """
+    topic_ids = [topic.id for topic in topics]
+
+    if not topic_ids:
+        return {}
+
+    query = """SELECT t.id, u.username 
+                FROM topics t 
+                JOIN users u ON t.author_id = u.id
+                WHERE t.id IN ({})""".format(", ".join("?" * len(topic_ids)))
+
+    author_data = read_query(query, tuple(topic_ids))
+
+    return {topic_id: username for topic_id, username in author_data}
+
+def get_categories_of_topics(topics: list[ViewAllTopics]) -> dict[int, str]:
+    """
+    Retrieve the categories of a list of topics.
+
+    Parameters:
+        topics (list[Topic]): The list of topics to retrieve the categories for.
+
+    Returns:
+        dict[int, str]: A dictionary mapping topic IDs to their category titles.
+    """
+    category_ids = [topic.category_id for topic in topics]
+
+    if not category_ids:
+        return {}
+
+    query = """SELECT t.id, c.title 
+                FROM topics t 
+                JOIN categories c ON t.category_id = c.id
+                WHERE t.id IN ({})""".format(", ".join("?" * len(category_ids)))
+
+    category_data = read_query(query, tuple(category_ids))
+
+    return {topic_id: title for topic_id, title in category_data}
