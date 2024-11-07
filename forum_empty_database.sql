@@ -10,6 +10,8 @@ TRUNCATE TABLE category_accesses;
 
 TRUNCATE TABLE conversations;
 
+TRUNCATE TABLE messages;
+
 TRUNCATE TABLE categories;
 
 TRUNCATE TABLE users;
