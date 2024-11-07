@@ -1,0 +1,17 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE votes;
+
+TRUNCATE TABLE replies;
+
+TRUNCATE TABLE topics;
+
+TRUNCATE TABLE category_accesses;
+
+TRUNCATE TABLE conversations;
+
+TRUNCATE TABLE categories;
+
+TRUNCATE TABLE users;
+
+SET FOREIGN_KEY_CHECKS = 1;
