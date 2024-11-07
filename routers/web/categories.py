@@ -19,7 +19,8 @@ def get_categories(
         error: str | None = None,
 ):
     error_messages = {
-        "not_authorized": "You are not authorized!",
+        "not_authorized": "You need to login first!",
+        "invalid_token": "Your sesh has expired! Please login again!",
         "unknown_error": "Oops! Something went wrong while loading categories 🙈",
         "not_found": "Category not found",
     }
@@ -27,6 +28,7 @@ def get_categories(
     try:
         token = request.cookies.get("token")
         flash_message = request.cookies.get("flash_message")
+
         if not token:
             return RedirectResponse(
                 url="/?error=not_authorized",
@@ -89,7 +91,7 @@ def toggle_lock(
         token = request.cookies.get("token")
         if not token:
             return RedirectResponse(
-                url="/?error=not_authorized_categories",
+                url="/?error=not_authorized",
                 status_code=302
             )
 
@@ -153,7 +155,7 @@ def toggle_access(
         token = request.cookies.get("token")
         if not token:
             return RedirectResponse(
-                url="/?error=not_authorized_categories",
+                url="/?error=not_authorized",
                 status_code=302
             )
 

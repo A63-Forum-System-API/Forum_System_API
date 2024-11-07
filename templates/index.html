@@ -14,6 +14,7 @@
 
     <div class="container">
         <h1>♡₊˚  GOSSIP FORUM ・₊✧</h1>
+
         {% if not request.cookies.get("token") %}
 
             <h1> login </h1>
@@ -70,68 +71,6 @@
         {% endif %}
            <a href="easter-egg.html" class="icon-animation">✗♡✗♡</a>
         </div>
-
-
-<!--        <div class="products-section">-->
-<!--            <div class="product-title">Бургер "Черна дупка"</div>-->
-<!--            <div class="content-wrapper">-->
-<!--                <div class="left-side">-->
-<!--                    <div class="description-block">-->
-<!--                        Гравитационно изкушение с два сочни телешки стека в уникална черна бриош питка с активен въглен. Нашият таен черен сос, хрупкав бекон и топен чедър създават космическо преживяване, което ще погълне сетивата ви! Внимание: Създава гравитационна зависимост!-->
-<!--                    </div>-->
-<!--                    <div class="price-order-section">-->
-<!--                        <div class="product-price">122 ₭</div>-->
-<!--                        <a href="cart.html" class="button">ПОРЪЧАЙ</a>-->
-<!--                    </div>-->
-<!--              </div>-->
-
-<!--                <div class="right-side">-->
-<!--                    <div class="product-image">-->
-<!--                        <img src="/static/images/black-hole-burger.png" alt="Бургер черна дупка">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        <div class="products-section">-->
-<!--            <div class="product-title">Сатурнови пръстени</div>-->
-<!--            <div class="content-wrapper">-->
-<!--                <div class="left-side">-->
-<!--                    <div class="description-block">-->
-<!--                        Двойно панирани хрупкави лучени кръгове, които издават звук на разбиващи се метеорити при всяка хапка. Поднесени с нашия легендарен 'звезден сос' - кремообразна смес от седем галактически подправки.-->
-<!--                    </div>-->
-<!--                    <div class="price-order-section">-->
-<!--                        <div class="product-price">76 ₭</div>-->
-<!--                        <a href="cart.html" class="button">ПОРЪЧАЙ</a>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="right-side">-->
-<!--                    <div class="product-image">-->
-<!--                        <img src="/static/images/saturn-onion-rings.png" alt="Сатурнови пръстени">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        <div class="products-section">-->
-<!--            <div class="product-title">Пулсар пунш</div>-->
-<!--            <div class="content-wrapper">-->
-<!--                <div class="left-side">-->
-<!--                    <div class="description-block">-->
-<!--                        Магическа смес от драконов плод, космическо манго и звезден личи, обогатена със синя спирулина. Излъчва мистериозно сияние в тъмното и носи свежест от далечните галактики.-->
-<!--                    </div>-->
-<!--                    <div class="price-order-section">-->
-<!--                        <div class="product-price">57 ₭</div>-->
-<!--                        <a href="cart.html" class="button">ПОРЪЧАЙ</a>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="right-side">-->
-<!--                    <div class="product-image">-->
-<!--                        <img src="/static/images/pulsar-punch.png" alt="Пулсар пунш">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
 
     {{ macros.footer() }}
 </body>
