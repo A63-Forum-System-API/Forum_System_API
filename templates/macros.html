@@ -21,7 +21,7 @@
             {% endif %}
 
             {% if request.cookies.get("token") %}
-                <a href="/categories" class="nav-link">⋆DRAMA MENU⋆</a>
+                <a href="/topics?author_id=true" class="nav-link">⋆DRAMA MENU⋆</a>
             {% else %}
                 <a href="/?error=not_authorized" class="nav-link">⋆DRAMA MENU⋆</a>
             {% endif %}
@@ -33,13 +33,20 @@
             {% endif %}
 
 
-
-            <a href="login.html" class="nav-link">⋆MY SPILLS⋆</a>
             <div class="conversation-icon">
+                {% if request.cookies.get("token") %}
                 <a href="/conversations/" class="conversations-link">
                     🤫
                     <span class="conversations-count" id="conversationsCount">0</span>
                 </a>
+                {% else %}
+                <a href="/?error=not_authorized" class="conversations-link">
+                    🤫
+                    <span class="conversations-count">0</span>
+                </a>
+                {% endif %}
+
+
             {% if request.cookies.get("token") %}
                 <a href="/users/logout">
                     <svg width="30" height="48" viewBox="0 0 24 24" class="logout-link">
