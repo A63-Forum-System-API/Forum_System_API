@@ -21,13 +21,13 @@
             {% endif %}
 
             {% if request.cookies.get("token") %}
-                <a href="/topics?author_id=true" class="nav-link">⋆DRAMA MENU⋆</a>
+                <a href="/categories/" class="nav-link">⋆DRAMA MENU⋆</a>
             {% else %}
                 <a href="/?error=not_authorized" class="nav-link">⋆DRAMA MENU⋆</a>
             {% endif %}
 
             {% if request.cookies.get("token") %}
-                <a href="/topics/{{ current}}" class="nav-link">⋆MY SPILLS⋆</a>
+                <a href="/topics?author_id=true" class="nav-link">⋆MY SPILLS⋆</a>
             {% else %}
                 <a href="/?error=not_authorized" class="nav-link">⋆MY SPILLS⋆</a>
             {% endif %}
