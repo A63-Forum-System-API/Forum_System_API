@@ -229,7 +229,7 @@ def create_new_category(
             return templates.TemplateResponse(
                 request=request, name="categories.html",
                 context={
-                    "error": f"Category with title '{title}' already exists!"
+                    "error": f"Category with title '{title}' already exists! 🙈"
                 }
             )
 
@@ -241,13 +241,21 @@ def create_new_category(
             status_code=302
         )
 
-    except Exception:
+    except Exception as e:
+        error_message = str(e)
+        if "title" in str(e):
+            error_message = "Title should have at least 5 characters"
+        elif "description" in str(e):
+            error_message = "Description must be at least 5 characters"
+
         return templates.TemplateResponse(
-            request=request, name="categories.html",
+            name="categories.html",
             context={
-                "error": "Oops! Something went wrong 🙈",
-            }
+                "request": request,
+                "error": f"{error_message} 🙈",
+            },
         )
+
 
 @categories_router.get("/{category_id}/manage-access")
 def manage_access(request: Request, category_id: int, error: str | None = None,):

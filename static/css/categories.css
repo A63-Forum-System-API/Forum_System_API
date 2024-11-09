@@ -248,9 +248,40 @@ h1 {
     text-align: center;
     transition: all 0.3s ease;
     position: relative;
-    overflow: hidden;
     height: 150px;
     cursor: pointer;
+}
+
+.category-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: calc(100% - 30px); /* Намаляваме височината за да има място за бутона */
+    width: 100%;
+}
+
+.card-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.access-btn {
+    position: absolute;
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: 'Courier New', monospace;
+    z-index: 2;
+}
+
+.access-btn:hover {
+    color: #40e7ed;
+    text-shadow: 0 0 5px #40e7ed;
 }
 
 .category-card:hover {
@@ -269,6 +300,7 @@ h1 {
 .category-card:hover .description-preview {
     max-height: 134px;
 }
+
 
 .search-form {
     display: flex;
@@ -310,38 +342,6 @@ h1 {
     max-width: 600px;
 }
 
-/* Lock button styling */
-.lock-btn {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-}
-.locked {
-    color: red;
-}
-.unlocked {
-    color: green;
-}
-
-.access-btn {
-    position: relative;
-    bottom: 5px;
-    right: 10px;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    font-family: 'Courier New', monospace;
-}
-
-.access-btn:hover {
-    color: #40e7ed;
-    text-shadow: 0 0 5px #40e7ed;
-}
 
 .private {
     color: #b6eef1;

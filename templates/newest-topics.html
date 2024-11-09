@@ -72,17 +72,20 @@
 
         {% if topics %}
             <div class="categories-grid">
-                {% for topic in topics %}
-                    <div class="category-card">
-                        <a href="/topics/{{ topic.id }}">
-                            <h3>{{ topic.title }}</h3>
-                            <p class="author">By {{ authors_of_topics[topic.id] }}</p>
-                            <p class="category">{{ categories_of_topics[topic.id] }}</p>
+    {% for topic in topics %}
+        <div class="category-card">
+                    <a href="/topics/{{ topic.id }}">
+                        <h3>{{ topic.title }}</h3>
+                        <p class="author">By {{ authors_of_topics[topic.id] }}</p>
+                        <p class="category">{{ categories_of_topics[topic.id] }}</p>
+                        <div class="card-footer">
+                            <p class="date">{{ topic.created_at.strftime('%d/%m/%Y') }}</p>
                             <p class="replies_count">{{ topic.replies_count }} replies</p>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
         {% else %}
        {% if not error %}
             <div class="no-gossip-message">

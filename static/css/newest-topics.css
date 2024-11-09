@@ -329,6 +329,36 @@ h1 {
     text-shadow: 0 0 8px rgba(64, 231, 237, 0.3);
 }
 
+
+/* Контейнер за датата и replies */
+.card-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* Стил за датата */
+.category-card .date {
+    color: #888;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Променяме малко replies_count */
+.category-card .replies_count {
+    margin-top: 0;  /* Премахваме старият margin */
+    color: #40e7ed;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
+}
 /*-----------------*/
 .search-form {
     display: flex;

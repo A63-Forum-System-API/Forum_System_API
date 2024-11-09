@@ -1,3 +1,4 @@
+import mariadb
 from fastapi import APIRouter, Request, Form, Query
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
@@ -151,11 +152,21 @@ def create_topic(
             url=f"/topics/{topic.id}", status_code=302
         )
 
-    except Exception:
+    except Exception as e:
+        error_message = str(e)
+        if "title" in str(e):
+            error_message = "Title should have at least 5 characters"
+        elif "content" in str(e):
+            error_message = "Content should have at least 5 characters"
+        elif "'NoneType' object has no attribute 'id'" in str(e):
+            error_message = "Category does not exist"
+
         return templates.TemplateResponse(
             name="newest-topics.html",
             context={
                 "request": request,
-                "error": "Oops! Something went wrong while creating topic 🙈",
+                "error": f"{error_message} 🙈",
             },
         )
+
+
