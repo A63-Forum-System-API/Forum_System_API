@@ -12,7 +12,13 @@
 
    <div class="container">
        <div class="header-container">
-        <h1>♡₊˚ TOPICS{% if category_title %} IN {{ category_title | upper }}{% endif %} ・₊✧</h1>
+        <h1>♡₊˚ TOPICS IN {{ category_title | upper }}{% endif %} ・₊✧</h1>
+           {% if category_title %}
+
+        <div class="topic-info">
+        <h2 class="title-preview">{{ category_title | upper }}</h2>
+        </div>
+        {% endif %}
 
             <div class="new-topic-container">
                 <input type="checkbox" id="new-topic-toggle" class="toggle-input">
