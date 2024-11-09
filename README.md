@@ -64,5 +64,11 @@ Here's how users can interact with Gossip Forum to get the most out of the exper
 New users can easily create an account by clicking the **"Register"** button on the homepage.
 Registered users can log in using their email and password via the **"Login"** button.
 Once logged in, users can access all features, including creating topics, commenting, and sending private messages.
+
 ![Landing Page](https://imgur.com/OKGWnwD.png)
+
+**2. Exploring Topics & Categories**
+Navigate through various categories to find topics that interest you.
+Click on a topic to read the full thread, upvote or downvote replies, and leave your own comments.
+Use the pagination controls at the bottom of the page to browse through long lists of topics.
 
