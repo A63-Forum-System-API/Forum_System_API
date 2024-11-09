@@ -243,7 +243,7 @@ def create_new_category(
 
     except Exception:
         return templates.TemplateResponse(
-            request=request, name="conversations.html",
+            request=request, name="categories.html",
             context={
                 "error": "Oops! Something went wrong 🙈",
             }
