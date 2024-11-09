@@ -3,6 +3,7 @@ from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from common.auth import get_current_user
+from schemas.topic import CreateTopicRequest
 from services import topic_service, category_service, user_service, reply_service
 
 topics_router = APIRouter(prefix='/topics')
@@ -51,6 +52,7 @@ def get_topic_by_id(request: Request, topic_id: int):
                 "error": "Oops! Something went wrong while loading conversations 🙈",
             }
         )
+
 
 @topics_router.get("/")
 def get_all_topics(
