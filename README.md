@@ -1,4 +1,4 @@
-<h1 align="center"><img src="https://imgur.com/mYAf78I.png" width="500"></h1>
+<h1 align="center"><img src="https://imgur.com/W7RlXaQ.png" width="500"></h1>
 
 
 Welcome to Gossip Forum! 💌✨
@@ -36,3 +36,23 @@ Easily navigate through extensive lists of topics and categories with pagination
 - **Backend**: Python, FastAPI
 - **Database**: MariaDB
 - **Templating Engine**: Jinja2
+
+## 🚀 Installation & Setup
+Follow these steps to set up the project on your local machine:
+
+**1.Clone the repository**
+
+    ```git clone https://github.com/A63-Forum-System-API/Forum_System_API.git```
+
+**2.Install Python dependencies**
+Make sure you have pip installed:
+    
+    ```pip install -r requirements.txt```
+**3.Run the server**
+Start the FastAPI server using uvicorn:
+    
+    ```uvicorn main:app --reload```
+
+The app should now be running at:
+http://localhost:8000
+
