@@ -503,3 +503,15 @@ def has_access(category_id, user_id) -> bool:
     )
     return bool(data)
 
+
+def get_by_title(title: str) -> Category:
+    data = read_query(
+        """SELECT id, title, description, is_private, is_locked, created_at, admin_id
+            FROM categories
+            WHERE title = ?""",
+        (title,),
+    )
+    if not data:
+        return None
+
+    return Category.from_query_result(*data[0])

@@ -12,37 +12,57 @@
 
    <div class="container">
        <div class="header-container">
-        <h1>♡₊˚ TOPICS IN {{ category_title | upper }}{% endif %} ・₊✧</h1>
+        <h1>♡₊˚ TOPICS ・₊✧</h1>
+
            {% if category_title %}
-
-        <div class="topic-info">
-        <h2 class="title-preview">{{ category_title | upper }}</h2>
-        </div>
-        {% endif %}
-
-            <div class="new-topic-container">
-                <input type="checkbox" id="new-topic-toggle" class="toggle-input">
-                <label for="new-topic-toggle" class="new-topic-button">
-                    <svg width="40" height="40" viewbox="0 0 24 24" class="new-topic-icon">
+            <div class="new-category-container">
+                <input type="checkbox" id="new-category-toggle" class="toggle-input">
+                <label for="new-category-toggle" class="new-category-button">
+                    <svg width="40" height="40" viewbox="0 0 24 24" class="new-category-icon">
                         <path fill="#fa057e" d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2 7h-3v3h-2v-3h-3v-2h3V8h2v3h3v2z"/>
                     </svg>
                 </label>
 
-                <form method="POST" action="/topics/" class="new-topic-form">
-                    <input type="text" name="title" placeholder="Topic title..." required autocomplete="off">
+                <form method="POST" action="/topics" class="new-category-form">
+                    <input type="hidden" name="category_title" value="{{ category_title }}">
+                    <input type="text" name="title" placeholder="Topic name..." required autocomplete="off">
                     <textarea name="content" placeholder="Topic content..." required></textarea>
-                    <input type="hidden" name="category_id" value="{{ category_id }}">
-                    <button type="submit" class="submit-new-topic-button">Create new topic</button>
+                    <button type="submit" class="submit-new-category-button">Create new topic</button>
                 </form>
             </div>
+           {% else %}
+              <div class="new-category-container">
+                <input type="checkbox" id="new-category-toggle" class="toggle-input">
+                <label for="new-category-toggle" class="new-category-button">
+                    <svg width="40" height="40" viewbox="0 0 24 24" class="new-category-icon">
+                        <path fill="#fa057e" d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2 7h-3v3h-2v-3h-3v-2h3V8h2v3h3v2z"/>
+                    </svg>
+                </label>
+
+                <form method="POST" action="/topics" class="new-category-form">
+                    <input type="text" name="title" placeholder="Topic name..." required autocomplete="off">
+                    <input type="text" name="category_title" placeholder="Category title..." required autocomplete="off">
+                    <textarea name="content" placeholder="Topic content..." required></textarea>
+                    <button type="submit" class="submit-new-category-button">Create new topic</button>
+                </form>
+            </div>
+              {% endif %}
+
 
         </div>
 
-        <form class="search-form" method="get" action="/topics">
+
+        {% if category_title %}
+            <div class="topic-info">
+                <h2 class="title-preview">Category: {{ category_title | upper }}</h2>
+            </div>
+        {% endif %}
+
+       <form class="search-form" method="get" action="/topics">
             <input type="text" name="search" value="{{ search }}" placeholder="Search for title..." autocomplete="off">
-            {% if category_id %}
-                <input type="hidden" name="category_id" value="{{ category_id }}">
-            {% endif %}
+                {% if category_id %}
+                    <input type="hidden" name="category_id" value="{{ category_id }}">
+                {% endif %}
             <button type="submit">SEARCH</button>
         </form>
 
@@ -50,21 +70,15 @@
             <div class="no-gossip-message">{{ error }}</div>
         {% endif %}
 
-        {% if flash_message %}
-            <div class="error-message">{{ flash_message }}</div>
-        {% endif %}
-
         {% if topics %}
-            <div class="topics-grid">
+            <div class="categories-grid">
                 {% for topic in topics %}
-                    <div class="topic-card">
+                    <div class="category-card">
                         <a href="/topics/{{ topic.id }}">
-                            <div>
-                                <h3>{{ topic.title }}</h3>
-                                <p class="description-preview">{{ topic.title }}</p>
-                                <p class="author">By {{ authors_of_topics[topic.id] }}</p>
-                                <p class="category">Category: {{ categories_of_topics[topic.id] }}</p>
-                            </div>
+                            <h3>{{ topic.title }}</h3>
+                            <p class="author">By {{ authors_of_topics[topic.id] }}</p>
+                            <p class="category">{{ categories_of_topics[topic.id] }}</p>
+                            <p class="replies_count">{{ topic.replies_count }} replies</p>
                         </a>
                     </div>
                 {% endfor %}

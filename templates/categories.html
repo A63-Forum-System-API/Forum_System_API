@@ -12,11 +12,11 @@
 <body>
     {{ macros.header(request) }}
 
-    <div class="container">
-        <div class="header-container">
-            <h1>♡₊˚ CATEGORIES ・₊✧</h1>
+   <div class="container">
+       <div class="header-container">
+        <h1>♡₊˚ CATEGORIES ・₊✧</h1>
 
-            {% if is_admin %}
+           {% if is_admin %}
                 <div class="new-category-container">
                     <input type="checkbox" id="new-category-toggle" class="toggle-input">
                     <label for="new-category-toggle" class="new-category-button">
@@ -78,9 +78,8 @@
                                 </div>
                             </div>
                         {% endif %}
-
                         {% if is_admin and category.is_private %}
-                            <div class="manage-access-button">
+                            <div>
                                 <a href="/categories/{{ category.id }}/manage-access">
                                     <button class="access-btn private" title="Manage Access">
                                         <i class="fas fa-cog"></i> manage access
@@ -88,25 +87,24 @@
                                 </a>
                             </div>
                         {% endif %}
+                        <div>
+                            <h3>{{ category.title }}</h3>
+                            <p class="description-preview">{{ category.description }}</p>
+                        </div>
 
-                        <!-- Category Link -->
-                        <a href="/topics?category_id={{ category.id }}" class="category-link">
-                            <div>
-                                <h3>{{ category.title }}</h3>
-                                <p class="description-preview">{{ category.description }}</p>
-                            </div>
-                        </a>
                     </div>
                 {% endfor %}
+
             </div>
+
         {% else %}
-            {% if not error %}
-                <div class="no-gossip-message">
-                    Sweetie, this category is giving crickets...
-                    <br>
-                    Be the first to drop the tea! 💅🏻
-                </div>
-            {% endif %}
+       {% if not error %}
+            <div class="no-gossip-message">
+                Sweetie, this category is giving crickets...
+                <br>
+                Be the first to drop the tea! 💅🏻
+            </div>
+        {% endif %}
         {% endif %}
     </div>
     {{ macros.footer() }}

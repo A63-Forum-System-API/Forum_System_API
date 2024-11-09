@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, Query
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
@@ -16,7 +16,7 @@ def get_topic_by_id(request: Request, topic_id: int):
         token = request.cookies.get("token")
         if not token:
             return RedirectResponse(
-                url="/?error=not_authorized_categories",
+                url="/?error=not_authorized",
                 status_code=302
             )
 
@@ -57,7 +57,7 @@ def get_topic_by_id(request: Request, topic_id: int):
 @topics_router.get("/")
 def get_all_topics(
         request: Request,
-        search: str | None = None,
+        search: str = Query(default=""),
         category_id: str | None = None,
         author_id: str | None = None,
 ):
@@ -65,7 +65,7 @@ def get_all_topics(
         token = request.cookies.get("token")
         if not token:
             return RedirectResponse(
-                url="/?error=not_authorized_categories", status_code=302
+                url="/?error=not_authorized", status_code=302
             )
 
         try:
@@ -125,13 +125,13 @@ def create_topic(
         request: Request,
         title: str = Form(...),
         content: str = Form(...),
-        category_id: int = Form(...),
+        category_title: str = Form(...),
 ):
     try:
         token = request.cookies.get("token")
         if not token:
             return RedirectResponse(
-                url="/?error=not_authorized_categories", status_code=302
+                url="/?error=not_authorized", status_code=302
             )
 
         try:
@@ -140,14 +140,15 @@ def create_topic(
         except:
             return RedirectResponse(url="/?error=invalid_token", status_code=302)
 
+        category_id = category_service.get_by_title(category_title).id
         topic = CreateTopicRequest(
             title=title, content=content, is_locked=False, category_id=category_id
         )
 
-        topic_service.create(topic, current_user_id)
+        topic = topic_service.create(topic, current_user_id)
 
         return RedirectResponse(
-            url=f"/topics?category_id={category_id}", status_code=302
+            url=f"/topics/{topic.id}", status_code=302
         )
 
     except Exception:
