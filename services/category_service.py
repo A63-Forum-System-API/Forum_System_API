@@ -23,7 +23,7 @@ def get_categories(
     limit: int = 10,
     offset: int = 0,
     current_user_id: int = None,
-):
+) -> list[ViewAllCategories]:
     """
     Retrieve from the database a list of categories with optional filtering and sorting.
     The visibility of categories is determined based on the user's access level. 
