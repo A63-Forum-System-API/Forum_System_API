@@ -42,16 +42,17 @@ Follow these steps to set up the project on your local machine:
 
 **1.Clone the repository**
 
-    ```git clone https://github.com/A63-Forum-System-API/Forum_System_API.git```
+    git clone https://github.com/A63-Forum-System-API/Forum_System_API.git
 
 **2.Install Python dependencies**
 Make sure you have pip installed:
     
-    ```pip install -r requirements.txt```
+    pip install -r requirements.txt
+
 **3.Run the server**
 Start the FastAPI server using uvicorn:
     
-    ```uvicorn main:app --reload```
+    uvicorn main:app --reload
 
 The app should now be running at:
 http://localhost:8000
