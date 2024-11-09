@@ -13,20 +13,40 @@
         <nav class="nav-menu">
 
             <a href="/" class="nav-link">⋆TEA ROOM⋆</a>
-            <a href="/topics/" class="nav-link">⋆LATEST BUZZ⋆</a>
+
             {% if request.cookies.get("token") %}
-                <a href="/categories" class="nav-link">⋆DRAMA MENU⋆</a>
+                <a href="/topics" class="nav-link">⋆LATEST BUZZ⋆</a>
+            {% else %}
+                <a href="/?error=not_authorized" class="nav-link">⋆LATEST BUZZ⋆</a>
+            {% endif %}
+
+            {% if request.cookies.get("token") %}
+                <a href="/categories/" class="nav-link">⋆DRAMA MENU⋆</a>
+            {% else %}
+                <a href="/?error=not_authorized" class="nav-link">⋆DRAMA MENU⋆</a>
+            {% endif %}
+
+            {% if request.cookies.get("token") %}
                 <a href="/topics?author_id=true" class="nav-link">⋆MY SPILLS⋆</a>
             {% else %}
-                <a href="/?error=not_authorized_categories" class="nav-link">⋆DRAMA MENU⋆</a>
+                <a href="/?error=not_authorized" class="nav-link">⋆MY SPILLS⋆</a>
             {% endif %}
 
 
             <div class="conversation-icon">
+                {% if request.cookies.get("token") %}
                 <a href="/conversations/" class="conversations-link">
                     🤫
                     <span class="conversations-count" id="conversationsCount">0</span>
                 </a>
+                {% else %}
+                <a href="/?error=not_authorized" class="conversations-link">
+                    🤫
+                    <span class="conversations-count">0</span>
+                </a>
+                {% endif %}
+
+
             {% if request.cookies.get("token") %}
                 <a href="/users/logout">
                     <svg width="30" height="48" viewBox="0 0 24 24" class="logout-link">
