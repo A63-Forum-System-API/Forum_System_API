@@ -57,3 +57,12 @@ Start the FastAPI server using uvicorn:
 The app should now be running at:
 http://localhost:8000
 
+## 🚀 Usage
+Here's how users can interact with Gossip Forum to get the most out of the experience:
+
+**1. Registration & Login**
+New users can easily create an account by clicking the **"Register"** button on the homepage.
+Registered users can log in using their email and password via the **"Login"** button.
+Once logged in, users can access all features, including creating topics, commenting, and sending private messages.
+![Landing Page](https://imgur.com/OKGWnwD.png)
+
