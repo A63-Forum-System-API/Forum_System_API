@@ -4,13 +4,19 @@ from schemas.topic import ViewAllTopics, Topic, SingleTopic, CreateTopicRequest
 from services import user_service
 
 
-def get_all_topics(search: str | None, category_id: int | None,
-                   author_id: int | None, is_locked: bool | None,
-                   user_id: int, limit: int, offset: int) -> list[ViewAllTopics]:
+def get_all_topics(
+        search: str | None,
+        category_id: int | None,
+        author_id: int | None,
+        is_locked: bool | None,
+        user_id: int,
+        limit: int,
+        offset: int,
+) -> list[ViewAllTopics]:
     """
     Retrieve all topics based on the provided filters.
 
-     Parameters:
+    Parameters:
         search (str | None): A search term to filter topics by title.
         category_id (int | None): The ID of the category to filter topics.
         author_id (int | None): The ID of the author to filter topics.
@@ -23,52 +29,52 @@ def get_all_topics(search: str | None, category_id: int | None,
         list[ViewAllTopics]: A list of topics matching the filters.
     """
 
-    base_query = """SELECT t.id, t.title, t.is_locked, t.created_at, t.author_id , t.category_id, COALESCE(COUNT(r.id), 0) as replies_count
-                FROM topics t
-                JOIN categories c ON t.category_id = c.id
-                LEFT JOIN replies r ON t.id = r.topic_id"""
+    base_query = """SELECT t.id, t.title, t.is_locked, t.created_at, t.author_id, t.category_id,
+                    COALESCE(COUNT(r.id), 0) as replies_count
+                    FROM topics t
+                    JOIN categories c ON t.category_id = c.id
+                    LEFT JOIN replies r ON t.id = r.topic_id"""
 
-    # build conditions and params
-    where_conditions, params = _build_conditions_and_params(search, category_id,
-                                                            author_id, is_locked, user_id)
+    # Build conditions and params
+    where_conditions, params = _build_conditions_and_params(
+        search, category_id, author_id, is_locked, user_id
+    )
 
-    # build final query
-    final_query, params = _build_final_query(base_query, where_conditions,
-                                     params, limit, offset)
+    # Build final query
+    final_query, params = _build_final_query(
+        base_query, where_conditions, params, limit, offset
+    )
 
-    # execute query
+    # Execute query
     topics = read_query(final_query, (*params,))
 
     return [ViewAllTopics.from_query_result(*topic) for topic in topics]
 
 
-def _build_conditions_and_params(search: str | None, category_id: int | None,
-                                 author_id: int | None, is_locked: bool | None,
-                                 user_id: int) -> tuple:
+def _build_conditions_and_params(
+        search: str | None,
+        category_id: int | None,
+        author_id: int | None,
+        is_locked: bool | None,
+        user_id: int,
+) -> tuple[list[str], list]:
     """
     Build the WHERE conditions and parameters for the SQL query based on the provided filters.
-
-    Parameters:
-        search (str | None): A search term to filter topics by title.
-        category_id (int | None): The ID of the category to filter topics.
-         author_id (int | None): The ID of the author to filter topics.
-         is_locked (bool | None): The lock status to filter topics.
-        user_id (int): The ID of the user requesting the topics.
-
-    Returns:
-         tuple: A tuple containing the list of WHERE conditions and the list of parameters.
     """
     where_conditions = []
     params = []
 
-    # check if user is not admin
+    # Check if user is not admin
     if not user_service.is_admin(user_id):
-        where_conditions.append("""(c.is_private = 0 OR (c.is_private = 1 AND EXISTS (SELECT 1 FROM category_accesses ca WHERE ca.category_id = t.category_id AND ca.user_id = ?)))""")
+        where_conditions.append(
+            """(c.is_private = 0 OR (c.is_private = 1 AND EXISTS 
+            (SELECT 1 FROM category_accesses ca WHERE ca.category_id = t.category_id AND ca.user_id = ?)))"""
+        )
         params.append(user_id)
 
-    # check for optional parameters
+    # Check for optional parameters
     if search is not None:
-        where_conditions.append("t.title like ?")
+        where_conditions.append("t.title LIKE ?")
         params.append(f"%{search}%")
 
     if category_id is not None:
@@ -86,31 +92,22 @@ def _build_conditions_and_params(search: str | None, category_id: int | None,
     return where_conditions, params
 
 
-def _build_final_query(base_query: str, where_conditions: list,
-                       params: list, limit: int, offset: int) -> tuple:
+def _build_final_query(
+        base_query: str, where_conditions: list[str], params: list, limit: int, offset: int
+) -> tuple[str, list]:
     """
     Build the final SQL query with the provided base query, conditions, and parameters.
-
-    Parameters:
-         base_query (str): The base SQL query.
-        where_conditions (list): A list of WHERE conditions to apply.
-        params (list): A list of parameters for the SQL query.
-        limit (int): The maximum number of records to return.
-        offset (int): The number of records to skip before starting to return results.
-
-    Returns:
-        tuple: A tuple containing the final SQL query and the list of parameters.
     """
-    where_clause = " WHERE " + " AND ".join(where_conditions) if where_conditions else ""
-    final_query = f"{base_query}{where_clause} GROUP BY t.id LIMIT ? OFFSET ?"
-    params.append(limit)
-    params.append(offset)
+    where_clause = (
+        " WHERE " + " AND ".join(where_conditions) if where_conditions else ""
+    )
+    final_query = f"{base_query}{where_clause} GROUP BY t.id ORDER BY t.created_at DESC LIMIT ? OFFSET ?"
+    params.extend([limit, offset])
 
     return final_query, params
 
 
-def sort_topics(topics: list[ViewAllTopics],
-                reverse=False) -> list[ViewAllTopics]:
+def sort_topics(topics: list[ViewAllTopics], reverse=False) -> list[ViewAllTopics]:
     """
     Sort a list of topics by their creation date.
 
@@ -122,7 +119,7 @@ def sort_topics(topics: list[ViewAllTopics],
         list[ViewAllTopics]: The sorted list of topics.
     """
 
-    return sorted(topics,  key=lambda t: t.created_at, reverse=reverse)
+    return sorted(topics, key=lambda t: t.created_at, reverse=reverse)
 
 
 def get_by_id_with_replies(topic_id: int) -> SingleTopic | None:
@@ -138,12 +135,13 @@ def get_by_id_with_replies(topic_id: int) -> SingleTopic | None:
     query = """
     SELECT 
         t.id, t.title, t.content, t.is_locked, t.category_id, t.created_at, t.best_reply_id, t.author_id,
-        r.id as reply_id, r.content as reply_content, r.topic_id as topic_id, r.created_at as reply_created_at, r.is_best_reply as reply_is_best_reply, r.author_id as reply_author_id,
-        SUM(CASE 
+        r.id as reply_id, r.content as reply_content, r.topic_id as reply_topic_id, r.created_at as reply_created_at,
+        r.is_best_reply as reply_is_best_reply, r.author_id as reply_author_id,
+        COALESCE(SUM(CASE 
                 WHEN v.vote_type = True THEN 1 
                 WHEN v.vote_type = False THEN -1 
                 ELSE 0 
-            END) as vote_count
+            END), 0) as vote_count
     FROM topics t
     LEFT JOIN replies r ON t.id = r.topic_id
     LEFT JOIN votes v ON r.id = v.reply_id
@@ -155,12 +153,12 @@ def get_by_id_with_replies(topic_id: int) -> SingleTopic | None:
     if not data:
         return None
 
-    # create topic
+    # Create topic
     topic_data = data[0][:8]
     topic = Topic.from_query_result(*topic_data)
 
-    # create reply list
-    replies = [_create_reply_from_row(row) for row in data if row[8]]
+    # Create reply list
+    replies = [_create_reply_from_row(row) for row in data if row[8] is not None]
 
     return SingleTopic(topic=topic, all_replies=replies)
 
@@ -175,7 +173,7 @@ def _create_reply_from_row(row) -> Reply:
     Returns:
         Reply: The Reply object created from the row data.
     """
-    reply_data = row[8:]
+    reply_data = row[8:14]
     reply = Reply.from_query_result(*reply_data)
     reply.vote_count = int(row[14])
 
@@ -281,7 +279,9 @@ def validate_topic_author(topic_id: int, user_id: int) -> bool:
     return len(result) > 0
 
 
-def update_best_reply(topic_id: int, reply_id: int, prev_best_reply: int | None) -> None:
+def update_best_reply(
+        topic_id: int, reply_id: int, prev_best_reply: int | None
+) -> None:
     """
     Update the best reply for a topic.
 
@@ -338,15 +338,6 @@ def _mark_reply_as_not_best(reply_id: int) -> None:
     update_query(query, (reply_id,))
 
 
-def get_latest_topics():
-    query = """SELECT t.title, t.content, t.author_id, u.username
-            FROM topics t
-            JOIN users u on t.author_id = u.id
-            ORDER BY created_at DESC
-            """
-    return read_query(query)
-
-
 def _update_topic_best_reply(topic_id: int, reply_id: int) -> None:
     """
     Update the best reply ID for a topic.
@@ -381,12 +372,13 @@ def _mark_reply_as_best(reply_id: int) -> None:
 
     update_query(query, (reply_id,))
 
+
 def get_authors_of_topics(topics: list[ViewAllTopics]) -> dict[int, str]:
     """
     Retrieve the authors of a list of topics.
 
     Parameters:
-        topics (list[Topic]): The list of topics to retrieve the authors for.
+        topics (list[ViewAllTopics]): The list of topics to retrieve the authors for.
 
     Returns:
         dict[int, str]: A dictionary mapping topic IDs to their usernames.
@@ -396,35 +388,38 @@ def get_authors_of_topics(topics: list[ViewAllTopics]) -> dict[int, str]:
     if not topic_ids:
         return {}
 
-    query = """SELECT t.id, u.username 
+    placeholders = ", ".join("?" for _ in topic_ids)
+    query = f"""SELECT t.id, u.username 
                 FROM topics t 
                 JOIN users u ON t.author_id = u.id
-                WHERE t.id IN ({})""".format(", ".join("?" * len(topic_ids)))
+                WHERE t.id IN ({placeholders})"""
 
     author_data = read_query(query, tuple(topic_ids))
 
     return {topic_id: username for topic_id, username in author_data}
+
 
 def get_categories_of_topics(topics: list[ViewAllTopics]) -> dict[int, str]:
     """
     Retrieve the categories of a list of topics.
 
     Parameters:
-        topics (list[Topic]): The list of topics to retrieve the categories for.
+        topics (list[ViewAllTopics]): The list of topics to retrieve the categories for.
 
     Returns:
         dict[int, str]: A dictionary mapping topic IDs to their category titles.
     """
-    category_ids = [topic.category_id for topic in topics]
+    topic_ids = [topic.id for topic in topics]
 
-    if not category_ids:
+    if not topic_ids:
         return {}
 
-    query = """SELECT t.id, c.title 
+    placeholders = ", ".join("?" for _ in topic_ids)
+    query = f"""SELECT t.id, c.title 
                 FROM topics t 
                 JOIN categories c ON t.category_id = c.id
-                WHERE t.id IN ({})""".format(", ".join("?" * len(category_ids)))
+                WHERE t.id IN ({placeholders})"""
 
-    category_data = read_query(query, tuple(category_ids))
+    category_data = read_query(query, tuple(topic_ids))
 
     return {topic_id: title for topic_id, title in category_data}

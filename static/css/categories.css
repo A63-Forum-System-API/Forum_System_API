@@ -14,7 +14,6 @@ body::before {
     z-index: -1;
 }
 
-
 body {
     background-color: #000000;
     color: #ffd700;
@@ -24,6 +23,7 @@ body {
     padding: 20px;
 }
 
+/* Container */
 .container {
     max-width: 800px;
     margin: 0 auto;
@@ -36,6 +36,7 @@ body {
     flex-direction: column;
 }
 
+/* Header */
 h1 {
     text-align: center;
     color: #ffd700;
@@ -44,6 +45,7 @@ h1 {
     margin-left: 170px;
 }
 
+/* Blinking Animation */
 .blink {
     animation: blink 1s infinite;
 }
@@ -54,6 +56,7 @@ h1 {
     100% { opacity: 1; }
 }
 
+/* Icon Animation */
 .icon-animation {
     text-align: center;
     font-size: 35px;
@@ -72,6 +75,7 @@ h1 {
     100% { transform: translateY(0px); }
 }
 
+/* Buttons */
 .button {
     background-color: rgb(44, 1, 22);
     color: #ffd700;
@@ -95,6 +99,7 @@ h1 {
     box-shadow: 0 0 10px #ffd700;
 }
 
+/* Gossip Header */
 .gossip-header {
     background-color: rgba(0, 0, 0, 0.61);
     border-bottom: 2px solid #fa057e;
@@ -184,7 +189,7 @@ h1 {
     transform: scale(1.2);
 }
 
-
+/* Gossip Footer */
 .gossip-footer {
     background-color: rgba(0, 0, 0, 0.61);
     border-top: 2px solid #fa057e;
@@ -231,13 +236,12 @@ h1 {
 
 /*--------------------------------------------*/
 
-
+/* Categories Grid */
 .categories-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     padding: 20px;
-
 }
 
 .category-card {
@@ -250,7 +254,6 @@ h1 {
     position: relative;
     overflow: hidden;
     height: 150px;
-    cursor: pointer;
 }
 
 .category-card:hover {
@@ -310,7 +313,7 @@ h1 {
     max-width: 600px;
 }
 
-/* Lock button styling */
+/* Lock Button Styling */
 .lock-btn {
     position: absolute;
     bottom: 10px;
@@ -320,32 +323,39 @@ h1 {
     cursor: pointer;
     font-size: 18px;
 }
+
 .locked {
     color: red;
 }
+
 .unlocked {
     color: green;
 }
 
-/* Access button styling */
+/* Access Button Styling */
 .access-btn {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
+    position: relative;
+    bottom: 5px;
+    right: 10px;
     background-color: transparent;
     border: none;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
+    font-family: 'Courier New', monospace;
 }
+
+.access-btn:hover {
+    color: #40e7ed;
+    text-shadow: 0 0 5px #40e7ed;
+}
+
 .private {
-    color: red;
-}
-.public {
-    color: green;
+    color: #b6eef1;
 }
 
 /*--------------------------------------------*/
 
+/* Category Controls */
 .category-controls {
     display: flex;
     justify-content: center;
@@ -436,9 +446,20 @@ input:checked + .slider:before {
     opacity: 0.9;
 }
 
+/* Remove underline from category links in category cards */
+.category-card .category-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.category-card .category-link:hover {
+    text-decoration: none;
+}
+
 /*--------------------------------------------*/
 
-
+/* Header Container */
 .header-container {
     display: flex;
     justify-content: space-between;
@@ -465,6 +486,7 @@ input:checked + .slider:before {
     transition: all 0.3s ease;
     display: block;
 }
+
 .new-category-button:hover {
     transform: scale(1.1);
     background: rgba(250, 5, 126, 0.1);
@@ -514,7 +536,6 @@ input:checked + .slider:before {
     box-shadow: 0 0 10px #fa057e;
 }
 
-
 .submit-new-category-button {
     background: #fa057e;
     color: white;
@@ -539,4 +560,163 @@ input:checked + .slider:before {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/*--------------------------------------------*/
+
+/* User Access Management Styles */
+.category-info {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 0px 20px;
+    margin-top: 0;
+}
+
+.category-info h2 {
+    margin-bottom: 15px;
+    color: #ffffff;
+}
+
+.category-info p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+.manage-access-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.manage-access-form {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #fa057e;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 10px;
+    z-index: 1000;
+    width: 100%;
+    box-shadow: 0 0 15px rgba(250, 5, 126, 0.3);
+}
+
+.toggle-input:checked + .access-btn + .manage-access-form {
+    display: block;
+}
+
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.user-access-container {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #fa057e;
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.username-section {
+    flex: 1;
+}
+
+.username-section h3 {
+    margin: 0;
+    color: #ffffff;
+}
+
+.remove-button {
+    background-color: rgba(0, 0, 0, 0.87);
+    border: 1px solid #40e7ed;
+    border-radius: 20px;
+    color: #b6eef1;
+    padding: 5px 15px;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.remove-button:hover {
+    background-color: rgba(64, 231, 237, 0.22);
+    box-shadow: 0 0 8px #40e7ed;
+    color: #40e7ed;
+}
+
+.access-label {
+    color: #b6eef1;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.radio-group {
+    margin: 8px 0;
+}
+
+.custom-radio {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+
+.custom-radio input {
+    display: none;
+}
+
+.radio-control {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #40e7ed;
+    border-radius: 50%;
+    margin-right: 10px;
+    position: relative;
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.87);
+    transition: all 0.3s ease;
+}
+
+.radio-control:before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #40e7ed;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.2s ease;
+}
+
+.custom-radio:hover .radio-control {
+    box-shadow: 0 0 8px #40e7ed;
+}
+
+.custom-radio input:checked + .radio-control:before {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 5px #40e7ed;
+}
+
+.radio-label {
+    color: #b6eef1;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.custom-radio:hover .radio-label {
+    color: #40e7ed;
+    text-shadow: 0 0 5px #40e7ed;
 }
