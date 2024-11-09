@@ -338,6 +338,15 @@ def _mark_reply_as_not_best(reply_id: int) -> None:
     update_query(query, (reply_id,))
 
 
+def get_latest_topics():
+    query = """SELECT t.title, t.content, t.author_id, u.username
+            FROM topics t
+            JOIN users u on t.author_id = u.id
+            ORDER BY created_at DESC
+            """
+    return read_query(query)
+
+
 def _update_topic_best_reply(topic_id: int, reply_id: int) -> None:
     """
     Update the best reply ID for a topic.

@@ -3,6 +3,7 @@ from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from common.auth import get_current_user
+from schemas.topic import CreateTopicRequest
 from services import topic_service, category_service, user_service, reply_service
 
 topics_router = APIRouter(prefix='/topics')
@@ -109,44 +110,50 @@ def get_all_toppics(
             }
         )
 
+
+from fastapi import Form
+
 @topics_router.post("/")
-def create_topic(
+async def create_topic(
         request: Request,
-        title: str,
-        text: str,
-        category_id: int
+        title: str = Form(...),
+        content: str = Form(...),
+        category_id: int = Form(...)
 ):
     try:
         token = request.cookies.get("token")
         if not token:
             return RedirectResponse(
-                url="/?error=not_authorized_categories",
+                url="/?error=not_authorized_topics",
                 status_code=302
             )
 
         try:
             current_user_id = get_current_user(token)
-
-        except:
+        except Exception:
             return RedirectResponse(
                 url="/?error=invalid_token",
                 status_code=302
             )
 
-        topic_service.create(title, text, category_id, current_user_id)
+        # Създаване на тема чрез сървисния слой
+        topic_service.create(CreateTopicRequest(
+            title=title,
+            content=content,
+            category_id=category_id
+        ), current_user_id)
 
         return RedirectResponse(
             url="/topics",
             status_code=302
         )
 
-    except Exception:
+    except Exception as e:
         return templates.TemplateResponse(
-            request=request, name="newest-topics.html",
-            context={
-                "error": "Oops! Something went wrong while creating topic 🙈",
-            }
+            "newest-topics.html",
+            {"request": request, "error": "Oops! Something went wrong while creating topic 🙈"}
         )
+
 
 
 
