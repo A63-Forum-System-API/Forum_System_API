@@ -36,6 +36,8 @@ Easily navigate through extensive lists of topics and categories with pagination
 - **Backend**: Python, FastAPI
 - **Database**: MariaDB
 - **Templating Engine**: Jinja2
+- **Frontend**: HTML, CSS
+- **Authentication**: JWT (JSON Web Tokens)
 
 ## 🚀 Installation & Setup
 Follow these steps to set up the project on your local machine:
