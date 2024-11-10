@@ -18,7 +18,7 @@ Dive into trending discussions, create new topics, and comment on existing threa
 - **Private Messaging**:
 Connect with other users directly through private messages for off-the-record conversations and building connections.
 
-- **Advanced Admin Controls**
+- **Advanced Admin Controls**:
 Administrators have full control to:
 
     - Create and manage categories for better topic organization.
