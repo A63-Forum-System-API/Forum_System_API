@@ -83,4 +83,11 @@ Want to start a new discussion? Click on the "New Topic" button.
 Fill in the title, select the appropriate category, and share your thoughts in the content box.
 Hit "Create new topic" to publish your topic and get the conversation started!
 
-![New Topic](https://imgur.com/RYgPJY2.png)
+![New Topic](https://imgur.com/lIEkMFv.png)
+
+**4. Messaging Other Users**
+Connect with other users through the private messaging feature.
+Open a user's profile and click "Message" to start a private conversation.
+All your messages can be accessed from the inbox on your profile page.
+
+![Messaging](https://imgur.com/iDwrmK2.png)
