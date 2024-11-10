@@ -27,7 +27,7 @@ def get_categories(
     is_admin = False
     try:
         token = request.cookies.get("token")
-        flash_message = request.cookies.get("flash_message")
+        # flash_message = request.cookies.get("flash_message")
 
         if not token:
             return RedirectResponse(
@@ -62,10 +62,10 @@ def get_categories(
                 "search": search,
                 "is_admin": is_admin,
                 "error": error_messages.get(error),
-                "flash_message": flash_message,
+                # "flash_message": flash_message,
             }
         )
-        response.delete_cookie("flash_message")
+        # response.delete_cookie("flash_message")
         return response
 
     except Exception as e:
@@ -133,7 +133,7 @@ def toggle_lock(
                 url=referer_url,
                 status_code=303,
             )
-        response.set_cookie(key="flash_message", value=f"Category id {category_id} was successfully updated!")
+        # response.set_cookie(key="flash_message", value=f"Category id {category_id} was successfully updated!")
         return response
         
 
@@ -197,7 +197,7 @@ def toggle_access(
                 url=referer_url,
                 status_code=303,
             )
-        response.set_cookie(key="flash_message", value=f"Category id {category_id} was successfully updated!")
+        # response.set_cookie(key="flash_message", value=f"Category id {category_id} was successfully updated!")
         return response
         
 
@@ -268,7 +268,7 @@ def manage_access(request: Request, category_id: int, error: str | None = None,)
 
     try:
         referer_url = request.headers.get("referer", "/categories/")
-        flash_message = request.cookies.get("flash_message")
+        # flash_message = request.cookies.get("flash_message")
         token = request.cookies.get("token")
         if not token:
             return RedirectResponse(
@@ -312,10 +312,10 @@ def manage_access(request: Request, category_id: int, error: str | None = None,)
                 "category": category,
                 "accesses": accesses,
                 "error": error_messages.get(error),
-                "flash_message": flash_message,
+                # "flash_message": flash_message,
             }
         )
-        response.delete_cookie("flash_message")
+        # response.delete_cookie("flash_message")
         return response
         
     except Exception as e:
@@ -374,7 +374,7 @@ def remove_access(
                 url=referer_url,
                 status_code=303,
             )
-        response.set_cookie(key="flash_message", value=f"User id {user_id} was successfully removed!")
+        # response.set_cookie(key="flash_message", value=f"User id {user_id} was successfully removed!")
         return response
         
 
@@ -441,7 +441,7 @@ def change_user_access(
                 url=referer_url,
                 status_code=303,
             )
-        response.set_cookie(key="flash_message", value=f"User id {user_id} was successfully updated")
+        # response.set_cookie(key="flash_message", value=f"User id {user_id} was successfully updated")
         return response 
 
     except Exception as e:
@@ -510,7 +510,7 @@ def change_user_access(
                 url=referer_url,
                 status_code=303,
             )
-            response.set_cookie(key="flash_message", value=f"User id {user_id} already is added to the category")
+            # response.set_cookie(key="flash_message", value=f"User id {user_id} already is added to the category")
             return response 
 
         
@@ -521,7 +521,7 @@ def change_user_access(
                 url=referer_url,
                 status_code=303,
             )
-        response.set_cookie(key="flash_message", value=f"User id {user_id} was successfully added")
+        # response.set_cookie(key="flash_message", value=f"User id {user_id} was successfully added")
         return response 
 
     except Exception as e:
