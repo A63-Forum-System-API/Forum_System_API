@@ -9,22 +9,22 @@ Gossip smarter. Share louder. Stay updated.
 
 ## 🌟 Features
 
-- **User Authentication**
+- **User Authentication**:
 Secure login and registration system to ensure privacy. Users can create accounts, log in, and manage their profiles effortlessly.
 
-- **Create, Read, and Interact with Topics**
+- **Create, Read, and Interact with Topics**:
 Dive into trending discussions, create new topics, and comment on existing threads. Engage in lively conversations with the community!
 
-- **Private Messaging**
+- **Private Messaging**:
 Connect with other users directly through private messages for off-the-record conversations and building connections.
 
 - **Advanced Admin Controls**
 Administrators have full control to:
 
-- Create and manage categories for better topic organization.
-- Control user access levels and permissions.
-- Oversee all topics, categories, and user interactions.
--👍 Upvoting, 👎 Downvoting, and ⭐ Best Reply
+    - Create and manage categories for better topic organization.
+    - Control user access levels and permissions.
+    - Oversee all topics, categories, and user interactions.
+    -👍 Upvoting, 👎 Downvoting, and ⭐ Best Reply
 Encourage quality content by upvoting helpful replies, downvoting irrelevant ones, and marking the most helpful response as the "Best Reply."
 
 - **Pagination & Filtering**
